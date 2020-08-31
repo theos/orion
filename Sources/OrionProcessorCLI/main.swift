@@ -2,7 +2,7 @@ import Foundation
 import OrionProcessor
 
 extension OrionGenerator.Backend {
-    static let substrate: Self = .init(name: "Substrate.OrionBackend", module: "SubstrateOrionBackend")
+    static let substrate: Self = .init(name: "SubstrateBackend", module: "SubstrateOrionBackend")
 
     static let all: [String: Self] = [
         "internal": .internal,

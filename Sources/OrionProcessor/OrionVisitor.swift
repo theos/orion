@@ -3,7 +3,7 @@ import SwiftSyntax
 
 private extension Diagnostic.Message {
     static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
-        .init(.error, "A \(declKind) cannot be private or fileprivate")
+        .init(.error, "A \(declKind) cannot be private, fileprivate, or final")
     }
     static func multipleDecls() -> Diagnostic.Message {
         .init(.error, "A type can only be a single type of hook or tweak")
@@ -15,6 +15,7 @@ class OrionVisitor: SyntaxVisitor {
     private static let functionHookTypes: Set<String> = ["FunctionHook"]
     private static let defaultTweakTypes: Set<String> = ["Tweak"]
     private static let backendTweakTypes: Set<String> = ["TweakWithBackend"]
+    private static let uninheritableModifiers: Set<String> = ["private", "fileprivate", "final"]
 
     let converter: SourceLocationConverter
     let diagnosticEngine: DiagnosticEngine
@@ -143,7 +144,10 @@ class OrionVisitor: SyntaxVisitor {
             .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
                 guard let modifiers = decl.modifiers else { return true }
-                return !modifiers.contains { $0.name.text == "private" || $0.name.text == "fileprivate" }
+                // we intentionally don't emit a warning here; this allows users to
+                // use one of these declarations to add a helper function, which isn't
+                // actually a hook, to a hook type
+                return !modifiers.contains { Self.uninheritableModifiers.contains($0.name.text) }
             }
             .map { function -> OrionData.ClassHook.Method in
                 let isClass = functionHasClass(function)
@@ -202,13 +206,13 @@ class OrionVisitor: SyntaxVisitor {
         case 0: return nil
         case 1:
             let kind = declarationKinds[0]
-            let privateFileprivate = modifiers?.filter { $0.name.text == "private" || $0.name.text == "fileprivate" } ?? []
-            if !privateFileprivate.isEmpty {
+            let uninheritable = modifiers?.filter { Self.uninheritableModifiers.contains($0.name.text) } ?? []
+            if !uninheritable.isEmpty {
                 diagnosticEngine.diagnose(
                     .invalidDeclAccess(declKind: "\(kind)"),
-                    location: privateFileprivate[0].startLocation(converter: converter)
+                    location: uninheritable[0].startLocation(converter: converter)
                 ) { builder in
-                    privateFileprivate.forEach {
+                    uninheritable.forEach {
                         builder.fixItRemove($0.sourceRange(converter: self.converter))
                     }
                 }

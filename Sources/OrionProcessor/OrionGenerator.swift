@@ -191,7 +191,7 @@ public final class OrionGenerator {
         @_cdecl("__orion_constructor")
         func __orion_constructor() {
             \(tweakName)().activate(
-            \(hasCustomBackend ? "" : "backend: \(backend.name)(),\n")\
+                \(hasCustomBackend ? "" : "backend: \(backend.name)(),\n")\
                 hooks: [
                     \(allHooks)
                 ]
