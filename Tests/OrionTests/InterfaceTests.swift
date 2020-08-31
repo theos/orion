@@ -12,20 +12,24 @@ import Orion
 
 final class InterfaceTests: XCTestCase {
 
+    func testClass() {
+        _ = Class("NSDate", interface: DateClassInterface.self).dateWithNaturalLanguageString("today")
+    }
+
     func testInstanceInterface() {
-        XCTAssertFalse(NSDate(timeIntervalSince1970: 0).withInterface(DateInterface.self).isInToday)
-        XCTAssertTrue(NSDate().withInterface(DateInterface.self).isInToday)
+        XCTAssertFalse(NSDate(timeIntervalSince1970: 0).as(interface: DateInterface.self).isInToday)
+        XCTAssertTrue(NSDate().as(interface: DateInterface.self).isInToday)
     }
 
     func testClassInterface() {
         XCTAssertEqual(
             Calendar.current.startOfDay(for: Date()),
-            NSDate.withInterface(DateClassInterface.self).dateWithNaturalLanguageString("today") as Date
+            NSDate.as(interface: DateClassInterface.self).dateWithNaturalLanguageString("today") as Date
         )
     }
 
     func testAllocInterface() {
-        let date = NSDate.allocWithInterface(DateInterface.self).`init`(timeIntervalSince1970: 0)
+        let date = NSDate.alloc(interface: DateInterface.self).`init`(timeIntervalSince1970: 0)
         XCTAssertEqual(date as Date, Date(timeIntervalSince1970: 0))
     }
 
