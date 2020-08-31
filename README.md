@@ -1,3 +1,3 @@
-# LogosSwift
+# Orion
 
-A description of this package.
+An elegant DSL for tweak development in Swift.

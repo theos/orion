@@ -1,33 +1,58 @@
 // swift-tools-version:5.1
 
 import PackageDescription
+import Foundation
+
+enum Builder {
+    case theos
+    case xcode
+    case spm
+}
 
 let swiftSyntaxVersion: Version = {
     #if swift(>=5.3)
     #error("""
-    Logos.swift does not support this version of Swift yet. \
-    Please check https://github.com/theos/Logos.swift for progress updates.
+    Orion does not support this version of Swift yet. \
+    Please check https://github.com/theos/Orion for progress updates.
     """)
     #elseif swift(>=5.2)
     return "0.50200.0"
     #elseif swift(>=5.1)
-    #error("Logos.swift does not support Swift 5.1 yet, but support is planned.")
+    #error("Orion does not support Swift 5.1 yet, but support is coming soon.")
     return "0.50100.0"
     #else
-    #error("Logos.swift does not support versions of Swift lower than 5.1.")
+    #error("Orion does not support versions of Swift lower than 5.1.")
     #endif
 }()
 
+let builder: Builder
+let env = ProcessInfo.processInfo.environment
+if env["SPM_THEOS_BUILD"] == "1" {
+    builder = .theos
+} else if env["XPC_SERVICE_NAME"]?.hasPrefix("com.apple.dt.Xcode.") == true {
+    builder = .xcode
+} else {
+    builder = .spm
+}
+
+let rpathLinkerSettings: [LinkerSetting]? = builder == .xcode ? [
+    .unsafeFlags([
+        // we need this for SwiftSyntax to find lib_InternalSwiftSyntaxParser.dylib. Not needed if we use
+        // generate-xcodeproj but it's required if the package is opened directly.
+        "-rpath", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx"
+    ])
+] : nil
+
 var package = Package(
-    name: "LogosSwift",
+    name: "Orion",
     products: [
         .library(
-            name: "LogosSwiftProcessor",
-            targets: ["LogosSwiftProcessor"]
+            name: "OrionProcessor",
+            targets: ["OrionProcessor"]
         ),
         .executable(
-            name: "logos-swift",
-            targets: ["LogosSwiftProcessorCLI"]
+            name: "orion",
+            targets: ["OrionProcessorCLI"]
         ),
     ],
     dependencies: [
@@ -36,24 +61,17 @@ var package = Package(
     ],
     targets: [
         .target(
-            name: "LogosSwiftProcessor",
+            name: "OrionProcessor",
             dependencies: ["SwiftSyntax"]
         ),
         .target(
-            name: "LogosSwiftProcessorCLI",
-            dependencies: ["LogosSwiftProcessor"]
-//            linkerSettings: [
-//                .unsafeFlags(
-//                    // we need this for SwiftSyntax to find lib_InternalSwiftSyntaxParser.dylib. Not needed if we use
-//                    // generate-xcodeproj but it's required if the package is opened directly.
-//                    ["-rpath", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx"],
-//                    .when(platforms: [.macOS])
-//                )
-//            ]
+            name: "OrionProcessorCLI",
+            dependencies: ["OrionProcessor"],
+            linkerSettings: rpathLinkerSettings
         ),
         .testTarget(
-            name: "LogosSwiftProcessorTests",
-            dependencies: ["LogosSwiftProcessor"],
+            name: "OrionProcessorTests",
+            dependencies: ["OrionProcessor"],
             linkerSettings: [
                 .unsafeFlags(
                     // we need this for SwiftSyntax to find lib_InternalSwiftSyntaxParser.dylib. Not needed if we use
@@ -69,27 +87,27 @@ var package = Package(
 #if canImport(ObjectiveC)
 package.products += [
     .library(
-        name: "LogosSwift",
-        targets: ["LogosSwift"]
+        name: "Orion",
+        targets: ["Orion"]
     ),
 ]
 
 package.targets += [
     .target(
-        name: "LogosSwiftC",
+        name: "OrionC",
         dependencies: []
     ),
     .target(
-        name: "LogosSwift",
-        dependencies: ["LogosSwiftC"]
+        name: "Orion",
+        dependencies: ["OrionC"]
     ),
     .target(
-        name: "LogosSwiftTestSupport",
-        dependencies: ["LogosSwift"]
+        name: "OrionTestSupport",
+        dependencies: ["Orion"]
     ),
     .testTarget(
-        name: "LogosSwiftTests",
-        dependencies: ["LogosSwift", "LogosSwiftTestSupport"]
+        name: "OrionTests",
+        dependencies: ["Orion", "OrionTestSupport"]
     ),
 ]
 #endif

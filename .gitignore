@@ -3,3 +3,6 @@
 /Packages
 /*.xcodeproj
 xcuserdata/
+
+Output
+.framework_build

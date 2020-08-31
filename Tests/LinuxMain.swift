@@ -1,7 +1,7 @@
 import XCTest
 
-import LogosSwiftProcessorTests
+import OrionProcessorTests
 
 var tests = [XCTestCaseEntry]()
-tests += LogosSwiftProcessorTests.allTests()
+tests += OrionProcessorTests.allTests()
 XCTMain(tests)
