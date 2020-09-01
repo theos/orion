@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol _ClassHookProtocol: AnyHook {
+public protocol _ClassHookProtocol: class, AnyHook {
     associatedtype Target: AnyObject
 
     static var target: Target.Type { get }
@@ -9,7 +9,7 @@ public protocol _ClassHookProtocol: AnyHook {
     init(target: Target)
 }
 
-open class ClassHook<Target: AnyObject>: _ClassHookProtocol {
+@objcMembers open class ClassHook<Target: AnyObject>: _ClassHookProtocol {
     open var target: Target
     public required init(target: Target) { self.target = target }
 
@@ -37,87 +37,57 @@ open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
 
 public typealias NamedClassHook<Target: AnyObject> = _NamedClassHookClass<Target> & _NamedClassHookProtocol
 
-public enum ClassRequest {
-    case selfCall
-    case origCall
-    case superCall
-}
+public protocol _ConcreteClassHook: ConcreteHook {
+    static var _orig: AnyClass { get }
+    var _orig: AnyObject { get }
 
-public protocol ConcreteClassHook: ConcreteHook {
-    static var callState: CallState<ClassRequest> { get }
-    var callState: CallState<ClassRequest> { get }
+    static var _supr: AnyClass { get }
+    var _supr: AnyObject { get }
 }
 
 extension _ClassHookProtocol {
-    private func makeRequest<Result>(
-        _ request: ClassRequest,
-        transition: CallStateTransition,
-        _ block: () throws -> Result
-    ) rethrows -> Result {
-        guard let concrete = self as? ConcreteClassHook else {
-            fatalError("\(type(of: self)) is not a concrete function hook")
-        }
-        concrete.callState.makeRequest(request, transition: transition)
-        return try block()
-    }
 
-    private static func makeRequest<Result>(
-        _ request: ClassRequest,
-        transition: CallStateTransition,
-        _ block: () throws -> Result
-    ) rethrows -> Result {
-        guard let concrete = self as? ConcreteClassHook.Type else {
-            fatalError("\(self) is not a concrete function hook")
-        }
-        concrete.callState.makeRequest(request, transition: transition)
-        return try block()
+    @discardableResult
+    public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
+        guard let unwrapped = (self as? _ConcreteClassHook)?._orig as? Self
+            else { fatalError("Could not get orig") }
+        return try block(unwrapped)
     }
 
     @discardableResult
-    public func orig<Result>(
-        transition: CallStateTransition = .default,
-        _ block: () throws -> Result
-    ) rethrows -> Result {
-        try makeRequest(.origCall, transition: transition, block)
+    public static func orig<Result>(_ block: (Self.Type) throws -> Result) rethrows -> Result {
+        guard let unwrapped = (self as? _ConcreteClassHook.Type)?._orig as? Self.Type
+            else { fatalError("Could not get orig") }
+        return try block(unwrapped)
     }
 
     @discardableResult
-    public static func orig<Result>(
-        transition: CallStateTransition = .default,
-        _ block: () throws -> Result
-    ) rethrows -> Result {
-        try makeRequest(.origCall, transition: transition, block)
+    public func supr<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
+        guard let unwrapped = (self as? _ConcreteClassHook)?._supr as? Self
+            else { fatalError("Could not get supr") }
+        return try block(unwrapped)
     }
 
     @discardableResult
-    public func supr<Result>(
-        transition: CallStateTransition = .default,
-        _ block: () throws -> Result
-    ) rethrows -> Result {
-        try makeRequest(.superCall, transition: transition, block)
+    public static func supr<Result>(_ block: (Self.Type) throws -> Result) rethrows -> Result {
+        guard let unwrapped = (self as? _ConcreteClassHook.Type)?._supr as? Self.Type
+            else { fatalError("Could not get supr") }
+        return try block(unwrapped)
     }
 
-    @discardableResult
-    public static func supr<Result>(
-        transition: CallStateTransition = .default,
-        _ block: () throws -> Result
-    ) rethrows -> Result {
-        try makeRequest(.superCall, transition: transition, block)
-    }
-
-    // used to recurse within a hook; use recurse { self.hook() }, not self.hook()
-    @discardableResult
-    public func recurse<Result>(_ block: () throws -> Result) rethrows -> Result {
-        try makeRequest(.selfCall, transition: .atomic, block)
-    }
-
-    @discardableResult
-    public static func recurse<Result>(_ block: () throws -> Result) rethrows -> Result {
-        try makeRequest(.selfCall, transition: .atomic, block)
-    }
 }
 
-extension _ClassHookProtocol where Self: ConcreteClassHook {
+public protocol ConcreteClassHook: _ConcreteClassHook, _ClassHookProtocol {
+    associatedtype OrigType: _ClassHookProtocol where OrigType.Target == Target
+    associatedtype SuprType: _ClassHookProtocol where SuprType.Target == Target
+}
+extension ConcreteClassHook {
+    public static var _orig: AnyClass { OrigType.self }
+    public var _orig: AnyObject { OrigType(target: target) }
+
+    public static var _supr: AnyClass { SuprType.self }
+    public var _supr: AnyObject { SuprType(target: target) }
+
     public static func register<Code>(_ backend: Backend, _ sel: Selector, _ replacement: inout Code, isClassMethod: Bool = false) {
         let cls: AnyClass = isClassMethod ? object_getClass(Self.target)! : Self.target
         replacement = backend.hookMethod(cls: cls, sel: sel, replacement: replacement)

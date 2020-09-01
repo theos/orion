@@ -28,43 +28,48 @@ public struct Function: CustomStringConvertible {
     public var description: String { descriptor.description }
 }
 
-public protocol FunctionHook: class, AnyHook {
+public protocol _FunctionHookProtocol: class, AnyHook {
     static var target: Function { get }
+    init()
 }
-extension FunctionHook {
+extension _FunctionHookProtocol {
     public static func activate(withBackend backend: Backend) {
         fatalError("\(type(of: self)) is not a concrete function hook")
     }
 }
 
-public enum FunctionRequest {
-    case origCall
+open class _FunctionHookClass {
+    required public init() {}
 }
+
+public typealias FunctionHook = _FunctionHookClass & _FunctionHookProtocol
 
 public protocol _ConcreteFunctionHook: ConcreteHook {
-    var callState: CallState<FunctionRequest> { get }
+    static var _orig: AnyClass { get }
+    var _orig: AnyObject { get }
 }
 
-extension FunctionHook {
+extension _FunctionHookProtocol {
     @discardableResult
-    public func orig<Result>(
-        transition: CallStateTransition = .default,
-        _ block: () throws -> Result
-    ) rethrows -> Result {
-        guard let concrete = self as? _ConcreteFunctionHook else {
-            fatalError("\(type(of: self)) is not a concrete function hook")
-        }
-        concrete.callState.makeRequest(.origCall, transition: transition)
-        return try block()
+    public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
+        guard let unwrapped = (self as? _ConcreteFunctionHook)?._orig as? Self
+            else { fatalError("Could not get orig") }
+        return try block(unwrapped)
     }
 }
 
-public protocol ConcreteFunctionHook: _ConcreteFunctionHook, FunctionHook {
+public protocol ConcreteFunctionHook: _ConcreteFunctionHook, _FunctionHookProtocol {
     associatedtype Code
     static var origFunction: Code { get set }
+
+    associatedtype OrigType: _FunctionHookProtocol
 }
+
 extension ConcreteFunctionHook {
     public static func activate(withBackend backend: Backend) {
         origFunction = backend.hookFunction(target, replacement: origFunction)
     }
+
+    public static var _orig: AnyClass { OrigType.self }
+    public var _orig: AnyObject { OrigType() }
 }

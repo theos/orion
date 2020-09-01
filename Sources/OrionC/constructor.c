@@ -1,7 +1,7 @@
 #include <stdbool.h>
 
 // since Orion is linked statically, this symbol should be found while linking;
-// it's declared in the Swift companion file as @_cdecl("__orion_constructor")
+// it's declared in the Swift glue file as @_cdecl("__orion_constructor")
 extern void __orion_constructor(void);
 
 // in order to not optimize out the constructor, we call it again from within Tweak.swift.

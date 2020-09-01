@@ -2,33 +2,6 @@ import XCTest
 import Orion
 import OrionTestSupport
 
-class PropertyHookX: ClassHook<PropertyClass> {
-    @Property(.nonatomic) var x = 1
-
-    func getXValue() -> Int { print("getting x"); return x }
-    func setXValue(_ x: Int) { print("setting x"); self.x = x }
-}
-
-class PropertyHookY: ClassHook<PropertyClass> {
-    @Property(.nonatomic) var x = 1
-
-    func getYValue() -> Int { x }
-
-    func setYValue(_ x: Int) {
-        self.x = x
-    }
-}
-
-class PropertyHook2: ClassHook<PropertyClass2> {
-    @Property(.nonatomic) var x = 1
-
-    func getXValue() -> Int { x }
-
-    func setXValue(_ x: Int) {
-        self.x = x
-    }
-}
-
 final class PropertyTests: XCTestCase {
 
     func testBasic() {

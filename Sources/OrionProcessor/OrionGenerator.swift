@@ -2,10 +2,29 @@ import Foundation
 import SwiftSyntax
 
 private extension Sequence {
+    // y u no variadic generics, swift :/
+
     func unzip<T1, T2>() -> ([T1], [T2]) where Element == (T1, T2) {
         reduce(into: ([] as [T1], [] as [T2])) { arrays, element in
             arrays.0.append(element.0)
             arrays.1.append(element.1)
+        }
+    }
+
+    func unzip<T1, T2, T3>() -> ([T1], [T2], [T3]) where Element == (T1, T2, T3) {
+        reduce(into: ([] as [T1], [] as [T2], [] as [T3])) { arrays, element in
+            arrays.0.append(element.0)
+            arrays.1.append(element.1)
+            arrays.2.append(element.2)
+        }
+    }
+
+    func unzip<T1, T2, T3, T4>() -> ([T1], [T2], [T3], [T4]) where Element == (T1, T2, T3, T4) {
+        reduce(into: ([] as [T1], [] as [T2], [] as [T3], [] as [T4])) { arrays, element in
+            arrays.0.append(element.0)
+            arrays.1.append(element.1)
+            arrays.2.append(element.2)
+            arrays.3.append(element.3)
         }
     }
 }
@@ -49,56 +68,73 @@ public final class OrionGenerator {
         from method: OrionData.ClassHook.Method,
         className: String,
         index: Int
-    ) -> (hook: String, register: String) {
+    ) -> (orig: String, supr: String, main: String, register: String) {
         let args = arguments(for: method.function)
         let argsList = args.joined(separator: ", ")
         let commaArgs = args.isEmpty ? "" : ", \(argsList)"
-        let orig = "orion_orig\(index)"
-        let sel = "orion_sel\(index)"
+        let origIdent = "orion_orig\(index)"
+        let selIdent = "orion_sel\(index)"
+
+        let funcOverride = "\(method.hasObjcAttribute ? "" : "@objc ")\(method.function.function)"
+
+        let orig = """
+        \(funcOverride) {
+            Self.\(origIdent)(target, Self.\(selIdent)\(commaArgs))
+        }
+        """
+
+        let supr = """
+        \(funcOverride) {
+            callSuper((@convention(c) \(method.superClosure)).self) { $0($1, Self.\(selIdent)\(commaArgs)) }
+        }
+        """
+
         // say there's a method foo() and another named foo(bar:). #selector(foo) will result in an error
         // because it could refer to either. Adding the signature disambiguates.
         let selSig = "\(method.isClassMethod ? "" : "(Self) -> ")\(method.function.closure)"
-        let hook = """
-        private static var \(orig): @convention(c) \(method.methodClosure) = { target, _cmd\(commaArgs) in
+        let main = """
+        private static let \(selIdent) = #selector(\(method.function.identifier) as \(selSig))
+        private static var \(origIdent): @convention(c) \(method.methodClosure) = { target, _cmd\(commaArgs) in
             \(className)\(method.isClassMethod ? "" : "(target: target)").\(method.function.identifier)(\(argsList))
-        }
-        private static let \(sel) = #selector(\(method.function.identifier) as \(selSig))
-        \(method.hasObjcAttribute ? "" : "@objc ")\(method.function.function) {
-            switch callState.fetchRequest() {
-            case nil, .selfCall:
-                return super.\(method.function.identifier)(\(argsList))
-            case .origCall:
-                return Self.\(orig)(target, Self.\(sel)\(commaArgs))
-            case .superCall:
-                return callSuper((@convention(c) \(method.superClosure)).self) { $0($1, Self.\(sel)\(commaArgs)) }
-            }
         }
         """
 
         let register = """
-        register(backend, \(sel), &\(orig), isClassMethod: \(method.isClassMethod))
+        register(backend, \(selIdent), &\(origIdent), isClassMethod: \(method.isClassMethod))
         """
 
-        return (hook, register)
+        return (orig, supr, main, register)
     }
 
     private func generateConcreteClassHook(from classHook: OrionData.ClassHook, idx: Int) -> (hook: String, name: String) {
+        func indentAndJoin(_ elements: [String], by level: Int) -> String {
+            let indent = String(repeating: "    ", count: level)
+            return elements.map {
+                $0.split(separator: "\n").map { "\(indent)\($0)" }.joined(separator: "\n")
+            }.joined(separator: "\n\n")
+        }
+
         let className = "Orion_ClassHook\(idx)"
 
-        let (methods, registers) = classHook.methods.enumerated()
+        let (origs, suprs, mains, registers) = classHook.methods.enumerated()
             .map { generateConcreteMethodHook(from: $1, className: className, index: $0 + 1) }
             .unzip()
 
-        let indentedMethods = methods.map {
-            $0.split(separator: "\n").map { "    \($0)" }.joined(separator: "\n")
-        }.joined(separator: "\n\n")
+        let indentedOrigs = indentAndJoin(origs, by: 2)
+        let indentedSuprs = indentAndJoin(suprs, by: 2)
+        let indentedMains = indentAndJoin(mains, by: 1)
 
         let hook = """
-        private final class \(className): \(classHook.name), ConcreteClassHook {
-            static let callState = CallState<ClassRequest>()
-            let callState = CallState<ClassRequest>()
+        private class \(className): \(classHook.name), ConcreteClassHook {
+            final class OrigType: \(className) {
+        \(indentedOrigs)
+            }
 
-        \(indentedMethods)
+            final class SuprType: \(className) {
+        \(indentedSuprs)
+            }
+
+        \(indentedMains)
 
             static func activate(withBackend backend: Backend) {
                 \(registers.joined(separator: "\n        "))
@@ -115,19 +151,14 @@ public final class OrionGenerator {
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
         let hook = """
-        private final class \(className): \(functionHook.name), ConcreteFunctionHook {
-            let callState = CallState<FunctionRequest>()
-
+        private class \(className): \(functionHook.name), ConcreteFunctionHook {
             static var origFunction: @convention(c) \(functionHook.function.closure) = { \(argsIn)
                 \(className)().\(functionHook.function.identifier)(\(argsList))
             }
 
-            \(functionHook.function.function) {
-                switch callState.fetchRequest() {
-                case nil:
-                    return super.\(functionHook.function.identifier)(\(argsList))
-                case .origCall:
-                    return Self.origFunction(\(argsList))
+            final class OrigType: \(className) {
+                \(functionHook.function.function) {
+                    Self.origFunction(\(argsList))
                 }
             }
         }

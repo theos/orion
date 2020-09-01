@@ -54,6 +54,10 @@ var package = Package(
             name: "orion",
             targets: ["OrionProcessorCLI"]
         ),
+        .executable(
+            name: "generate-test-fixtures",
+            targets: ["GenerateTestFixtures"]
+        ),
     ],
     dependencies: [
 //        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
@@ -69,17 +73,15 @@ var package = Package(
             dependencies: ["OrionProcessor"],
             linkerSettings: rpathLinkerSettings
         ),
+        .target(
+            name: "GenerateTestFixtures",
+            dependencies: ["OrionProcessor"],
+            linkerSettings: rpathLinkerSettings
+        ),
         .testTarget(
             name: "OrionProcessorTests",
             dependencies: ["OrionProcessor"],
-            linkerSettings: [
-                .unsafeFlags(
-                    // we need this for SwiftSyntax to find lib_InternalSwiftSyntaxParser.dylib. Not needed if we use
-                    // generate-xcodeproj but it's required if the package is opened directly.
-                    ["-rpath", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx"],
-                    .when(platforms: [.macOS])
-                )
-            ]
+            linkerSettings: rpathLinkerSettings
         ),
     ]
 )
