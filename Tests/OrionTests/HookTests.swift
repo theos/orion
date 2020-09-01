@@ -36,7 +36,14 @@ final class HookTests: XCTestCase {
 
     func testInitHook() {
         let cls = InitClass(x: 5)
-        XCTAssertFalse(cls.origInitCalled)
+        switch cls.initType {
+        case .none:
+            break
+        case .regular:
+            XCTFail("Hook called -[InitClass init] instead of -[NSObject init]")
+        case .withX:
+            XCTFail("Hook did not prevent original -[InitClass initWithX:] from being called")
+        }
         XCTAssertEqual(cls.x, 6)
     }
 

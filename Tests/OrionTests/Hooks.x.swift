@@ -72,8 +72,8 @@ class SuperHook: ClassHook<MyClass> {
 class PropertyHookX: ClassHook<PropertyClass> {
     @Property(.nonatomic) var x = 1
 
-    func getXValue() -> Int { print("getting x"); return x }
-    func setXValue(_ x: Int) { print("setting x"); self.x = x }
+    func getXValue() -> Int { x }
+    func setXValue(_ x: Int) { self.x = x }
 }
 
 class PropertyHookY: ClassHook<PropertyClass> {
