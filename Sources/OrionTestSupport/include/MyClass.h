@@ -8,6 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) size_t bar;
 @property (nonatomic, nullable) NSString *baz;
 @property (nonatomic, nullable) NSString *woz;
+@property (nonatomic, readonly) NSString *hooked;
 
 @end
 

@@ -2,7 +2,11 @@ import Foundation
 
 final class ReadWriteLock {
 
-    private var lock: pthread_rwlock_t
+    // I have absolutely ZERO clue why but this has to either be an IUO
+    // or have a layer of indirection (eg a computed property with
+    // `get { lock } set { lock = newValue }`) or else we get deadlock on
+    // the *first* lock attempt.
+    private var lock: pthread_rwlock_t!
 
     @discardableResult
     private static func check(

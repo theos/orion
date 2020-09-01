@@ -1,5 +1,6 @@
 import XCTest
 import Orion
+import OrionTestSupport
 
 // NOTE: We don't need the linux testing stuff here because the
 // runtime can only be built on platforms with Objective-C
@@ -29,6 +30,25 @@ class MyHook: NamedClassHook<NSObject> {
     }
 }
 
+class SuperHook: ClassHook<MyClass> {
+    @Property(.nonatomic) var x = 11
+
+    func description() -> String {
+        "hax description: \(supr { description() })"
+    }
+
+    func hooked() -> String {
+        if x == 0 {
+            return "zero"
+        } else {
+            x -= 1
+            return orig {
+                "orig: \(hooked()). hax hooked \(supr { description() }). x=\(x), prev=\(recurse { hooked() })"
+            }
+        }
+    }
+}
+
 final class HookTests: XCTestCase {
     func testClassHook() throws {
         // TODO: Maybe don't swizzle system stuff in tests? It might break the XCTest harness in
@@ -43,5 +63,18 @@ final class HookTests: XCTestCase {
 
         let str = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none)
         XCTAssertEqual(str, "Class method: Jan 1, 1970")
+    }
+
+    func testSuper() {
+        let cls = MyClass()
+        let desc = cls.description
+        XCTAssert(desc.hasPrefix("hax description: <MyClass: 0x"))
+    }
+
+    func testSuperSecond() {
+        let cls = MyClass()
+        let hooked = cls.hooked
+        XCTAssert(hooked.hasPrefix("orig: regular hooked. hax hooked <MyClass: 0x"))
+        XCTAssertEqual(hooked.count, 742)
     }
 }

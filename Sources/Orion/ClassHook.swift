@@ -38,6 +38,7 @@ open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
 public typealias NamedClassHook<Target: AnyObject> = _NamedClassHookClass<Target> & _NamedClassHookProtocol
 
 public enum ClassRequest {
+    case selfCall
     case origCall
     case superCall
 }
@@ -102,6 +103,17 @@ extension _ClassHookProtocol {
         _ block: () throws -> Result
     ) rethrows -> Result {
         try makeRequest(.superCall, transition: transition, block)
+    }
+
+    // used to recurse within a hook; use recurse { self.hook() }, not self.hook()
+    @discardableResult
+    public func recurse<Result>(_ block: () throws -> Result) rethrows -> Result {
+        try makeRequest(.selfCall, transition: .atomic, block)
+    }
+
+    @discardableResult
+    public static func recurse<Result>(_ block: () throws -> Result) rethrows -> Result {
+        try makeRequest(.selfCall, transition: .atomic, block)
     }
 }
 

@@ -33,9 +33,9 @@ final class IntegrationTests: XCTestCase {
             }
         }
 
-        enum MyCtor: Constructor {
-            static func activate() {
-                print("hi")
+        class SuperHook: ClassHook<MyClass> {
+            func description() -> String {
+                "hax"
             }
         }
         """#
@@ -50,8 +50,7 @@ final class IntegrationTests: XCTestCase {
             static let callState = CallState<ClassRequest>()
             let callState = CallState<ClassRequest>()
 
-            private typealias Orion_Function1 = @convention(c) (Target, Selector, Date) -> String
-            private static var orion_orig1: Orion_Function1 = { target, _cmd, arg1 in
+            private static var orion_orig1: @convention(c) (Target, Selector, Date) -> String = { target, _cmd, arg1 in
                 Orion_ClassHook1(target: target).string(fromDate:)(arg1)
             }
             private static let orion_sel1 = #selector(string(fromDate:) as (Self) -> (Date) -> String)
@@ -62,12 +61,11 @@ final class IntegrationTests: XCTestCase {
                 case .origCall:
                     return Self.orion_orig1(target, Self.orion_sel1, arg1)
                 case .superCall:
-                    return callSuper(Orion_Function1.self) { $0($1, Self.orion_sel1, arg1) }
+                    return callSuper((@convention(c) (UnsafeRawPointer, Selector, Date) -> String).self) { $0($1, Self.orion_sel1, arg1) }
                 }
             }
 
-            private typealias Orion_Function2 = @convention(c) (AnyClass, Selector, Date, DateFormatter.Style, DateFormatter.Style) -> String
-            private static var orion_orig2: Orion_Function2 = { target, _cmd, arg1, arg2, arg3 in
+            private static var orion_orig2: @convention(c) (AnyClass, Selector, Date, DateFormatter.Style, DateFormatter.Style) -> String = { target, _cmd, arg1, arg2, arg3 in
                 Orion_ClassHook1.localizedString(from:dateStyle:timeStyle:)(arg1, arg2, arg3)
             }
             private static let orion_sel2 = #selector(localizedString(from:dateStyle:timeStyle:) as (Date, DateFormatter.Style, DateFormatter.Style) -> String)
@@ -81,13 +79,37 @@ final class IntegrationTests: XCTestCase {
                 case .origCall:
                     return Self.orion_orig2(target, Self.orion_sel2, arg1, arg2, arg3)
                 case .superCall:
-                    return callSuper(Orion_Function2.self) { $0($1, Self.orion_sel2, arg1, arg2, arg3) }
+                    return callSuper((@convention(c) (UnsafeRawPointer, Selector, Date, DateFormatter.Style, DateFormatter.Style) -> String).self) { $0($1, Self.orion_sel2, arg1, arg2, arg3) }
                 }
             }
 
             static func activate(withBackend backend: Backend) {
                 register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
                 register(backend, orion_sel2, &orion_orig2, isClassMethod: true)
+            }
+        }
+
+        private final class Orion_ClassHook2: SuperHook, ConcreteClassHook {
+            static let callState = CallState<ClassRequest>()
+            let callState = CallState<ClassRequest>()
+
+            private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
+                Orion_ClassHook2(target: target).description()
+            }
+            private static let orion_sel1 = #selector(description as (Self) -> () -> String)
+            @objc override func description() -> String {
+                switch callState.fetchRequest() {
+                case nil:
+                    return super.description()
+                case .origCall:
+                    return Self.orion_orig1(target, Self.orion_sel1)
+                case .superCall:
+                    return callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, Self.orion_sel1) }
+                }
+            }
+
+            static func activate(withBackend backend: Backend) {
+                register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
             }
         }
 
@@ -114,6 +136,7 @@ final class IntegrationTests: XCTestCase {
                 backend: InternalBackend(),
                 hooks: [
                     Orion_ClassHook1.self,
+                    Orion_ClassHook2.self,
                     Orion_FunctionHook1.self
                 ]
             )

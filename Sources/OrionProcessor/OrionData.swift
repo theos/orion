@@ -15,7 +15,8 @@ public struct OrionData {
             var isClassMethod: Bool
             var hasObjcAttribute: Bool
             var function: Function
-            var methodClosure: Syntax // (Target, Selector, Blah) -> Blah
+            var methodClosure: Syntax // (<Target|AnyClass>, Selector, Blah) -> Blah
+            var superClosure: Syntax // (UnsafeRawPointer, Selector, Blah) -> Blah
         }
 
         var name: String

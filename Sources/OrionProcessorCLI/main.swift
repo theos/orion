@@ -61,6 +61,50 @@ if isTesting {
             "Class method: \(orig { localizedString(from: date, dateStyle: dstyle, timeStyle: tstyle) })"
         }
     }
+
+    class SuperHook: ClassHook<MyClass> {
+        func description() -> String {
+            "hax description: \(supr { description() })"
+        }
+
+        func hooked() -> String {
+            if x == 0 {
+                return "zero"
+            } else {
+                x -= 1
+                return orig {
+                    "orig: \(hooked()). hax hooked \(supr { description() }). x=\(x), prev=\(recurse { hooked() })"
+                }
+            }
+        }
+    }
+
+    class PropertyHookX: ClassHook<PropertyClass> {
+        @Property(.nonatomic) var x = 1
+
+        func getXValue() -> Int { print("getting x"); return x }
+        func setXValue(_ x: Int) { print("setting x"); self.x = x }
+    }
+
+    class PropertyHookY: ClassHook<PropertyClass> {
+        @Property(.nonatomic) var x = 1
+
+        func getYValue() -> Int { x }
+
+        func setYValue(_ x: Int) {
+            self.x = x
+        }
+    }
+
+    class PropertyHook2: ClassHook<PropertyClass2> {
+        @Property(.nonatomic) var x = 1
+
+        func getXValue() -> Int { x }
+
+        func setXValue(_ x: Int) {
+            self.x = x
+        }
+    }
     """#
 
 //    let contents = #"""

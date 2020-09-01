@@ -76,8 +76,7 @@ class OrionVisitor: SyntaxVisitor {
 
     private enum FunctionKind {
         case function
-        case instanceMethod
-        case classMethod
+        case method(firstType: String)
     }
 
     private func makeClosure(for function: FunctionDeclSyntax, kind: FunctionKind) -> Syntax {
@@ -87,14 +86,9 @@ class OrionVisitor: SyntaxVisitor {
         switch kind {
         case .function:
             prefixTypes = []
-        case .instanceMethod:
+        case .method(let firstType):
             prefixTypes = [
-                SyntaxFactory.makeTypeIdentifier("Target"),
-                SyntaxFactory.makeTypeIdentifier("Selector")
-            ]
-        case .classMethod:
-            prefixTypes = [
-                SyntaxFactory.makeTypeIdentifier("AnyClass"),
+                SyntaxFactory.makeTypeIdentifier(firstType),
                 SyntaxFactory.makeTypeIdentifier("Selector")
             ]
         }
@@ -155,7 +149,8 @@ class OrionVisitor: SyntaxVisitor {
                     isClassMethod: isClass,
                     hasObjcAttribute: functionHasObjc(function),
                     function: orionFunction(for: function),
-                    methodClosure: makeClosure(for: function, kind: isClass ? .classMethod : .instanceMethod)
+                    methodClosure: makeClosure(for: function, kind: .method(firstType: isClass ? "AnyClass" : "Target")),
+                    superClosure: makeClosure(for: function, kind: .method(firstType: "UnsafeRawPointer"))
                 )
             }
         data.classHooks.append(OrionData.ClassHook(name: node.identifier.text, methods: methods, converter: converter))

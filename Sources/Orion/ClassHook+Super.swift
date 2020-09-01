@@ -44,33 +44,29 @@ enum MessageSendSuperType {
 }
 
 extension _ClassHookProtocol where Self: ConcreteClassHook {
-    private static func callSuper<ReturnType, MessageType, SelfType>(
+    private static func callSuper<ReturnType, MessageType>(
         _ type: MessageType.Type,
         receiver: Any,
         cls: AnyClass,
-        send: (MessageType, SelfType) -> ReturnType
+        send: (MessageType, UnsafeRawPointer) -> ReturnType
     ) -> ReturnType {
         var result: ReturnType!
         MessageSendSuperType(for: ReturnType.self).send(receiver: receiver, cls: cls) {
-            // this unsafeBitCast isn't actually accurate because $0 is an objc_super *, but since
-            // that as well as Target are both pointers, it should succeed. The bit cast is there
-            // so that we only need a single @convention(c) function signature type, namely one
-            // that takes Target as its first argument
-            result = send(unsafeBitCast($1, to: MessageType.self), unsafeBitCast($0, to: SelfType.self))
+            result = send(unsafeBitCast($1, to: MessageType.self), UnsafeRawPointer($0))
         }
         return result
     }
 
     public static func callSuper<ReturnType, SuperType>(
         _ type: SuperType.Type,
-        send: (SuperType, AnyClass) -> ReturnType
+        send: (SuperType, UnsafeRawPointer) -> ReturnType
     ) -> ReturnType {
         callSuper(type, receiver: target, cls: object_getClass(target)!, send: send)
     }
 
     public func callSuper<ReturnType, SuperType>(
         _ type: SuperType.Type,
-        send: (SuperType, Target) -> ReturnType
+        send: (SuperType, UnsafeRawPointer) -> ReturnType
     ) -> ReturnType {
         Self.callSuper(type, receiver: target, cls: Self.target, send: send)
     }

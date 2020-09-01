@@ -53,26 +53,24 @@ public final class OrionGenerator {
         let args = arguments(for: method.function)
         let argsList = args.joined(separator: ", ")
         let commaArgs = args.isEmpty ? "" : ", \(argsList)"
-        let function = "Orion_Function\(index)"
         let orig = "orion_orig\(index)"
         let sel = "orion_sel\(index)"
         // say there's a method foo() and another named foo(bar:). #selector(foo) will result in an error
         // because it could refer to either. Adding the signature disambiguates.
         let selSig = "\(method.isClassMethod ? "" : "(Self) -> ")\(method.function.closure)"
         let hook = """
-        private typealias \(function) = @convention(c) \(method.methodClosure)
-        private static var \(orig): \(function) = { target, _cmd\(commaArgs) in
+        private static var \(orig): @convention(c) \(method.methodClosure) = { target, _cmd\(commaArgs) in
             \(className)\(method.isClassMethod ? "" : "(target: target)").\(method.function.identifier)(\(argsList))
         }
         private static let \(sel) = #selector(\(method.function.identifier) as \(selSig))
         \(method.hasObjcAttribute ? "" : "@objc ")\(method.function.function) {
             switch callState.fetchRequest() {
-            case nil:
+            case nil, .selfCall:
                 return super.\(method.function.identifier)(\(argsList))
             case .origCall:
                 return Self.\(orig)(target, Self.\(sel)\(commaArgs))
             case .superCall:
-                return callSuper(\(function).self) { $0($1, Self.\(sel)\(commaArgs)) }
+                return callSuper((@convention(c) \(method.superClosure)).self) { $0($1, Self.\(sel)\(commaArgs)) }
             }
         }
         """
