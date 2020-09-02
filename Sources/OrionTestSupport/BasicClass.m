@@ -14,6 +14,10 @@
     return [NSString stringWithFormat:@"Original test class method with arg %i", arg];
 }
 
++ (NSString *)someTestMethod3 {
+    return @"Base test class method";
+}
+
 - (BOOL)methodForNamedTest { return NO; }
 
 + (NSArray *)classMethodForNamedTestWithArgument:(NSString *)arg {

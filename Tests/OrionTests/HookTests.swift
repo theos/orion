@@ -34,6 +34,12 @@ final class HookTests: XCTestCase {
         XCTAssertEqual(res, ["Hooked named class method", "hello", "Orion, or is it!"])
     }
 
+    func testInheritedSuperClassHooks() {
+        // test for calling supr on a class method
+        let res = InheritedClass.someTestMethod3()
+        XCTAssertEqual(res, "Hooked test class method: Base test class method")
+    }
+
     func testInitHook() {
         let cls = InitClass(x: 5)
         switch cls.initType {

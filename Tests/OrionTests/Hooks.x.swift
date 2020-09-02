@@ -39,6 +39,12 @@ class NamedBasicHook: NamedClassHook<BasicClass> {
     }
 }
 
+class InheritedHook: ClassHook<InheritedClass> {
+    class func someTestMethod3() -> String {
+        "Hooked test class method: \(supr { $0.someTestMethod3() })"
+    }
+}
+
 class InitHook: ClassHook<InitClass> {
     // just a placeholder to allow forwarding
     func `init`() -> Target { orig { $0.`init`() } }

@@ -47,6 +47,10 @@ public protocol _ConcreteClassHook: ConcreteHook {
 
 extension _ClassHookProtocol {
 
+    // yes, thse can indeed be made computed properties (`var orig: Self`) instead,
+    // but unfortunately the Swift compiler emits a warning when it sees an orig/supr
+    // call like that, because it thinks it'll amount to infinite recursion
+
     @discardableResult
     public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
         guard let unwrapped = (self as? _ConcreteClassHook)?._orig as? Self
