@@ -300,14 +300,30 @@ private class Orion_ClassHook8: PropertyHook2, ConcreteClassHook {
     }
 }
 
-private class Orion_FunctionHook1: MyFunctionHook, ConcreteFunctionHook {
-    static var origFunction: @convention(c) (Int32, Int32) -> Int32 = { arg1, arg2 in
-        Orion_FunctionHook1().function(foo:bar:)(arg1, arg2)
+private class Orion_FunctionHook1: AtoiHook, ConcreteFunctionHook {
+    static let orion_shared = Orion_FunctionHook1()
+
+    static var origFunction: @convention(c) (UnsafePointer<Int8>) -> Int32 = { arg1 in
+        Orion_FunctionHook1.orion_shared.function(_:)(arg1)
     }
 
     final class OrigType: Orion_FunctionHook1 {
-        override func function(foo arg1: Int32, bar arg2: Int32) -> Int32 {
-            Self.origFunction(arg1, arg2)
+        override func function(_ arg1: UnsafePointer<Int8>) -> Int32 {
+            Self.origFunction(arg1)
+        }
+    }
+}
+
+private class Orion_FunctionHook2: AtofHook, ConcreteFunctionHook {
+    static let orion_shared = Orion_FunctionHook2()
+
+    static var origFunction: @convention(c) (UnsafePointer<Int8>) -> Double = { arg1 in
+        Orion_FunctionHook2.orion_shared.function(_:)(arg1)
+    }
+
+    final class OrigType: Orion_FunctionHook2 {
+        override func function(_ arg1: UnsafePointer<Int8>) -> Double {
+            Self.origFunction(arg1)
         }
     }
 }
@@ -325,7 +341,8 @@ func __orion_constructor() {
             Orion_ClassHook6.self,
             Orion_ClassHook7.self,
             Orion_ClassHook8.self,
-            Orion_FunctionHook1.self
+            Orion_FunctionHook1.self,
+            Orion_FunctionHook2.self
         ]
     )
 }

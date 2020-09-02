@@ -147,13 +147,16 @@ public final class OrionGenerator {
 
     private func generateConcreteFunctionHook(from functionHook: OrionData.FunctionHook, idx: Int) -> (hook: String, name: String) {
         let className = "Orion_FunctionHook\(idx)"
+        let shared = "orion_shared"
         let args = arguments(for: functionHook.function)
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
         let hook = """
         private class \(className): \(functionHook.name), ConcreteFunctionHook {
+            static let \(shared) = \(className)()
+
             static var origFunction: @convention(c) \(functionHook.function.closure) = { \(argsIn)
-                \(className)().\(functionHook.function.identifier)(\(argsList))
+                \(className).\(shared).\(functionHook.function.identifier)(\(argsList))
             }
 
             final class OrigType: \(className) {

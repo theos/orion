@@ -5,12 +5,31 @@ import Foundation
 import Orion
 import OrionTestSupport
 
-class MyFunctionHook: FunctionHook {
-    static let target = Function(image: nil, name: "socket")
+class AtoiHook: FunctionHook {
+    static let target = Function(image: nil, name: "atoi")
 
-    func function(foo: Int32, bar: Int32) -> Int32 {
-        _ = orig { $0.function(foo: foo, bar: bar) }
-        return 1
+    func function(_ string: UnsafePointer<Int8>) -> Int32 {
+        if strcmp(string, "1234") == 0 || strcmp(string, "2345") == 0 {
+            return 10 * orig { $0.function(string) }
+        } else {
+            return orig { $0.function(string) }
+        }
+    }
+}
+
+class AtofHook: FunctionHook {
+    // When using the internal generator, this unfortunately doesn't actually guarantee that the hooked
+    // symbol will be in the provided image. It does guarantee that the image *has* a function with the
+    // given name though, but due to two level namespacing fishhook may end up hooking functions by the
+    // same name in other images as well
+    static let target = Function(image: URL(fileURLWithPath: "/usr/lib/libc.dylib"), name: "atof")
+
+    func function(_ string: UnsafePointer<Int8>) -> Double {
+        if strcmp(string, "1.5") == 0 || strcmp(string, "2.5") == 0 {
+            return 10 * orig { $0.function(string) }
+        } else {
+            return orig { $0.function(string) }
+        }
     }
 }
 

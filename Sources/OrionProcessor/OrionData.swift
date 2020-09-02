@@ -5,7 +5,7 @@ public struct OrionData {
     struct Function {
         var numberOfArguments: Int
         // with args replaced with arg1, arg2, etc
-        var function: Syntax // func foo(bar arg1: Blah) -> Blah { /* ... */ }
+        var function: Syntax // func foo(bar arg1: Blah) -> Blah
         var identifier: Syntax // foo(bar:)
         var closure: Syntax // (Blah) -> Blah
     }

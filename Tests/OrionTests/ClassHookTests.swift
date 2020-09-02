@@ -5,7 +5,7 @@ import OrionTestSupport
 // NOTE: We don't need the linux testing stuff here because the
 // runtime can only be built on platforms with Objective-C
 
-final class HookTests: XCTestCase {
+final class ClassHookTests: XCTestCase {
     func testBasicDirectInstanceHooks() {
         let basic = BasicClass()
         XCTAssertEqual(basic.someTestMethod(), "Hooked test method", "Basic instance methods should be hookable")
@@ -63,6 +63,6 @@ final class HookTests: XCTestCase {
         let cls = MyClass()
         let hooked = cls.hooked
         XCTAssert(hooked.hasPrefix("orig: regular hooked. hax hooked <MyClass: 0x"))
-        XCTAssertEqual(hooked.count, 742)
+        XCTAssert(hooked.hasSuffix(">. x=0, prev=zero"))
     }
 }
