@@ -56,4 +56,5 @@ let glue = try catchingOrionFailures {
     try generator.generate(backend: backend)
 }
 
-print(glue)
+// the glue already includes a trailing newline so don't add a second one
+print(glue, terminator: "")

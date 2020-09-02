@@ -225,7 +225,7 @@ public final class OrionGenerator {
                     \(allHooks)
                 ]
             )
-        }
+        }\n
         """
     }
 
