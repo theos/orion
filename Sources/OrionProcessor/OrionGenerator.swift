@@ -211,12 +211,13 @@ public final class OrionGenerator {
             importBackend = ""
         }
 
-        // we might end up with duplicate imports but Swift accepts those so it's *technically* fine, but,
-        // TODO: Try to de-duplicate imports just to keep things shorter
+        // While duplicate imports are *technically* fine, de-duplicating them keeps things shorter
+        var imports = Set(data.imports.map { "\($0)" })
+        imports.insert("import Orion")
+        imports.insert("import Foundation")
+
         return """
-        import Orion
-        import Foundation
-        \(join(data.imports.map { "\($0)" }, separation: "\n"))\
+        \(join(imports.sorted(), separation: "\n"))\
         \(join(classes))\
         \(join(functions))\
         \(importBackend)\
