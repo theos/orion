@@ -10,10 +10,18 @@ import Orion
     func dateWithNaturalLanguageString(_ string: String) -> NSDate
 }
 
-final class InterfaceTests: XCTestCase {
+@objc class MyObjCClass: NSObject {
+    @objc class func sayHi() -> String { "hello" }
+}
 
-    func testClass() {
-        _ = Class("NSDate", interface: DateClassInterface.self).dateWithNaturalLanguageString("today")
+@objc protocol MyObjCInterface {
+    func sayHi() -> String
+}
+
+final class DynamicTests: XCTestCase {
+
+    func testMultipleDots() {
+        XCTAssertEqual(Dynamic.OrionTests.MyObjCClass.as(interface: MyObjCInterface.self).sayHi(), "hello")
     }
 
     func testInstanceInterface() {
@@ -24,12 +32,12 @@ final class InterfaceTests: XCTestCase {
     func testClassInterface() {
         XCTAssertEqual(
             Calendar.current.startOfDay(for: Date()),
-            NSDate.as(interface: DateClassInterface.self).dateWithNaturalLanguageString("today") as Date
+            Dynamic.NSDate.as(interface: DateClassInterface.self).dateWithNaturalLanguageString("today") as Date
         )
     }
 
     func testAllocInterface() {
-        let date = NSDate.alloc(interface: DateInterface.self).`init`(timeIntervalSince1970: 0)
+        let date = Dynamic.NSDate.alloc(interface: DateInterface.self).`init`(timeIntervalSince1970: 0)
         XCTAssertEqual(date as Date, Date(timeIntervalSince1970: 0))
     }
 
