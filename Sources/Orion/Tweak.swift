@@ -3,6 +3,7 @@ import OrionC
 
 public protocol Tweak {
     init()
+    func didActivate()
 }
 
 extension Tweak {
@@ -12,10 +13,16 @@ extension Tweak {
         // it being used
         __orion_constructor_c()
 
-        hooks.lazy
-            .filter { $0.shouldActivate }
-            .forEach { $0.activate(withBackend: backend) }
+        backend.withHooker { hooker in
+            hooks.lazy
+                .filter { $0.shouldActivate }
+                .forEach { $0.activate(withHooker: &hooker) }
+        }
+
+        didActivate()
     }
+
+    public func didActivate() {}
 }
 
 // a tweak which forces a custom backend

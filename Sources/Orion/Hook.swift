@@ -9,5 +9,5 @@ extension AnyHook {
 }
 
 public protocol ConcreteHook: AnyHook {
-    static func activate(withBackend backend: Backend)
+    static func activate(withHooker hooker: inout Hooker)
 }

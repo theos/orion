@@ -10,7 +10,7 @@ final class IntegrationTests: XCTestCase {
         let parser = OrionParser(contents: contents)
         let data = try parser.parse()
         let generator = OrionGenerator(data: data)
-        let source = try generator.generate(backend: .internal)
+        let source = try generator.generate()
 
         XCTAssertEqual(source, fixture)
     }

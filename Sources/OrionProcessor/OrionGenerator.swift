@@ -100,7 +100,7 @@ public final class OrionGenerator {
         """
 
         let register = """
-        register(backend, \(selIdent), &\(origIdent), isClassMethod: \(method.isClassMethod))
+        hooker.addHook(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod)) { \(origIdent) = $0 }
         """
 
         return (orig, supr, main, register)
@@ -136,7 +136,7 @@ public final class OrionGenerator {
 
         \(indentedMains)
 
-            static func activate(withBackend backend: Backend) {
+            static func activate(withClassHooker hooker: inout ClassHooker) {
                 \(registers.joined(separator: "\n        "))
             }
         }
@@ -224,7 +224,7 @@ public final class OrionGenerator {
         @_cdecl("__orion_constructor")
         func __orion_constructor() {
             \(tweakName)().activate(
-                \(hasCustomBackend ? "" : "backend: \(backend.name)(),\n")\
+        \(hasCustomBackend ? "" : "        backend: \(backend.name)(),\n")\
                 hooks: [
                     \(allHooks)
                 ]

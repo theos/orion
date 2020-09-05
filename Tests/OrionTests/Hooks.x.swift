@@ -5,6 +5,10 @@ import Foundation
 import Orion
 import OrionTestSupport
 
+struct HooksTweak: TweakWithBackend {
+    let backend: Backend = FishhookBackend()
+}
+
 class AtoiHook: FunctionHook {
     static let target = Function(image: nil, name: "atoi")
 

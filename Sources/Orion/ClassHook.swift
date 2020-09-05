@@ -81,9 +81,21 @@ extension _ClassHookProtocol {
 
 }
 
+public struct ClassHooker {
+    let target: AnyClass
+    var hooker: Hooker
+
+    public mutating func addHook<Code>(_ sel: Selector, _ replacement: Code, isClassMethod: Bool, completion: @escaping (Code) -> Void) {
+        let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
+        hooker.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
+    }
+}
+
 public protocol ConcreteClassHook: _ConcreteClassHook, _ClassHookProtocol {
     associatedtype OrigType: _ClassHookProtocol where OrigType.Target == Target
     associatedtype SuprType: _ClassHookProtocol where SuprType.Target == Target
+
+    static func activate(withClassHooker hooker: inout ClassHooker)
 }
 extension ConcreteClassHook {
     public static var _orig: AnyClass { OrigType.self }
@@ -92,8 +104,9 @@ extension ConcreteClassHook {
     public static var _supr: AnyClass { SuprType.self }
     public var _supr: AnyObject { SuprType(target: target) }
 
-    public static func register<Code>(_ backend: Backend, _ sel: Selector, _ replacement: inout Code, isClassMethod: Bool = false) {
-        let cls: AnyClass = isClassMethod ? object_getClass(Self.target)! : Self.target
-        replacement = backend.hookMethod(cls: cls, sel: sel, replacement: replacement)
+    public static func activate(withHooker hooker: inout Hooker) {
+        var classHooker = ClassHooker(target: target, hooker: hooker)
+        defer { hooker = classHooker.hooker }
+        activate(withClassHooker: &classHooker)
     }
 }

@@ -66,8 +66,8 @@ public protocol ConcreteFunctionHook: _ConcreteFunctionHook, _FunctionHookProtoc
 }
 
 extension ConcreteFunctionHook {
-    public static func activate(withBackend backend: Backend) {
-        origFunction = backend.hookFunction(target, replacement: origFunction)
+    public static func activate(withHooker hooker: inout Hooker) {
+        hooker.addFunctionHook(target, replacement: origFunction) { origFunction = $0 }
     }
 
     public static var _orig: AnyClass { OrigType.self }

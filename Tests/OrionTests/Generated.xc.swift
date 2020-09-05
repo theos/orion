@@ -46,10 +46,10 @@ private class Orion_ClassHook1: BasicHook, ConcreteClassHook {
         Orion_ClassHook1.someTestMethod2(withArgument:)(arg1)
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
-        register(backend, orion_sel2, &orion_orig2, isClassMethod: false)
-        register(backend, orion_sel3, &orion_orig3, isClassMethod: true)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        hooker.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
+        hooker.addHook(orion_sel3, orion_orig3, isClassMethod: true) { orion_orig3 = $0 }
     }
 }
 
@@ -84,9 +84,9 @@ private class Orion_ClassHook2: NamedBasicHook, ConcreteClassHook {
         Orion_ClassHook2.classMethodForNamedTest(withArgument:)(arg1)
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
-        register(backend, orion_sel2, &orion_orig2, isClassMethod: true)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        hooker.addHook(orion_sel2, orion_orig2, isClassMethod: true) { orion_orig2 = $0 }
     }
 }
 
@@ -108,8 +108,8 @@ private class Orion_ClassHook3: InheritedHook, ConcreteClassHook {
         Orion_ClassHook3.someTestMethod3()
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: true)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: true) { orion_orig1 = $0 }
     }
 }
 
@@ -144,9 +144,9 @@ private class Orion_ClassHook4: InitHook, ConcreteClassHook {
         Orion_ClassHook4(target: target).`init`(withX:)(arg1)
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
-        register(backend, orion_sel2, &orion_orig2, isClassMethod: false)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        hooker.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
 }
 
@@ -181,9 +181,9 @@ private class Orion_ClassHook5: SuperHook, ConcreteClassHook {
         Orion_ClassHook5(target: target).hooked()
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
-        register(backend, orion_sel2, &orion_orig2, isClassMethod: false)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        hooker.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
 }
 
@@ -218,9 +218,9 @@ private class Orion_ClassHook6: PropertyHookX, ConcreteClassHook {
         Orion_ClassHook6(target: target).setXValue(_:)(arg1)
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
-        register(backend, orion_sel2, &orion_orig2, isClassMethod: false)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        hooker.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
 }
 
@@ -255,9 +255,9 @@ private class Orion_ClassHook7: PropertyHookY, ConcreteClassHook {
         Orion_ClassHook7(target: target).setYValue(_:)(arg1)
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
-        register(backend, orion_sel2, &orion_orig2, isClassMethod: false)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        hooker.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
 }
 
@@ -292,9 +292,9 @@ private class Orion_ClassHook8: PropertyHook2, ConcreteClassHook {
         Orion_ClassHook8(target: target).setXValue(_:)(arg1)
     }
 
-    static func activate(withBackend backend: Backend) {
-        register(backend, orion_sel1, &orion_orig1, isClassMethod: false)
-        register(backend, orion_sel2, &orion_orig2, isClassMethod: false)
+    static func activate(withClassHooker hooker: inout ClassHooker) {
+        hooker.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        hooker.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
 }
 
@@ -328,8 +328,7 @@ private class Orion_FunctionHook2: AtofHook, ConcreteFunctionHook {
 
 @_cdecl("__orion_constructor")
 func __orion_constructor() {
-    DefaultTweak().activate(
-        backend: InternalBackend(),
+    HooksTweak().activate(
         hooks: [
             Orion_ClassHook1.self,
             Orion_ClassHook2.self,
