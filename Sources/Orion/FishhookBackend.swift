@@ -36,21 +36,74 @@ private func withArrayOfCStrings<S: Sequence, R>(
     }
 }
 
-private struct FishhookHooker: Hooker {
-    private struct Request {
-        let symbol: String
-        let replacement: UnsafeMutableRawPointer
-        let image: URL?
-        let completion: (UnsafeMutableRawPointer?) -> Void
+public struct FishhookBackend<UnderlyingBackend: Backend>: Backend {
+    let underlyingBackend: UnderlyingBackend
+
+    public init(underlyingBackend: UnderlyingBackend) {
+        self.underlyingBackend = underlyingBackend
     }
 
-    var underlyingHooker: Hooker
-    private var requests: [Request] = []
-    init(underlyingHooker: Hooker) {
-        self.underlyingHooker = underlyingHooker
+    public struct Builder: HookBuilder {
+        fileprivate struct Request {
+            let symbol: String
+            let replacement: UnsafeMutableRawPointer
+            let image: URL?
+            let completion: (UnsafeMutableRawPointer?) -> Void
+        }
+
+        var underlyingBuilder: UnderlyingBackend.Builder
+        fileprivate var requests: [Request] = []
     }
 
-    mutating func addFunctionHook<Code>(_ function: Function, replacement: Code, completion: @escaping (Code) -> Void) {
+    private func apply(
+        requests: [Builder.Request],
+        symbols: [UnsafeMutablePointer<UInt8>?],
+        origs: UnsafeMutableBufferPointer<UnsafeMutableRawPointer?>
+    ) {
+        // NOTE: Unfortunately fishhook doesn't support specifying a symbol's image (although
+        // there's a fork that does; maybe we should consider using it?). While it may seem like
+        // rebind_symbols_image does this job, its purpose is in fact to only make the hook apply
+        // to callers in that image, and not to specify the image of the target symbol itself.
+
+        var rebindings = symbols.enumerated().map { idx, sym in
+            rebinding(
+                name: UnsafeRawPointer(sym!).assumingMemoryBound(to: Int8.self),
+                replacement: requests[idx].replacement,
+                replaced: origs.baseAddress! + idx
+            )
+        }
+
+        guard orion_rebind_symbols(&rebindings, symbols.count) == 0
+            else { fatalError("Failed to hook functions") }
+    }
+
+    private func apply(requests: [Builder.Request]) {
+        if !requests.isEmpty {
+            let symbols = requests.lazy.map { $0.symbol }
+            var origs: [UnsafeMutableRawPointer?] = Array(repeating: nil, count: requests.count)
+
+            withArrayOfCStrings(symbols) { rawSymbols in
+                origs.withUnsafeMutableBufferPointer { rawOrigs in
+                    apply(requests: requests, symbols: rawSymbols, origs: rawOrigs)
+                }
+            }
+
+            requests.enumerated().forEach { $1.completion(origs[$0]) }
+        }
+    }
+
+    public func hook(_ build: (inout Builder) -> Void) {
+        underlyingBackend.hook {
+            var builder = Builder(underlyingBuilder: $0)
+            defer { apply(requests: builder.requests) }
+            build(&builder)
+        }
+    }
+}
+
+extension FishhookBackend.Builder {
+
+    public mutating func addFunctionHook<Code>(_ function: Function, replacement: Code, completion: @escaping (Code) -> Void) {
         guard case .symbol(let image, let symbol) = function.descriptor else {
             fatalError("""
             Cannot hook function at address \(function). If possible, provide a symbol \
@@ -86,61 +139,14 @@ private struct FishhookHooker: Hooker {
         requests.append(request)
     }
 
-    mutating func addMethodHook<Code>(cls: AnyClass, sel: Selector, replacement: Code, completion: @escaping (Code) -> Void) {
-        underlyingHooker.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
+    public mutating func addMethodHook<Code>(cls: AnyClass, sel: Selector, replacement: Code, completion: @escaping (Code) -> Void) {
+        underlyingBuilder.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
     }
 
-    private func applyRequests(
-        symbols: [UnsafeMutablePointer<UInt8>?],
-        origs: UnsafeMutableBufferPointer<UnsafeMutableRawPointer?>
-    ) {
-        // NOTE: Unfortunately fishhook doesn't support specifying a symbol's image (although
-        // there's a fork that does; maybe we should consider using it?). While it may seem like
-        // rebind_symbols_image does this job, its purpose is in fact to only make the hook apply
-        // to callers in that image, and not to specify the image of the target symbol itself.
-
-        var rebindings = symbols.enumerated().map { idx, sym in
-            rebinding(
-                name: UnsafeRawPointer(sym!).assumingMemoryBound(to: Int8.self),
-                replacement: requests[idx].replacement,
-                replaced: origs.baseAddress! + idx
-            )
-        }
-
-        guard orion_rebind_symbols(&rebindings, symbols.count) == 0
-            else { fatalError("Failed to hook functions") }
-    }
-
-    mutating func finalize() {
-        underlyingHooker.finalize()
-
-        if !requests.isEmpty {
-            let symbols = requests.lazy.map { $0.symbol }
-            var origs: [UnsafeMutableRawPointer?] = Array(repeating: nil, count: requests.count)
-
-            withArrayOfCStrings(symbols) { rawSymbols in
-                origs.withUnsafeMutableBufferPointer { rawOrigs in
-                    applyRequests(symbols: rawSymbols, origs: rawOrigs)
-                }
-            }
-
-            requests.enumerated().forEach { $1.completion(origs[$0]) }
-        }
-    }
 }
 
-public struct FishhookBackend: DefaultBackend {
-    let underlyingBackend: Backend
-
-    public init(underlyingBackend: Backend) {
-        self.underlyingBackend = underlyingBackend
-    }
-
+extension FishhookBackend: DefaultBackend where UnderlyingBackend: DefaultBackend {
     public init() {
-        self.init(underlyingBackend: InternalBackend())
-    }
-
-    public func makeHooker() -> Hooker {
-        FishhookHooker(underlyingHooker: underlyingBackend.makeHooker())
+        self.init(underlyingBackend: UnderlyingBackend())
     }
 }

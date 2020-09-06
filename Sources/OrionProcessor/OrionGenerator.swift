@@ -100,7 +100,7 @@ public final class OrionGenerator {
         """
 
         let register = """
-        hooker.addHook(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod)) { \(origIdent) = $0 }
+        builder.addHook(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod)) { \(origIdent) = $0 }
         """
 
         return (orig, supr, main, register)
@@ -136,7 +136,7 @@ public final class OrionGenerator {
 
         \(indentedMains)
 
-            static func activate(withClassHooker hooker: inout ClassHooker) {
+            static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
                 \(registers.joined(separator: "\n        "))
             }
         }

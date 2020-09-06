@@ -32,11 +32,6 @@ public protocol _FunctionHookProtocol: class, AnyHook {
     static var target: Function { get }
     init()
 }
-extension _FunctionHookProtocol {
-    public static func activate(withBackend backend: Backend) {
-        fatalError("\(type(of: self)) is not a concrete function hook")
-    }
-}
 
 open class _FunctionHookClass {
     required public init() {}
@@ -66,8 +61,8 @@ public protocol ConcreteFunctionHook: _ConcreteFunctionHook, _FunctionHookProtoc
 }
 
 extension ConcreteFunctionHook {
-    public static func activate(withHooker hooker: inout Hooker) {
-        hooker.addFunctionHook(target, replacement: origFunction) { origFunction = $0 }
+    public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
+        builder.addFunctionHook(target, replacement: origFunction) { origFunction = $0 }
     }
 
     public static var _orig: AnyClass { OrigType.self }

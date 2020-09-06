@@ -81,13 +81,13 @@ extension _ClassHookProtocol {
 
 }
 
-public struct ClassHooker {
+public struct ClassHookBuilder<Builder: HookBuilder> {
     let target: AnyClass
-    var hooker: Hooker
+    var builder: Builder
 
     public mutating func addHook<Code>(_ sel: Selector, _ replacement: Code, isClassMethod: Bool, completion: @escaping (Code) -> Void) {
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
-        hooker.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
+        builder.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
     }
 }
 
@@ -95,7 +95,7 @@ public protocol ConcreteClassHook: _ConcreteClassHook, _ClassHookProtocol {
     associatedtype OrigType: _ClassHookProtocol where OrigType.Target == Target
     associatedtype SuprType: _ClassHookProtocol where SuprType.Target == Target
 
-    static func activate(withClassHooker hooker: inout ClassHooker)
+    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>)
 }
 extension ConcreteClassHook {
     public static var _orig: AnyClass { OrigType.self }
@@ -104,9 +104,9 @@ extension ConcreteClassHook {
     public static var _supr: AnyClass { SuprType.self }
     public var _supr: AnyObject { SuprType(target: target) }
 
-    public static func activate(withHooker hooker: inout Hooker) {
-        var classHooker = ClassHooker(target: target, hooker: hooker)
-        defer { hooker = classHooker.hooker }
-        activate(withClassHooker: &classHooker)
+    public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
+        var classHookBuilder = ClassHookBuilder(target: target, builder: builder)
+        defer { builder = classHookBuilder.builder }
+        activate(withClassHookBuilder: &classHookBuilder)
     }
 }

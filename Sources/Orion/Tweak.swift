@@ -7,16 +7,16 @@ public protocol Tweak {
 }
 
 extension Tweak {
-    public func activate(backend: Backend, hooks: [ConcreteHook.Type]) {
+    public func activate<BackendType: Backend>(backend: BackendType, hooks: [ConcreteHook.Type]) {
         // this is effectively a no-op but we need it in order to prevent the
         // compiler from stripping out the constructor because it doesn't see
         // it being used
         __orion_constructor_c()
 
-        backend.withHooker { hooker in
+        backend.hook { builder in
             hooks.lazy
                 .filter { $0.shouldActivate }
-                .forEach { $0.activate(withHooker: &hooker) }
+                .forEach { $0.activate(withHookBuilder: &builder) }
         }
 
         didActivate()
@@ -27,7 +27,8 @@ extension Tweak {
 
 // a tweak which forces a custom backend
 public protocol TweakWithBackend: Tweak {
-    var backend: Backend { get }
+    associatedtype BackendType: Backend
+    var backend: BackendType { get }
 }
 
 extension TweakWithBackend {
