@@ -5,11 +5,30 @@ private extension Diagnostic.Message {
     static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
         .init(.error, "A \(declKind) cannot be private, fileprivate, or final")
     }
+    static func staticClassMethodHook() -> Diagnostic.Message {
+        .init(
+            .error,
+            """
+            A method hook cannot be static. If you are hooking a class method, \
+            use `class` instead of `static`. If this is a helper function, declare
+            it as private, fileprivate, or final.
+            """
+        )
+    }
     static func multipleDecls() -> Diagnostic.Message {
         .init(.error, "A type can only be a single type of hook or tweak")
     }
     static func functionHookWithoutFunction() -> Diagnostic.Message {
         .init(.error, "Function hooks must contain a function named 'function'")
+    }
+    static func invalidFunctionHookModifiers() -> Diagnostic.Message {
+        .init(
+            .error,
+            """
+            A function hook's `function` cannot be declared with the modifiers private, \
+            fileprivate, final, class, or static
+            """
+        )
     }
 }
 
@@ -19,6 +38,7 @@ class OrionVisitor: SyntaxVisitor {
     private static let defaultTweakTypes: Set<String> = ["Tweak"]
     private static let backendTweakTypes: Set<String> = ["TweakWithBackend"]
     private static let uninheritableModifiers: Set<String> = ["private", "fileprivate", "final"]
+    private static let invalidFunctionHookModifiers: Set<String> = ["private", "fileprivate", "final", "class", "static"]
 
     let converter: SourceLocationConverter
     let diagnosticEngine: DiagnosticEngine
@@ -128,6 +148,10 @@ class OrionVisitor: SyntaxVisitor {
         )
     }
 
+    private func staticModifier(in function: FunctionDeclSyntax) -> DeclModifierSyntax? {
+        function.modifiers?.first { $0.name.text == "static" }
+    }
+
     private func functionHasClass(_ function: FunctionDeclSyntax) -> Bool {
         function.modifiers?.contains { $0.name.text == "class" } == true
     }
@@ -145,6 +169,22 @@ class OrionVisitor: SyntaxVisitor {
                 // use one of these declarations to add a helper function, which isn't
                 // actually a hook, to a hook type
                 return !modifiers.contains { Self.uninheritableModifiers.contains($0.name.text) }
+            }
+            .filter { (decl: FunctionDeclSyntax) -> Bool in
+                if let staticModifier = staticModifier(in: decl) {
+                    diagnosticEngine.diagnose(
+                        .staticClassMethodHook(),
+                        location: decl.startLocation(converter: converter)
+                    ) { builder in
+                        builder.fixItReplace(
+                            staticModifier.sourceRange(converter: self.converter, afterLeadingTrivia: true, afterTrailingTrivia: true),
+                            with: "\(SyntaxFactory.makeClassKeyword())"
+                        )
+                    }
+                    didFail = true
+                    return false
+                }
+                return true
             }
             .map { function -> OrionData.ClassHook.Method in
                 let isClass = functionHasClass(function)
@@ -171,6 +211,16 @@ class OrionVisitor: SyntaxVisitor {
                 didFail = true
                 return
             }
+
+        if let invalidModifiers = function.modifiers?.filter({ Self.invalidFunctionHookModifiers.contains($0.name.text) }), !invalidModifiers.isEmpty {
+            diagnosticEngine.diagnose(
+                .invalidFunctionHookModifiers(),
+                location: invalidModifiers[0].startLocation(converter: converter)
+            )
+            didFail = true
+            return
+        }
+
         data.functionHooks.append(OrionData.FunctionHook(
             name: node.identifier.text,
             function: orionFunction(for: function),
