@@ -7,11 +7,20 @@ public struct AnyBackend: Backend {
             self.builder = builder
         }
 
-        public mutating func addFunctionHook<Code>(_ function: Function, replacement: Code, completion: @escaping (Code) -> Void) {
+        public mutating func addFunctionHook(
+            _ function: Function,
+            replacement: UnsafeMutableRawPointer,
+            completion: @escaping (UnsafeMutableRawPointer) -> Void
+        ) {
             builder.addFunctionHook(function, replacement: replacement, completion: completion)
         }
 
-        public mutating func addMethodHook<Code>(cls: AnyClass, sel: Selector, replacement: Code, completion: @escaping (Code) -> Void) {
+        public mutating func addMethodHook(
+            cls: AnyClass,
+            sel: Selector,
+            replacement: UnsafeMutableRawPointer,
+            completion: @escaping (UnsafeMutableRawPointer) -> Void
+        ) {
             builder.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
         }
     }

@@ -62,7 +62,9 @@ public protocol ConcreteFunctionHook: _ConcreteFunctionHook, _FunctionHookProtoc
 
 extension ConcreteFunctionHook {
     public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
-        builder.addFunctionHook(target, replacement: origFunction) { origFunction = $0 }
+        builder.addFunctionHook(target, replacement: unsafeBitCast(origFunction, to: UnsafeMutableRawPointer.self)) {
+            origFunction = unsafeBitCast($0, to: Code.self)
+        }
     }
 
     public static var _orig: AnyClass { OrigType.self }

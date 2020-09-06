@@ -104,7 +104,11 @@ public struct FishhookBackend<UnderlyingBackend: Backend>: Backend {
 
 extension FishhookBackend.Builder {
 
-    public mutating func addFunctionHook<Code>(_ function: Function, replacement: Code, completion: @escaping (Code) -> Void) {
+    public mutating func addFunctionHook(
+        _ function: Function,
+        replacement: UnsafeMutableRawPointer,
+        completion: @escaping (UnsafeMutableRawPointer) -> Void
+    ) {
         guard case .symbol(let image, let symbol) = function.descriptor else {
             fatalError("""
             The fishhook backend cannot hook functions at raw addresses. If possible, provide \
@@ -131,16 +135,21 @@ extension FishhookBackend.Builder {
 
         let request = Request(
             symbol: symbol,
-            replacement: unsafeBitCast(replacement, to: UnsafeMutableRawPointer.self),
+            replacement: replacement,
             image: image
         ) { brokenOrig in
             guard brokenOrig != nil else { fatalError("Failed to hook function \(function)") }
-            completion(unsafeBitCast(orig, to: Code.self))
+            completion(orig)
         }
         requests.append(request)
     }
 
-    public mutating func addMethodHook<Code>(cls: AnyClass, sel: Selector, replacement: Code, completion: @escaping (Code) -> Void) {
+    public mutating func addMethodHook(
+        cls: AnyClass,
+        sel: Selector,
+        replacement: UnsafeMutableRawPointer,
+        completion: @escaping (UnsafeMutableRawPointer) -> Void
+    ) {
         underlyingBuilder.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
     }
 

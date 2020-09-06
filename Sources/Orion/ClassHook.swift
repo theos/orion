@@ -81,7 +81,13 @@ public struct ClassHookBuilder<Builder: HookBuilder> {
 
     public mutating func addHook<Code>(_ sel: Selector, _ replacement: Code, isClassMethod: Bool, completion: @escaping (Code) -> Void) {
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
-        builder.addMethodHook(cls: cls, sel: sel, replacement: replacement, completion: completion)
+        builder.addMethodHook(
+            cls: cls,
+            sel: sel,
+            replacement: unsafeBitCast(replacement, to: UnsafeMutableRawPointer.self)
+        ) { orig in
+            completion(unsafeBitCast(orig, to: Code.self))
+        }
     }
 }
 

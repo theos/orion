@@ -6,21 +6,27 @@ public struct InternalBackend: DefaultBackend {
     public struct Builder: HookBuilder {
         fileprivate var actions: [() -> Void] = []
 
-        public func addFunctionHook<Code>(_ function: Function, replacement: Code, completion: (Code) -> Void) {
+        public func addFunctionHook(
+            _ function: Function,
+            replacement: UnsafeMutableRawPointer,
+            completion: (UnsafeMutableRawPointer) -> Void
+        ) {
             fatalError("The internal backend does not support function hooking")
         }
 
-        public mutating func addMethodHook<Code>(cls: AnyClass, sel: Selector, replacement: Code, completion: @escaping (Code) -> Void) {
+        public mutating func addMethodHook(
+            cls: AnyClass,
+            sel: Selector,
+            replacement: UnsafeMutableRawPointer,
+            completion: @escaping (UnsafeMutableRawPointer) -> Void
+        ) {
             guard let method = class_getInstanceMethod(cls, sel) else {
                 let isMeta = class_isMetaClass(cls)
                 let methodDescription = "\(isMeta ? "+" : "-")[\(cls) \(sel)]"
                 fatalError("Could not find method \(methodDescription)")
             }
             actions.append {
-                completion(unsafeBitCast(
-                    method_setImplementation(method, unsafeBitCast(replacement, to: IMP.self)),
-                    to: Code.self
-                ))
+                completion(.init(method_setImplementation(method, .init(replacement))))
             }
         }
     }
