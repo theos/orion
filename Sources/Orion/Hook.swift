@@ -1,11 +1,15 @@
 import Foundation
 
 public protocol _AnyHook {
-    static var shouldActivate: Bool { get }
+    // Return true to continue activation, false to skip. Default implementation
+    // always returns true.
+    static func willActivate() -> Bool
+    static func didActivate()
 }
 
 extension _AnyHook {
-    public static var shouldActivate: Bool { true }
+    public static func willActivate() -> Bool { true }
+    public static func didActivate() {}
 }
 
 public protocol _ConcreteHook: _AnyHook {

@@ -14,9 +14,10 @@ extension Tweak {
         __orion_constructor_c()
 
         backend.hook { builder in
-            hooks.lazy
-                .filter { $0.shouldActivate }
-                .forEach { $0.activate(withHookBuilder: &builder) }
+            for hook in hooks where hook.willActivate() {
+                hook.activate(withHookBuilder: &builder)
+                hook.didActivate()
+            }
         }
 
         didActivate()
