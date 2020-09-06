@@ -95,8 +95,9 @@ public struct FishhookBackend<UnderlyingBackend: Backend>: Backend {
     public func hook(_ build: (inout Builder) -> Void) {
         underlyingBackend.hook {
             var builder = Builder(underlyingBuilder: $0)
-            defer { apply(requests: builder.requests) }
             build(&builder)
+            apply(requests: builder.requests)
+            $0 = builder.underlyingBuilder
         }
     }
 }
