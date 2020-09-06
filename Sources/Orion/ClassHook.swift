@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol _ClassHookProtocol: class, AnyHook {
+public protocol _ClassHookProtocol: class, _AnyHook {
     associatedtype Target: AnyObject
 
     static var target: Target.Type { get }
@@ -31,7 +31,7 @@ open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
 
 public typealias NamedClassHook<Target: AnyObject> = _NamedClassHookClass<Target> & _NamedClassHookProtocol
 
-public protocol _ConcreteClassHook: ConcreteHook {
+public protocol _AnyGlueClassHook {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
 
@@ -47,28 +47,28 @@ extension _ClassHookProtocol {
 
     @discardableResult
     public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
-        guard let unwrapped = (self as? _ConcreteClassHook)?._orig as? Self
+        guard let unwrapped = (self as? _AnyGlueClassHook)?._orig as? Self
             else { fatalError("Could not get orig") }
         return try block(unwrapped)
     }
 
     @discardableResult
     public static func orig<Result>(_ block: (Self.Type) throws -> Result) rethrows -> Result {
-        guard let unwrapped = (self as? _ConcreteClassHook.Type)?._orig as? Self.Type
+        guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._orig as? Self.Type
             else { fatalError("Could not get orig") }
         return try block(unwrapped)
     }
 
     @discardableResult
     public func supr<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
-        guard let unwrapped = (self as? _ConcreteClassHook)?._supr as? Self
+        guard let unwrapped = (self as? _AnyGlueClassHook)?._supr as? Self
             else { fatalError("Could not get supr") }
         return try block(unwrapped)
     }
 
     @discardableResult
     public static func supr<Result>(_ block: (Self.Type) throws -> Result) rethrows -> Result {
-        guard let unwrapped = (self as? _ConcreteClassHook.Type)?._supr as? Self.Type
+        guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._supr as? Self.Type
             else { fatalError("Could not get supr") }
         return try block(unwrapped)
     }
@@ -79,7 +79,12 @@ public struct ClassHookBuilder<Builder: HookBuilder> {
     let target: AnyClass
     var builder: Builder
 
-    public mutating func addHook<Code>(_ sel: Selector, _ replacement: Code, isClassMethod: Bool, completion: @escaping (Code) -> Void) {
+    public mutating func addHook<Code>(
+        _ sel: Selector,
+        _ replacement: Code,
+        isClassMethod: Bool,
+        completion: @escaping (Code) -> Void
+    ) {
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
         builder.addMethodHook(
             cls: cls,
@@ -91,13 +96,14 @@ public struct ClassHookBuilder<Builder: HookBuilder> {
     }
 }
 
-public protocol ConcreteClassHook: _ConcreteClassHook, _ClassHookProtocol {
+public protocol _GlueClassHook: _AnyGlueClassHook, _ClassHookProtocol, _ConcreteHook {
     associatedtype OrigType: _ClassHookProtocol where OrigType.Target == Target
     associatedtype SuprType: _ClassHookProtocol where SuprType.Target == Target
 
     static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>)
 }
-extension ConcreteClassHook {
+
+extension _GlueClassHook {
     public static var _orig: AnyClass { OrigType.self }
     public var _orig: AnyObject { OrigType(target: target) }
 

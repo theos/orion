@@ -43,7 +43,7 @@ enum MessageSendSuperType {
     }
 }
 
-extension _ClassHookProtocol where Self: ConcreteClassHook {
+extension _ClassHookProtocol where Self: _GlueClassHook {
     private static func callSuper<ReturnType, MessageType>(
         _ type: MessageType.Type,
         receiver: Any,

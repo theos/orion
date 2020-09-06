@@ -7,7 +7,7 @@ public protocol Tweak {
 }
 
 extension Tweak {
-    public func activate<BackendType: Backend>(backend: BackendType, hooks: [ConcreteHook.Type]) {
+    public func activate<BackendType: Backend>(backend: BackendType, hooks: [_ConcreteHook.Type]) {
         // this is effectively a no-op but we need it in order to prevent the
         // compiler from stripping out the constructor because it doesn't see
         // it being used
@@ -32,7 +32,7 @@ public protocol TweakWithBackend: Tweak {
 }
 
 extension TweakWithBackend {
-    public func activate(hooks: [ConcreteHook.Type]) {
+    public func activate(hooks: [_ConcreteHook.Type]) {
         activate(backend: backend, hooks: hooks)
     }
 }

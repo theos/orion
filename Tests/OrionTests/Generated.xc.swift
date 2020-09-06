@@ -2,7 +2,7 @@ import Foundation
 import Orion
 import OrionTestSupport
 
-private class Orion_ClassHook1: BasicHook, ConcreteClassHook {
+private class Orion_ClassHook1: BasicHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook1 {
         @objc override func someTestMethod() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -53,7 +53,7 @@ private class Orion_ClassHook1: BasicHook, ConcreteClassHook {
     }
 }
 
-private class Orion_ClassHook2: NamedBasicHook, ConcreteClassHook {
+private class Orion_ClassHook2: NamedBasicHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook2 {
         @objc override func methodForNamedTest() -> Bool {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -90,7 +90,7 @@ private class Orion_ClassHook2: NamedBasicHook, ConcreteClassHook {
     }
 }
 
-private class Orion_ClassHook3: InheritedHook, ConcreteClassHook {
+private class Orion_ClassHook3: InheritedHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook3 {
         @objc class override func someTestMethod3() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -113,7 +113,7 @@ private class Orion_ClassHook3: InheritedHook, ConcreteClassHook {
     }
 }
 
-private class Orion_ClassHook4: InitHook, ConcreteClassHook {
+private class Orion_ClassHook4: InitHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook4 {
         @objc override func `init`() -> Target {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -150,7 +150,7 @@ private class Orion_ClassHook4: InitHook, ConcreteClassHook {
     }
 }
 
-private class Orion_ClassHook5: SuperHook, ConcreteClassHook {
+private class Orion_ClassHook5: SuperHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook5 {
         @objc override func description() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -187,7 +187,7 @@ private class Orion_ClassHook5: SuperHook, ConcreteClassHook {
     }
 }
 
-private class Orion_ClassHook6: PropertyHookX, ConcreteClassHook {
+private class Orion_ClassHook6: PropertyHookX, _GlueClassHook {
     final class OrigType: Orion_ClassHook6 {
         @objc override func getXValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -224,7 +224,7 @@ private class Orion_ClassHook6: PropertyHookX, ConcreteClassHook {
     }
 }
 
-private class Orion_ClassHook7: PropertyHookY, ConcreteClassHook {
+private class Orion_ClassHook7: PropertyHookY, _GlueClassHook {
     final class OrigType: Orion_ClassHook7 {
         @objc override func getYValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -261,7 +261,7 @@ private class Orion_ClassHook7: PropertyHookY, ConcreteClassHook {
     }
 }
 
-private class Orion_ClassHook8: PropertyHook2, ConcreteClassHook {
+private class Orion_ClassHook8: PropertyHook2, _GlueClassHook {
     final class OrigType: Orion_ClassHook8 {
         @objc override func getXValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -298,7 +298,7 @@ private class Orion_ClassHook8: PropertyHook2, ConcreteClassHook {
     }
 }
 
-private class Orion_FunctionHook1: AtoiHook, ConcreteFunctionHook {
+private class Orion_FunctionHook1: AtoiHook, _GlueFunctionHook {
     static let orion_shared = Orion_FunctionHook1()
 
     static var origFunction: @convention(c) (UnsafePointer<Int8>) -> Int32 = { arg1 in
@@ -312,7 +312,7 @@ private class Orion_FunctionHook1: AtoiHook, ConcreteFunctionHook {
     }
 }
 
-private class Orion_FunctionHook2: AtofHook, ConcreteFunctionHook {
+private class Orion_FunctionHook2: AtofHook, _GlueFunctionHook {
     static let orion_shared = Orion_FunctionHook2()
 
     static var origFunction: @convention(c) (UnsafePointer<Int8>) -> Double = { arg1 in

@@ -125,7 +125,7 @@ public final class OrionGenerator {
         let indentedMains = indentAndJoin(mains, by: 1)
 
         let hook = """
-        private class \(className): \(classHook.name), ConcreteClassHook {
+        private class \(className): \(classHook.name), _GlueClassHook {
             final class OrigType: \(className) {
         \(indentedOrigs)
             }
@@ -152,7 +152,7 @@ public final class OrionGenerator {
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
         let hook = """
-        private class \(className): \(functionHook.name), ConcreteFunctionHook {
+        private class \(className): \(functionHook.name), _GlueFunctionHook {
             static let \(shared) = \(className)()
 
             static var origFunction: @convention(c) \(functionHook.function.closure) = { \(argsIn)

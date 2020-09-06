@@ -28,7 +28,7 @@ public struct Function: CustomStringConvertible {
     public var description: String { descriptor.description }
 }
 
-public protocol _FunctionHookProtocol: class, AnyHook {
+public protocol _FunctionHookProtocol: class, _AnyHook {
     static var target: Function { get }
     init()
 }
@@ -39,7 +39,7 @@ open class _FunctionHookClass {
 
 public typealias FunctionHook = _FunctionHookClass & _FunctionHookProtocol
 
-public protocol _ConcreteFunctionHook: ConcreteHook {
+public protocol _AnyGlueFunctionHook {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
 }
@@ -47,20 +47,20 @@ public protocol _ConcreteFunctionHook: ConcreteHook {
 extension _FunctionHookProtocol {
     @discardableResult
     public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
-        guard let unwrapped = (self as? _ConcreteFunctionHook)?._orig as? Self
+        guard let unwrapped = (self as? _AnyGlueFunctionHook)?._orig as? Self
             else { fatalError("Could not get orig") }
         return try block(unwrapped)
     }
 }
 
-public protocol ConcreteFunctionHook: _ConcreteFunctionHook, _FunctionHookProtocol {
+public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _FunctionHookProtocol, _ConcreteHook {
     associatedtype Code
     static var origFunction: Code { get set }
 
     associatedtype OrigType: _FunctionHookProtocol
 }
 
-extension ConcreteFunctionHook {
+extension _GlueFunctionHook {
     public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
         builder.addFunctionHook(target, replacement: unsafeBitCast(origFunction, to: UnsafeMutableRawPointer.self)) {
             origFunction = unsafeBitCast($0, to: Code.self)
