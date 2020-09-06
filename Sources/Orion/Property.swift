@@ -44,8 +44,8 @@ private class PropertyKeys {
 @propertyWrapper public struct Property<T> {
     @available(*, unavailable, message: "@Property is only available on ClassHook types")
     public var wrappedValue: T {
-        get { fatalError() }
-        set { fatalError() }
+        get { fatalError("@Property is only available on ClassHook types") }
+        set { fatalError("@Property is only available on ClassHook types") }
     }
 
     public enum Weak {

@@ -107,8 +107,8 @@ extension FishhookBackend.Builder {
     public mutating func addFunctionHook<Code>(_ function: Function, replacement: Code, completion: @escaping (Code) -> Void) {
         guard case .symbol(let image, let symbol) = function.descriptor else {
             fatalError("""
-            Cannot hook function at address \(function). If possible, provide a symbol \
-            name and image instead.
+            The fishhook backend cannot hook functions at raw addresses. If possible, provide \
+            a symbol name and image instead.
             """)
         }
 

@@ -25,13 +25,7 @@ open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
         guard let targetName = (self as? _NamedClassHookProtocol.Type)?.targetName else {
             fatalError("Must conform to NamedClassHookProtocol when conforming to NamedClassHookClass")
         }
-        guard let cls = NSClassFromString(targetName) else {
-            fatalError("Could not find a class named '\(targetName)'")
-        }
-        guard let typedClass = cls as? Target.Type else {
-            fatalError("The class '\(targetName)' is not a subclass of \(Target.self)")
-        }
-        return typedClass
+        return Dynamic(targetName).as(type: Target.self)
     }
 }
 
