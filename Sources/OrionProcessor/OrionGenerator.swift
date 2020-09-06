@@ -144,6 +144,8 @@ public final class OrionGenerator {
 
         let hook = """
         private class \(className): \(classHook.name), _GlueClassHook {
+            static let storedTarget: AnyClass = computeTarget()
+
             final class OrigType: \(className) {\(indentedOrigs)}
 
             final class SuprType: \(className) {\(indentedSuprs)}

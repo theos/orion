@@ -3,7 +3,11 @@ import Foundation
 public protocol _ClassHookProtocol: class, _AnyHook {
     associatedtype Target: AnyObject
 
-    static var target: Target.Type { get }
+    // since this may be expensive, rather than using a computed prop, when
+    // accessing the static `target` this function is only called once and
+    // then cached by the glue. Do not call this yourself.
+    static func computeTarget() -> Target.Type
+
     var target: Target { get }
 
     init(target: Target)
@@ -13,7 +17,7 @@ public protocol _ClassHookProtocol: class, _AnyHook {
     open var target: Target
     public required init(target: Target) { self.target = target }
 
-    public class var target: Target.Type { Target.self }
+    open class func computeTarget() -> Target.Type { Target.self }
 }
 
 public protocol _NamedClassHookProtocol {
@@ -21,10 +25,9 @@ public protocol _NamedClassHookProtocol {
 }
 
 open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
-    public override class var target: Target.Type {
-        guard let targetName = (self as? _NamedClassHookProtocol.Type)?.targetName else {
-            fatalError("Must conform to NamedClassHookProtocol when conforming to NamedClassHookClass")
-        }
+    open override class func computeTarget() -> Target.Type {
+        guard let targetName = (self as? _NamedClassHookProtocol.Type)?.targetName
+            else { fatalError("Use NamedClassHook") }
         return Dynamic(targetName).as(type: Target.self)
     }
 }
@@ -32,6 +35,8 @@ open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
 public typealias NamedClassHook<Target: AnyObject> = _NamedClassHookClass<Target> & _NamedClassHookProtocol
 
 public protocol _AnyGlueClassHook {
+    static var storedTarget: AnyClass { get }
+
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
 
@@ -40,6 +45,12 @@ public protocol _AnyGlueClassHook {
 }
 
 extension _ClassHookProtocol {
+
+    public static var target: Target.Type {
+        guard let unwrapped = (self as? _AnyGlueClassHook.Type)?.storedTarget as? Target.Type
+            else { fatalError("Could not get target") }
+        return unwrapped
+    }
 
     // yes, thse can indeed be made computed properties (`var orig: Self`) instead,
     // but unfortunately the Swift compiler emits a warning when it sees an orig/supr
@@ -114,6 +125,7 @@ extension _GlueClassHook {
         let methodDescription = { "\(isClassMethod ? "+" : "-")[\(self) \(selector)]" }
         guard let method = (isClassMethod ? class_getClassMethod : class_getInstanceMethod)(self, selector)
             else { fatalError("Could not find method \(methodDescription())")}
+        // TODO: Figure out if there's a way to get the type encoding statically instead
         guard let types = method_getTypeEncoding(method)
             else { fatalError("Could not get method signature for \(methodDescription())") }
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
