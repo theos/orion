@@ -8,6 +8,9 @@ private extension Diagnostic.Message {
     static func multipleDecls() -> Diagnostic.Message {
         .init(.error, "A type can only be a single type of hook or tweak")
     }
+    static func functionHookWithoutFunction() -> Diagnostic.Message {
+        .init(.error, "Function hooks must contain a function named 'function'")
+    }
 }
 
 class OrionVisitor: SyntaxVisitor {
@@ -160,7 +163,14 @@ class OrionVisitor: SyntaxVisitor {
         guard let function = node.members.members
             .compactMap({ $0.decl.as(FunctionDeclSyntax.self) })
             .first(where: { $0.identifier.text == "function" })
-            else { return }
+            else {
+                diagnosticEngine.diagnose(
+                    .functionHookWithoutFunction(),
+                    location: node.startLocation(converter: converter)
+                )
+                didFail = true
+                return
+            }
         data.functionHooks.append(OrionData.FunctionHook(
             name: node.identifier.text,
             function: orionFunction(for: function),
