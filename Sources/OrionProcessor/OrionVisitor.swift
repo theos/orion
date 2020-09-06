@@ -5,13 +5,13 @@ private extension Diagnostic.Message {
     static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
         .init(.error, "A \(declKind) cannot be private, fileprivate, or final")
     }
-    static func staticClassMethodHook() -> Diagnostic.Message {
+    static func staticClassMethodDecl() -> Diagnostic.Message {
         .init(
             .error,
             """
-            A method hook cannot be static. If you are hooking a class method, \
-            use `class` instead of `static`. If this is a helper function, declare
-            it as private, fileprivate, or final.
+            A method hook/addition cannot be static. If you are hooking/adding a class \
+            method, use `class` instead of `static`. If this is a helper function, declare \
+            it as private or fileprivate.
             """
         )
     }
@@ -38,6 +38,7 @@ class OrionVisitor: SyntaxVisitor {
     private static let defaultTweakTypes: Set<String> = ["Tweak"]
     private static let backendTweakTypes: Set<String> = ["TweakWithBackend"]
     private static let uninheritableModifiers: Set<String> = ["private", "fileprivate", "final"]
+    private static let ignoredMethodModifiers: Set<String> = ["private", "fileprivate"]
     private static let invalidFunctionHookModifiers: Set<String> = ["private", "fileprivate", "final", "class", "static"]
 
     let converter: SourceLocationConverter
@@ -152,6 +153,12 @@ class OrionVisitor: SyntaxVisitor {
         function.modifiers?.first { $0.name.text == "static" }
     }
 
+    // TODO: Maybe use a comment above the function instead? Something
+    // like `// orion:set:next addition` (similar to swiftlint)
+    private func functionIsAddition(_ function: FunctionDeclSyntax) -> Bool {
+        function.modifiers?.contains { $0.name.text == "final" } == true
+    }
+
     private func functionHasClass(_ function: FunctionDeclSyntax) -> Bool {
         function.modifiers?.contains { $0.name.text == "class" } == true
     }
@@ -165,15 +172,21 @@ class OrionVisitor: SyntaxVisitor {
             .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
                 guard let modifiers = decl.modifiers else { return true }
-                // we intentionally don't emit a warning here; this allows users to
-                // use one of these declarations to add a helper function, which isn't
-                // actually a hook, to a hook type
-                return !modifiers.contains { Self.uninheritableModifiers.contains($0.name.text) }
+                // This allows users to use one of these declarations to add a helper function,
+                // which isn't actually a hook, to a hook type
+                return !modifiers.contains { Self.ignoredMethodModifiers.contains($0.name.text) }
             }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
+                // Although if the method is `final` we could technically skip this check because
+                // we don't need to inherit method additions, `static` and `final` aren't allowed
+                // to co-exist anyway because static implies final. Swift recommends removing final
+                // which would result in us not treating the method as an addition. And removing
+                // static results in the method being an instance method instead of a class method.
+                // Strictly disallowing static reduces confusion, making it clear that one should
+                // use `class` instead of `static`.
                 if let staticModifier = staticModifier(in: decl) {
                     diagnosticEngine.diagnose(
-                        .staticClassMethodHook(),
+                        .staticClassMethodDecl(),
                         location: decl.startLocation(converter: converter)
                     ) { builder in
                         builder.fixItReplace(
@@ -189,6 +202,7 @@ class OrionVisitor: SyntaxVisitor {
             .map { function -> OrionData.ClassHook.Method in
                 let isClass = functionHasClass(function)
                 return OrionData.ClassHook.Method(
+                    isAddition: functionIsAddition(function),
                     isClassMethod: isClass,
                     hasObjcAttribute: functionHasObjc(function),
                     function: orionFunction(for: function),

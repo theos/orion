@@ -62,6 +62,16 @@ class NamedBasicHook: NamedClassHook<BasicClass> {
     }
 }
 
+class AdditionHook: ClassHook<BasicClass> {
+    final func someTestProtocolMethod() -> String {
+        "New method"
+    }
+
+    final class func someTestProtocolClassMethod() -> String {
+        "New class method"
+    }
+}
+
 class InheritedHook: ClassHook<InheritedClass> {
     class func someTestMethod3() -> String {
         "Hooked test class method: \(supr { $0.someTestMethod3() })"

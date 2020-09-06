@@ -12,6 +12,7 @@ public struct OrionData {
 
     struct ClassHook {
         struct Method {
+            var isAddition: Bool // implies the method should be added, not swizzled
             var isClassMethod: Bool
             var hasObjcAttribute: Bool
             var function: Function

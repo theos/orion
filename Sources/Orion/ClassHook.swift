@@ -110,6 +110,16 @@ extension _GlueClassHook {
     public static var _supr: AnyClass { SuprType.self }
     public var _supr: AnyObject { SuprType(target: target) }
 
+    public static func addMethod<Code>(_ selector: Selector, _ implementation: Code, isClassMethod: Bool) {
+        let methodDescription = { "\(isClassMethod ? "+" : "-")[\(self) \(selector)]" }
+        guard let method = (isClassMethod ? class_getClassMethod : class_getInstanceMethod)(self, selector)
+            else { fatalError("Could not find method \(methodDescription())")}
+        guard let types = method_getTypeEncoding(method)
+            else { fatalError("Could not get method signature for \(methodDescription())") }
+        let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
+        class_addMethod(cls, selector, unsafeBitCast(implementation, to: IMP.self), types)
+    }
+
     public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
         var classHookBuilder = ClassHookBuilder(target: target, builder: builder)
         defer { builder = classHookBuilder.builder }

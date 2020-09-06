@@ -90,14 +90,35 @@ private class Orion_ClassHook2: NamedBasicHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook3: InheritedHook, _GlueClassHook {
-    final class OrigType: Orion_ClassHook3 {
+private class Orion_ClassHook3: AdditionHook, _GlueClassHook {
+    final class OrigType: Orion_ClassHook3 {}
+
+    final class SuprType: Orion_ClassHook3 {}
+
+    private static let orion_sel1 = #selector(someTestProtocolMethod as (Self) -> () -> String)
+    private static var orion_imp1: @convention(c) (Target, Selector) -> String = { target, _cmd in
+        Orion_ClassHook3(target: target).someTestProtocolMethod()
+    }
+
+    private static let orion_sel2 = #selector(someTestProtocolClassMethod as () -> String)
+    private static var orion_imp2: @convention(c) (AnyClass, Selector) -> String = { target, _cmd in
+        Orion_ClassHook3.someTestProtocolClassMethod()
+    }
+
+    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+        addMethod(orion_sel1, orion_imp1, isClassMethod: false)
+        addMethod(orion_sel2, orion_imp2, isClassMethod: true)
+    }
+}
+
+private class Orion_ClassHook4: InheritedHook, _GlueClassHook {
+    final class OrigType: Orion_ClassHook4 {
         @objc class override func someTestMethod3() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
         }
     }
 
-    final class SuprType: Orion_ClassHook3 {
+    final class SuprType: Orion_ClassHook4 {
         @objc class override func someTestMethod3() -> String {
             callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, Self.orion_sel1) }
         }
@@ -105,7 +126,7 @@ private class Orion_ClassHook3: InheritedHook, _GlueClassHook {
 
     private static let orion_sel1 = #selector(someTestMethod3 as () -> String)
     private static var orion_orig1: @convention(c) (AnyClass, Selector) -> String = { target, _cmd in
-        Orion_ClassHook3.someTestMethod3()
+        Orion_ClassHook4.someTestMethod3()
     }
 
     static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
@@ -113,8 +134,8 @@ private class Orion_ClassHook3: InheritedHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook4: InitHook, _GlueClassHook {
-    final class OrigType: Orion_ClassHook4 {
+private class Orion_ClassHook5: InitHook, _GlueClassHook {
+    final class OrigType: Orion_ClassHook5 {
         @objc override func `init`() -> Target {
             Self.orion_orig1(target, Self.orion_sel1)
         }
@@ -124,7 +145,7 @@ private class Orion_ClassHook4: InitHook, _GlueClassHook {
         }
     }
 
-    final class SuprType: Orion_ClassHook4 {
+    final class SuprType: Orion_ClassHook5 {
         @objc override func `init`() -> Target {
             callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Target).self) { $0($1, Self.orion_sel1) }
         }
@@ -136,12 +157,12 @@ private class Orion_ClassHook4: InitHook, _GlueClassHook {
 
     private static let orion_sel1 = #selector(`init` as (Self) -> () -> Target)
     private static var orion_orig1: @convention(c) (Target, Selector) -> Target = { target, _cmd in
-        Orion_ClassHook4(target: target).`init`()
+        Orion_ClassHook5(target: target).`init`()
     }
 
     private static let orion_sel2 = #selector(`init`(withX:) as (Self) -> (Int32) -> Target)
     private static var orion_orig2: @convention(c) (Target, Selector, Int32) -> Target = { target, _cmd, arg1 in
-        Orion_ClassHook4(target: target).`init`(withX:)(arg1)
+        Orion_ClassHook5(target: target).`init`(withX:)(arg1)
     }
 
     static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
@@ -150,8 +171,8 @@ private class Orion_ClassHook4: InitHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook5: SuperHook, _GlueClassHook {
-    final class OrigType: Orion_ClassHook5 {
+private class Orion_ClassHook6: SuperHook, _GlueClassHook {
+    final class OrigType: Orion_ClassHook6 {
         @objc override func description() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
         }
@@ -161,7 +182,7 @@ private class Orion_ClassHook5: SuperHook, _GlueClassHook {
         }
     }
 
-    final class SuprType: Orion_ClassHook5 {
+    final class SuprType: Orion_ClassHook6 {
         @objc override func description() -> String {
             callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, Self.orion_sel1) }
         }
@@ -173,12 +194,12 @@ private class Orion_ClassHook5: SuperHook, _GlueClassHook {
 
     private static let orion_sel1 = #selector(description as (Self) -> () -> String)
     private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-        Orion_ClassHook5(target: target).description()
+        Orion_ClassHook6(target: target).description()
     }
 
     private static let orion_sel2 = #selector(hooked as (Self) -> () -> String)
     private static var orion_orig2: @convention(c) (Target, Selector) -> String = { target, _cmd in
-        Orion_ClassHook5(target: target).hooked()
+        Orion_ClassHook6(target: target).hooked()
     }
 
     static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
@@ -187,8 +208,8 @@ private class Orion_ClassHook5: SuperHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook6: PropertyHookX, _GlueClassHook {
-    final class OrigType: Orion_ClassHook6 {
+private class Orion_ClassHook7: PropertyHookX, _GlueClassHook {
+    final class OrigType: Orion_ClassHook7 {
         @objc override func getXValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
         }
@@ -198,7 +219,7 @@ private class Orion_ClassHook6: PropertyHookX, _GlueClassHook {
         }
     }
 
-    final class SuprType: Orion_ClassHook6 {
+    final class SuprType: Orion_ClassHook7 {
         @objc override func getXValue() -> Int {
             callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) { $0($1, Self.orion_sel1) }
         }
@@ -210,12 +231,12 @@ private class Orion_ClassHook6: PropertyHookX, _GlueClassHook {
 
     private static let orion_sel1 = #selector(getXValue as (Self) -> () -> Int)
     private static var orion_orig1: @convention(c) (Target, Selector) -> Int = { target, _cmd in
-        Orion_ClassHook6(target: target).getXValue()
+        Orion_ClassHook7(target: target).getXValue()
     }
 
     private static let orion_sel2 = #selector(setXValue(_:) as (Self) -> (Int) -> Void)
     private static var orion_orig2: @convention(c) (Target, Selector, Int) -> Void = { target, _cmd, arg1 in
-        Orion_ClassHook6(target: target).setXValue(_:)(arg1)
+        Orion_ClassHook7(target: target).setXValue(_:)(arg1)
     }
 
     static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
@@ -224,8 +245,8 @@ private class Orion_ClassHook6: PropertyHookX, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook7: PropertyHookY, _GlueClassHook {
-    final class OrigType: Orion_ClassHook7 {
+private class Orion_ClassHook8: PropertyHookY, _GlueClassHook {
+    final class OrigType: Orion_ClassHook8 {
         @objc override func getYValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
         }
@@ -235,7 +256,7 @@ private class Orion_ClassHook7: PropertyHookY, _GlueClassHook {
         }
     }
 
-    final class SuprType: Orion_ClassHook7 {
+    final class SuprType: Orion_ClassHook8 {
         @objc override func getYValue() -> Int {
             callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) { $0($1, Self.orion_sel1) }
         }
@@ -247,12 +268,12 @@ private class Orion_ClassHook7: PropertyHookY, _GlueClassHook {
 
     private static let orion_sel1 = #selector(getYValue as (Self) -> () -> Int)
     private static var orion_orig1: @convention(c) (Target, Selector) -> Int = { target, _cmd in
-        Orion_ClassHook7(target: target).getYValue()
+        Orion_ClassHook8(target: target).getYValue()
     }
 
     private static let orion_sel2 = #selector(setYValue(_:) as (Self) -> (Int) -> Void)
     private static var orion_orig2: @convention(c) (Target, Selector, Int) -> Void = { target, _cmd, arg1 in
-        Orion_ClassHook7(target: target).setYValue(_:)(arg1)
+        Orion_ClassHook8(target: target).setYValue(_:)(arg1)
     }
 
     static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
@@ -261,8 +282,8 @@ private class Orion_ClassHook7: PropertyHookY, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook8: PropertyHook2, _GlueClassHook {
-    final class OrigType: Orion_ClassHook8 {
+private class Orion_ClassHook9: PropertyHook2, _GlueClassHook {
+    final class OrigType: Orion_ClassHook9 {
         @objc override func getXValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
         }
@@ -272,7 +293,7 @@ private class Orion_ClassHook8: PropertyHook2, _GlueClassHook {
         }
     }
 
-    final class SuprType: Orion_ClassHook8 {
+    final class SuprType: Orion_ClassHook9 {
         @objc override func getXValue() -> Int {
             callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) { $0($1, Self.orion_sel1) }
         }
@@ -284,12 +305,12 @@ private class Orion_ClassHook8: PropertyHook2, _GlueClassHook {
 
     private static let orion_sel1 = #selector(getXValue as (Self) -> () -> Int)
     private static var orion_orig1: @convention(c) (Target, Selector) -> Int = { target, _cmd in
-        Orion_ClassHook8(target: target).getXValue()
+        Orion_ClassHook9(target: target).getXValue()
     }
 
     private static let orion_sel2 = #selector(setXValue(_:) as (Self) -> (Int) -> Void)
     private static var orion_orig2: @convention(c) (Target, Selector, Int) -> Void = { target, _cmd, arg1 in
-        Orion_ClassHook8(target: target).setXValue(_:)(arg1)
+        Orion_ClassHook9(target: target).setXValue(_:)(arg1)
     }
 
     static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
@@ -338,6 +359,7 @@ func __orion_constructor() {
             Orion_ClassHook6.self,
             Orion_ClassHook7.self,
             Orion_ClassHook8.self,
+            Orion_ClassHook9.self,
             Orion_FunctionHook1.self,
             Orion_FunctionHook2.self
         ]

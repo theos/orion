@@ -64,30 +64,49 @@ public final class OrionGenerator {
         (0..<function.numberOfArguments).map { "arg\($0 + 1)" }
     }
 
-    private func generateConcreteMethodHook(
+    private func generateConcreteMethodData(
         from method: OrionData.ClassHook.Method,
         className: String,
         index: Int
-    ) -> (orig: String, supr: String, main: String, register: String) {
+    ) -> (orig: String?, supr: String?, main: String, activation: String) {
+        let orig: String?
+        let supr: String?
+        let register: String
+
         let args = arguments(for: method.function)
         let argsList = args.joined(separator: ", ")
         let commaArgs = args.isEmpty ? "" : ", \(argsList)"
-        let origIdent = "orion_orig\(index)"
+        let origIdent = "orion_\(method.isAddition ? "imp" : "orig")\(index)"
         let selIdent = "orion_sel\(index)"
 
-        let funcOverride = "\(method.hasObjcAttribute ? "" : "@objc ")\(method.function.function)"
+        if method.isAddition {
+            orig = nil
+            supr = nil
+            register = """
+            addMethod(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod))
+            """
+        } else {
+            // While we don't need to add @objc due to the class being @objcMembers (and the #selector
+            // failing if the function can't be represented in objc), this results in better diagnostics
+            // than merely having an error on the #selector line
+            let funcOverride = "\(method.hasObjcAttribute ? "" : "@objc ")\(method.function.function)"
 
-        let orig = """
-        \(funcOverride) {
-            Self.\(origIdent)(target, Self.\(selIdent)\(commaArgs))
-        }
-        """
+            orig = """
+            \(funcOverride) {
+                Self.\(origIdent)(target, Self.\(selIdent)\(commaArgs))
+            }
+            """
 
-        let supr = """
-        \(funcOverride) {
-            callSuper((@convention(c) \(method.superClosure)).self) { $0($1, Self.\(selIdent)\(commaArgs)) }
+            supr = """
+            \(funcOverride) {
+                callSuper((@convention(c) \(method.superClosure)).self) { $0($1, Self.\(selIdent)\(commaArgs)) }
+            }
+            """
+
+            register = """
+            builder.addHook(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod)) { \(origIdent) = $0 }
+            """
         }
-        """
 
         // say there's a method foo() and another named foo(bar:). #selector(foo) will result in an error
         // because it could refer to either. Adding the signature disambiguates.
@@ -99,43 +118,36 @@ public final class OrionGenerator {
         }
         """
 
-        let register = """
-        builder.addHook(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod)) { \(origIdent) = $0 }
-        """
-
         return (orig, supr, main, register)
     }
 
     private func generateConcreteClassHook(from classHook: OrionData.ClassHook, idx: Int) -> (hook: String, name: String) {
         func indentAndJoin(_ elements: [String], by level: Int) -> String {
+            guard !elements.isEmpty else { return "" }
             let indent = String(repeating: "    ", count: level)
-            return elements.map {
+            let outdent = String(repeating: "    ", count: level - 1)
+            let joined = elements.map {
                 $0.split(separator: "\n").map { "\(indent)\($0)" }.joined(separator: "\n")
             }.joined(separator: "\n\n")
+            return "\n\(joined)\n\(outdent)"
         }
 
         let className = "Orion_ClassHook\(idx)"
 
         let (origs, suprs, mains, registers) = classHook.methods.enumerated()
-            .map { generateConcreteMethodHook(from: $1, className: className, index: $0 + 1) }
+            .map { generateConcreteMethodData(from: $1, className: className, index: $0 + 1) }
             .unzip()
 
-        let indentedOrigs = indentAndJoin(origs, by: 2)
-        let indentedSuprs = indentAndJoin(suprs, by: 2)
+        let indentedOrigs = indentAndJoin(origs.compactMap { $0 }, by: 2)
+        let indentedSuprs = indentAndJoin(suprs.compactMap { $0 }, by: 2)
         let indentedMains = indentAndJoin(mains, by: 1)
 
         let hook = """
         private class \(className): \(classHook.name), _GlueClassHook {
-            final class OrigType: \(className) {
-        \(indentedOrigs)
-            }
+            final class OrigType: \(className) {\(indentedOrigs)}
 
-            final class SuprType: \(className) {
-        \(indentedSuprs)
-            }
-
+            final class SuprType: \(className) {\(indentedSuprs)}
         \(indentedMains)
-
             static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
                 \(registers.joined(separator: "\n        "))
             }
