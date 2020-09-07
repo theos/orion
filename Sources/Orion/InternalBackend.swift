@@ -20,13 +20,28 @@ public struct InternalBackend: DefaultBackend {
             replacement: UnsafeMutableRawPointer,
             completion: @escaping (UnsafeMutableRawPointer) -> Void
         ) {
-            guard let method = class_getInstanceMethod(cls, sel) else {
-                let isMeta = class_isMetaClass(cls)
-                let methodDescription = "\(isMeta ? "+" : "-")[\(cls) \(sel)]"
-                fatalError("Could not find method \(methodDescription)")
+            let methodDescription = { "\(class_isMetaClass(cls) ? "+" : "-")[\(cls) \(sel)]" }
+
+            guard let origMethod = class_getInstanceMethod(cls, sel) else {
+                fatalError("Could not find method \(methodDescription())")
             }
+
+            guard let types = method_getTypeEncoding(origMethod) else {
+                fatalError("Could not get type encoding for method \(methodDescription())")
+            }
+
             actions.append {
-                completion(.init(method_setImplementation(method, .init(replacement))))
+                let imp = IMP(replacement)
+                let orig: IMP
+                // first try to add the method (in case the current imp is inherited)
+                if class_addMethod(cls, sel, imp, types) {
+                    // if added, return the super imp
+                    orig = method_getImplementation(origMethod)
+                } else {
+                    // otherwise, the current class has its own imp of the method. Replace it.
+                    orig = method_setImplementation(origMethod, imp)
+                }
+                completion(.init(orig))
             }
         }
     }
