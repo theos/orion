@@ -6,7 +6,7 @@ public protocol _ClassHookProtocol: class, _AnyHook {
     // since this may be expensive, rather than using a computed prop, when
     // accessing the static `target` this function is only called once and
     // then cached by the glue. Do not call this yourself.
-    static func computeTarget() -> Target.Type
+    static func initializeTargetType() -> Target.Type
 
     var target: Target { get }
 
@@ -21,7 +21,7 @@ public protocol NamedClassHook: class, _AnyHook {
     open var target: Target
     public required init(target: Target) { self.target = target }
 
-    open class func computeTarget() -> Target.Type {
+    open class func initializeTargetType() -> Target.Type {
         (self as? NamedClassHook.Type).map { Dynamic($0.targetName).as(type: Target.self) }
             ?? Target.self
     }

@@ -14,7 +14,7 @@ open class Subclass<Target: AnyObject>: ClassHook<Target> {
             ?? Target.self
     }
 
-    open override class func computeTarget() -> Target.Type {
+    open override class func initializeTargetType() -> Target.Type {
         guard let pair: AnyClass = objc_allocateClassPair(superclass, className, 0)
             else { fatalError("Could not allocate subclass for \(self)") }
         objc_registerClassPair(pair)
