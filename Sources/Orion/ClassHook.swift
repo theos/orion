@@ -34,6 +34,12 @@ open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
 
 public typealias NamedClassHook<Target: AnyObject> = _NamedClassHookClass<Target> & _NamedClassHookProtocol
 
+// the glue adds this as an extension on the user's own class because that ensures
+// that, for example, if one has `class MySubclass: Subclass<NSObject>` they can
+// get the target with `MySubclass.target`. If this was part of _AnyGlueClassHook,
+// accessing `target` on `MySubclass` directly would crash; you'd only be able to
+// do it using Self inside a MySubclass method since that would refer to the concrete
+// subclass.
 public protocol _AnyClassHook {
     static var storedTarget: AnyClass { get }
 }

@@ -62,6 +62,39 @@ class NamedBasicHook: NamedClassHook<BasicClass> {
     }
 }
 
+class BasicSubclass: Subclass<BasicClass> {
+    // this ensures that the method is added to the *subclass* and doesn't
+    // swizzle the superclass imp. If it did swizzle the original, we'd
+    // know because the test for the actual `someTestMethod` would fail
+    func someTestMethod() -> String {
+        "Subclassed test method"
+    }
+
+    final func someNewMethod() -> String {
+        "New method"
+    }
+
+    func subclassableTestMethod() -> String {
+        "Subclassed: \(supr { $0.subclassableTestMethod() })"
+    }
+
+    class func subclassableTestMethod1() -> String {
+        "Subclassed class: \(supr { $0.subclassableTestMethod1() })"
+    }
+}
+
+class NamedBasicSubclass: NamedSubclass<NSObject> {
+    static let superclassName = "BasicClass"
+
+    func subclassableNamedTestMethod() -> String {
+        "Subclassed named: \(supr { $0.subclassableNamedTestMethod() })"
+    }
+
+    class func subclassableNamedTestMethod1() -> String {
+        "Subclassed named class: \(supr { $0.subclassableNamedTestMethod1() })"
+    }
+}
+
 class AdditionHook: ClassHook<BasicClass> {
     final func someTestProtocolMethod() -> String {
         "New method"

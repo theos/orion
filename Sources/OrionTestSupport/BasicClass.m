@@ -24,4 +24,20 @@
     return @[@"hello", [arg stringByAppendingString:@"!"]];
 }
 
+- (NSString *)subclassableTestMethod {
+    return @"Subclassable test method";
+}
+
++ (NSString *)subclassableTestMethod1 {
+    return @"Subclassable test class method";
+}
+
+- (NSString *)subclassableNamedTestMethod {
+    return @"Subclassable named test method";
+}
+
++ (NSString *)subclassableNamedTestMethod1 {
+    return @"Subclassable named test class method";
+}
+
 @end

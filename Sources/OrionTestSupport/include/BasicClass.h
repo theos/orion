@@ -13,6 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)methodForNamedTest;
 + (NSArray *)classMethodForNamedTestWithArgument:(NSString *)arg;
 
+- (NSString *)subclassableTestMethod;
++ (NSString *)subclassableTestMethod1;
+
+- (NSString *)subclassableNamedTestMethod;
++ (NSString *)subclassableNamedTestMethod1;
+
 @end
 
 NS_ASSUME_NONNULL_END
