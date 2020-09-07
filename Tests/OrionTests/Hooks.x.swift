@@ -51,7 +51,7 @@ class BasicHook: ClassHook<BasicClass> {
     }
 }
 
-class NamedBasicHook: ClassHook<BasicClass>, NamedClassHook {
+class NamedBasicHook: ClassHook<BasicClass>, ClassHookWithTargetName {
     static let targetName = "BasicClass"
 
     func methodForNamedTest() -> Bool { true }
@@ -62,11 +62,12 @@ class NamedBasicHook: ClassHook<BasicClass>, NamedClassHook {
     }
 }
 
-@objc protocol MyProtocol {}
+class BasicSubclass: ClassHook<BasicClass>, SubclassedHook, ClassHookWithProtocols {
+    static let subclassName = "CustomBasicSubclass"
 
-class BasicSubclass: Subclass<BasicClass>, SubclassWithProtocols {
     static var protocols: [Protocol] {
-        [MyProtocol.self]
+        // we could use NewMethodProtocol.self but this also tests `Dynamic.protocol`
+        [Dynamic.OrionTests.NewMethodProtocol.protocol]
     }
 
     // this ensures that the method is added to the *subclass* and doesn't
@@ -89,8 +90,8 @@ class BasicSubclass: Subclass<BasicClass>, SubclassWithProtocols {
     }
 }
 
-class NamedBasicSubclass: Subclass<NSObject>, NamedSubclass {
-    static let superclassName = "BasicClass"
+class NamedBasicSubclass: ClassHook<NSObject>, SubclassedHook, ClassHookWithTargetName {
+    static let targetName = "BasicClass"
 
     func subclassableNamedTestMethod() -> String {
         "Subclassed named: \(supr { $0.subclassableNamedTestMethod() })"

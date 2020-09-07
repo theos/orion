@@ -9,11 +9,13 @@ import Foundation
 
     private enum Guts {
         case cls(AnyClass)
+        case proto(Protocol)
         case name(String)
 
         var cls: AnyClass {
             switch self {
             case .cls(let cls): return cls
+            case .proto: fatalError("Cannot convert protocol to class")
             case .name(let name):
                 guard let cls = NSClassFromString(name)
                     else { fatalError("Could not find class named \(name)") }
@@ -21,9 +23,21 @@ import Foundation
             }
         }
 
+        var proto: Protocol {
+            switch self {
+            case .cls: fatalError("Cannot convert class to protocol")
+            case .proto(let proto): return proto
+            case .name(let name):
+                guard let cls = NSProtocolFromString(name)
+                    else { fatalError("Could not find protocol named \(name)") }
+                return cls
+            }
+        }
+
         var name: String {
             switch self {
             case .cls(let cls): return NSStringFromClass(cls)
+            case .proto(let proto): return NSStringFromProtocol(proto)
             case .name(let name): return name
             }
         }
@@ -34,7 +48,8 @@ import Foundation
     }
 
     private let guts: Guts
-    public var cls: AnyClass { guts.cls }
+    public var `class`: AnyClass { guts.cls }
+    public var `protocol`: Protocol { guts.proto }
 
     private init(_ guts: Guts) {
         self.guts = guts
@@ -70,8 +85,8 @@ import Foundation
     }
 
     public func `as`<T: AnyObject>(type: T.Type) -> T.Type {
-        guard let typed = cls as? T.Type
-            else { fatalError("Could not convert class \(cls) to type \(type)") }
+        guard let typed = `class` as? T.Type
+            else { fatalError("Could not convert class \(`class`) to type \(type)") }
         return typed
     }
 
@@ -81,9 +96,9 @@ import Foundation
         // we use init(reflecting:) to get the fully qualified protocol name
         guard let proto = `protocol` ?? NSProtocolFromString(String(reflecting: interface))
             else { fatalError("\(interface) is not an @objc protocol") }
-        class_addProtocol(cls, proto)
-        guard let typed = cls as? I
-            else { fatalError("Failed to make \(cls) conform to \(interface)") }
+        class_addProtocol(`class`, proto)
+        guard let typed = `class` as? I
+            else { fatalError("Failed to make \(`class`) conform to \(interface)") }
         return typed
     }
 

@@ -20,7 +20,6 @@ public struct OrionData {
             var superClosure: Syntax // (UnsafeRawPointer, Selector, Blah) -> Blah
         }
 
-        var isSubclass: Bool
         var name: String
         var methods: [Method]
         var converter: SourceLocationConverter

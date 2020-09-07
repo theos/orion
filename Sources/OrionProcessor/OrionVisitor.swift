@@ -34,22 +34,20 @@ private extension Diagnostic.Message {
 
 class OrionVisitor: SyntaxVisitor {
     private enum DeclarationKind: CustomStringConvertible {
-        case classHook(isSubclass: Bool)
+        case classHook
         case functionHook
         case tweak(hasBackend: Bool)
 
         var description: String {
             switch self {
-            case .classHook(false): return "class hook"
-            case .classHook(true): return "subclass"
+            case .classHook: return "class hook"
             case .functionHook: return "function hook"
             case .tweak: return "tweak"
             }
         }
 
         static let mapping: [String: DeclarationKind] = [
-            "ClassHook": .classHook(isSubclass: false),
-            "Subclass": .classHook(isSubclass: true),
+            "ClassHook": .classHook,
             "FunctionHook": .functionHook,
             "Tweak": .tweak(hasBackend: false),
             "TweakWithBackend": .tweak(hasBackend: true)
@@ -206,7 +204,7 @@ class OrionVisitor: SyntaxVisitor {
         function.attributes?.contains { $0.as(AttributeSyntax.self)?.attributeName.text == "objc" } == true
     }
 
-    private func handle(classHook node: ClassDeclSyntax, isSubclass: Bool) {
+    private func handle(classHook node: ClassDeclSyntax) {
         let methods = node.members.members
             .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
@@ -250,7 +248,6 @@ class OrionVisitor: SyntaxVisitor {
                 )
             }
         data.classHooks.append(OrionData.ClassHook(
-            isSubclass: isSubclass,
             name: node.identifier.text,
             methods: methods,
             converter: converter
@@ -346,8 +343,8 @@ class OrionVisitor: SyntaxVisitor {
         switch declarationKind(for: node.inheritanceClause, modifiers: node.modifiers) {
         case .tweak(let hasBackend):
             handle(tweak: node.identifier, hasBackend: hasBackend)
-        case .classHook(let isSubclass):
-            handle(classHook: node, isSubclass: isSubclass)
+        case .classHook:
+            handle(classHook: node)
         case .functionHook:
             handle(functionHook: node)
         case nil:

@@ -2,8 +2,8 @@ import Foundation
 import Orion
 import OrionTestSupport
 
-extension BasicHook: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension BasicHook: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook1: BasicHook, _GlueClassHook {
@@ -57,8 +57,8 @@ private class Orion_ClassHook1: BasicHook, _GlueClassHook {
     }
 }
 
-extension NamedBasicHook: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension NamedBasicHook: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook2: NamedBasicHook, _GlueClassHook {
@@ -98,8 +98,8 @@ private class Orion_ClassHook2: NamedBasicHook, _GlueClassHook {
     }
 }
 
-extension BasicSubclass: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension BasicSubclass: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook3: BasicSubclass, _GlueClassHook {
@@ -159,8 +159,8 @@ private class Orion_ClassHook3: BasicSubclass, _GlueClassHook {
     }
 }
 
-extension NamedBasicSubclass: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension NamedBasicSubclass: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook4: NamedBasicSubclass, _GlueClassHook {
@@ -200,8 +200,8 @@ private class Orion_ClassHook4: NamedBasicSubclass, _GlueClassHook {
     }
 }
 
-extension AdditionHook: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension AdditionHook: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook5: AdditionHook, _GlueClassHook {
@@ -225,8 +225,8 @@ private class Orion_ClassHook5: AdditionHook, _GlueClassHook {
     }
 }
 
-extension InheritedHook: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension InheritedHook: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook6: InheritedHook, _GlueClassHook {
@@ -252,8 +252,8 @@ private class Orion_ClassHook6: InheritedHook, _GlueClassHook {
     }
 }
 
-extension InitHook: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension InitHook: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook7: InitHook, _GlueClassHook {
@@ -293,8 +293,8 @@ private class Orion_ClassHook7: InitHook, _GlueClassHook {
     }
 }
 
-extension SuperHook: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension SuperHook: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook8: SuperHook, _GlueClassHook {
@@ -334,8 +334,8 @@ private class Orion_ClassHook8: SuperHook, _GlueClassHook {
     }
 }
 
-extension PropertyHookX: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension PropertyHookX: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook9: PropertyHookX, _GlueClassHook {
@@ -375,8 +375,8 @@ private class Orion_ClassHook9: PropertyHookX, _GlueClassHook {
     }
 }
 
-extension PropertyHookY: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension PropertyHookY: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook10: PropertyHookY, _GlueClassHook {
@@ -416,8 +416,8 @@ private class Orion_ClassHook10: PropertyHookY, _GlueClassHook {
     }
 }
 
-extension PropertyHook2: _AnyClassHook {
-    static let storedTarget: AnyClass = initializeTargetType()
+extension PropertyHook2: _AnyClassHookWithInitializedTarget {
+    static let initializedTarget: AnyClass = initializeTargetType()
 }
 
 private class Orion_ClassHook11: PropertyHook2, _GlueClassHook {

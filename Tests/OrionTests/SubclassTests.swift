@@ -2,20 +2,30 @@ import XCTest
 import Orion
 import OrionTestSupport
 
-@objc protocol NewMethodInterface {
-    @objc optional func someNewMethod() -> String
+@objc protocol NewMethodProtocol {
+    func someNewMethod() -> String
 }
 
 final class SubclassTests: XCTestCase {
+
+    func testCustomSubclassNameRespected() {
+        XCTAssertNotNil(NSClassFromString("CustomBasicSubclass") as? BasicClass.Type)
+    }
+
+    func testDefaultSubclassName() {
+        XCTAssertNotNil(NSClassFromString("OrionSubclass.OrionTests.NamedBasicSubclass") as? BasicClass.Type)
+    }
 
     func testOverriddenHookedMethod() {
         let obj = BasicSubclass.target.init()
         XCTAssertEqual(obj.someTestMethod(), "Subclassed test method")
     }
 
-    func testNewMethod() {
+    func testNewMethod() throws {
         let obj = BasicSubclass.target.init()
-        XCTAssertEqual(obj.as(interface: NewMethodInterface.self).someNewMethod?(), "New method")
+        // doubles as a check to ensure ClassHookWithProtocols works
+        let asProtocol = try XCTUnwrap(obj as? NewMethodProtocol, "BasicSubclass' target should conform to NewMethodProtocol")
+        XCTAssertEqual(asProtocol.someNewMethod(), "New method")
     }
 
     func testBasicSubclassInstanceMethod() {

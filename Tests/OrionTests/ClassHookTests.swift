@@ -26,7 +26,7 @@ final class ClassHookTests: XCTestCase {
 
     func testBasicNamedInstanceHooks() {
         let basic = BasicClass()
-        XCTAssertTrue(basic.methodForNamedTest(), "NamedClassHook should work on instance methods")
+        XCTAssertTrue(basic.methodForNamedTest(), "ClassHookWithTargetName should work on instance methods")
     }
 
     func testBasicNamedClassHooks() {

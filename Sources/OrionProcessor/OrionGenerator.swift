@@ -143,8 +143,8 @@ public final class OrionGenerator {
         let indentedMains = indentAndJoin(mains, by: 1)
 
         let hook = """
-        extension \(classHook.name): _AnyClassHook {
-            static let storedTarget: AnyClass = initializeTargetType()
+        extension \(classHook.name): _AnyClassHookWithInitializedTarget {
+            static let initializedTarget: AnyClass = initializeTargetType()
         }
 
         private class \(className): \(classHook.name), _GlueClassHook {
