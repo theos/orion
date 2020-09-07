@@ -34,9 +34,11 @@ open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
 
 public typealias NamedClassHook<Target: AnyObject> = _NamedClassHookClass<Target> & _NamedClassHookProtocol
 
-public protocol _AnyGlueClassHook {
+public protocol _AnyClassHook {
     static var storedTarget: AnyClass { get }
+}
 
+public protocol _AnyGlueClassHook {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
 
@@ -47,8 +49,8 @@ public protocol _AnyGlueClassHook {
 extension _ClassHookProtocol {
 
     public static var target: Target.Type {
-        guard let unwrapped = (self as? _AnyGlueClassHook.Type)?.storedTarget as? Target.Type
-            else { fatalError("Could not get target") }
+        guard let unwrapped = (self as? _AnyClassHook.Type)?.storedTarget as? Target.Type
+            else { fatalError("Could not get target. Has the Orion glue file been compiled?") }
         return unwrapped
     }
 
@@ -129,7 +131,8 @@ extension _GlueClassHook {
         guard let types = method_getTypeEncoding(method)
             else { fatalError("Could not get method signature for \(methodDescription())") }
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
-        class_addMethod(cls, selector, unsafeBitCast(implementation, to: IMP.self), types)
+        guard class_addMethod(cls, selector, unsafeBitCast(implementation, to: IMP.self), types)
+            else { fatalError("Failed to add method \(methodDescription())") }
     }
 
     public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {

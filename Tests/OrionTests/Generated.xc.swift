@@ -2,9 +2,11 @@ import Foundation
 import Orion
 import OrionTestSupport
 
-private class Orion_ClassHook1: BasicHook, _GlueClassHook {
+extension BasicHook: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook1: BasicHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook1 {
         @objc override func someTestMethod() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -55,9 +57,11 @@ private class Orion_ClassHook1: BasicHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook2: NamedBasicHook, _GlueClassHook {
+extension NamedBasicHook: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook2: NamedBasicHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook2 {
         @objc override func methodForNamedTest() -> Bool {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -94,9 +98,11 @@ private class Orion_ClassHook2: NamedBasicHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook3: AdditionHook, _GlueClassHook {
+extension AdditionHook: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook3: AdditionHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook3 {}
 
     final class SuprType: Orion_ClassHook3 {}
@@ -117,9 +123,11 @@ private class Orion_ClassHook3: AdditionHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook4: InheritedHook, _GlueClassHook {
+extension InheritedHook: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook4: InheritedHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook4 {
         @objc class override func someTestMethod3() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -142,9 +150,11 @@ private class Orion_ClassHook4: InheritedHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook5: InitHook, _GlueClassHook {
+extension InitHook: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook5: InitHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook5 {
         @objc override func `init`() -> Target {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -181,9 +191,11 @@ private class Orion_ClassHook5: InitHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook6: SuperHook, _GlueClassHook {
+extension SuperHook: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook6: SuperHook, _GlueClassHook {
     final class OrigType: Orion_ClassHook6 {
         @objc override func description() -> String {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -220,9 +232,11 @@ private class Orion_ClassHook6: SuperHook, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook7: PropertyHookX, _GlueClassHook {
+extension PropertyHookX: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook7: PropertyHookX, _GlueClassHook {
     final class OrigType: Orion_ClassHook7 {
         @objc override func getXValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -259,9 +273,11 @@ private class Orion_ClassHook7: PropertyHookX, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook8: PropertyHookY, _GlueClassHook {
+extension PropertyHookY: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook8: PropertyHookY, _GlueClassHook {
     final class OrigType: Orion_ClassHook8 {
         @objc override func getYValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
@@ -298,9 +314,11 @@ private class Orion_ClassHook8: PropertyHookY, _GlueClassHook {
     }
 }
 
-private class Orion_ClassHook9: PropertyHook2, _GlueClassHook {
+extension PropertyHook2: _AnyClassHook {
     static let storedTarget: AnyClass = computeTarget()
+}
 
+private class Orion_ClassHook9: PropertyHook2, _GlueClassHook {
     final class OrigType: Orion_ClassHook9 {
         @objc override func getXValue() -> Int {
             Self.orion_orig1(target, Self.orion_sel1)
