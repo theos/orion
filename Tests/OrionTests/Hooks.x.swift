@@ -51,7 +51,7 @@ class BasicHook: ClassHook<BasicClass> {
     }
 }
 
-class NamedBasicHook: NamedClassHook<BasicClass> {
+class NamedBasicHook: ClassHook<BasicClass>, NamedClassHook {
     static let targetName = "BasicClass"
 
     func methodForNamedTest() -> Bool { true }
@@ -62,7 +62,13 @@ class NamedBasicHook: NamedClassHook<BasicClass> {
     }
 }
 
-class BasicSubclass: Subclass<BasicClass> {
+@objc protocol MyProtocol {}
+
+class BasicSubclass: Subclass<BasicClass>, SubclassWithProtocols {
+    static var protocols: [Protocol] {
+        [MyProtocol.self]
+    }
+
     // this ensures that the method is added to the *subclass* and doesn't
     // swizzle the superclass imp. If it did swizzle the original, we'd
     // know because the test for the actual `someTestMethod` would fail
@@ -83,7 +89,7 @@ class BasicSubclass: Subclass<BasicClass> {
     }
 }
 
-class NamedBasicSubclass: NamedSubclass<NSObject> {
+class NamedBasicSubclass: Subclass<NSObject>, NamedSubclass {
     static let superclassName = "BasicClass"
 
     func subclassableNamedTestMethod() -> String {

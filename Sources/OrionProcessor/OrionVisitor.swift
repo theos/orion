@@ -33,14 +33,52 @@ private extension Diagnostic.Message {
 }
 
 class OrionVisitor: SyntaxVisitor {
-    private static let classHookTypes: Set<String> = ["ClassHook", "NamedClassHook"]
-    private static let subclassTypes: Set<String> = ["Subclass", "NamedSubclass"]
-    private static let functionHookTypes: Set<String> = ["FunctionHook"]
-    private static let defaultTweakTypes: Set<String> = ["Tweak"]
-    private static let backendTweakTypes: Set<String> = ["TweakWithBackend"]
-    private static let uninheritableModifiers: Set<String> = ["private", "fileprivate", "final"]
-    private static let ignoredMethodModifiers: Set<String> = ["private", "fileprivate"]
-    private static let invalidFunctionHookModifiers: Set<String> = ["private", "fileprivate", "final", "class", "static"]
+    private enum DeclarationKind: CustomStringConvertible {
+        case classHook(isSubclass: Bool)
+        case functionHook
+        case tweak(hasBackend: Bool)
+
+        var description: String {
+            switch self {
+            case .classHook(false): return "class hook"
+            case .classHook(true): return "subclass"
+            case .functionHook: return "function hook"
+            case .tweak: return "tweak"
+            }
+        }
+
+        static let mapping: [String: DeclarationKind] = [
+            "ClassHook": .classHook(isSubclass: false),
+            "Subclass": .classHook(isSubclass: true),
+            "FunctionHook": .functionHook,
+            "Tweak": .tweak(hasBackend: false),
+            "TweakWithBackend": .tweak(hasBackend: true)
+        ]
+    }
+
+    private enum ModifierKind: String {
+        case `private`, `fileprivate`, `final`, `class`, `static`
+
+        static let uninheritable: Set<ModifierKind> = [
+            .private, .fileprivate, .final
+        ]
+
+        static let ignoredInMethod: Set<ModifierKind> = [
+            .private, .fileprivate
+        ]
+
+        static let invalidForFunctionHooks: Set<ModifierKind> = [
+            .private, .fileprivate, .final, .class, .static
+        ]
+
+        init?(_ decl: DeclModifierSyntax) {
+            self.init(rawValue: decl.name.text)
+        }
+
+        var isUninheritable: Bool { Self.uninheritable.contains(self) }
+        var isIgnoredInMethod: Bool { Self.ignoredInMethod.contains(self) }
+        var isInvalidForFunctionHook: Bool { Self.invalidForFunctionHooks.contains(self) }
+    }
 
     let converter: SourceLocationConverter
     let diagnosticEngine: DiagnosticEngine
@@ -151,17 +189,17 @@ class OrionVisitor: SyntaxVisitor {
     }
 
     private func staticModifier(in function: FunctionDeclSyntax) -> DeclModifierSyntax? {
-        function.modifiers?.first { $0.name.text == "static" }
+        function.modifiers?.first { ModifierKind($0) == .static }
     }
 
     // TODO: Maybe use a comment above the function instead? Something
     // like `// orion:set:next addition` (similar to swiftlint)
     private func functionIsAddition(_ function: FunctionDeclSyntax) -> Bool {
-        function.modifiers?.contains { $0.name.text == "final" } == true
+        function.modifiers?.contains { ModifierKind($0) == .final } == true
     }
 
     private func functionHasClass(_ function: FunctionDeclSyntax) -> Bool {
-        function.modifiers?.contains { $0.name.text == "class" } == true
+        function.modifiers?.contains { ModifierKind($0) == .class } == true
     }
 
     private func functionHasObjc(_ function: FunctionDeclSyntax) -> Bool {
@@ -175,7 +213,7 @@ class OrionVisitor: SyntaxVisitor {
                 guard let modifiers = decl.modifiers else { return true }
                 // This allows users to use one of these declarations to add a helper function,
                 // which isn't actually a hook, to a hook type
-                return !modifiers.contains { Self.ignoredMethodModifiers.contains($0.name.text) }
+                return !modifiers.contains { ModifierKind($0)?.isIgnoredInMethod == true }
             }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
                 // Although if the method is `final` we could technically skip this check because
@@ -232,7 +270,9 @@ class OrionVisitor: SyntaxVisitor {
                 return
             }
 
-        if let invalidModifiers = function.modifiers?.filter({ Self.invalidFunctionHookModifiers.contains($0.name.text) }), !invalidModifiers.isEmpty {
+        if let invalidModifiers = function.modifiers?.filter({
+            ModifierKind($0)?.isInvalidForFunctionHook == true
+        }), !invalidModifiers.isEmpty {
             diagnosticEngine.diagnose(
                 .invalidFunctionHookModifiers(),
                 location: invalidModifiers[0].startLocation(converter: converter)
@@ -252,38 +292,18 @@ class OrionVisitor: SyntaxVisitor {
         data.tweaks.append(OrionData.Tweak(name: Syntax(identifier), hasBackend: hasBackend, converter: converter))
     }
 
-    private enum DeclarationKind: CustomStringConvertible {
-        case classHook(isSubclass: Bool)
-        case functionHook
-        case tweak(hasBackend: Bool)
-
-        var description: String {
-            switch self {
-            case .classHook(false): return "class hook"
-            case .classHook(true): return "subclass"
-            case .functionHook: return "function hook"
-            case .tweak: return "tweak"
-            }
-        }
-    }
-
     private func declarationKind(for node: TypeInheritanceClauseSyntax?, modifiers: ModifierListSyntax?) -> DeclarationKind? {
         guard let node = node else { return nil }
 
-        let idents = node.inheritedTypeCollection.compactMap {
+        let declarationKinds = node.inheritedTypeCollection.compactMap {
             $0.typeName.as(SimpleTypeIdentifierSyntax.self)?.name.text
-        }
-        var declarationKinds: [DeclarationKind] = []
-        if idents.contains(where: Self.classHookTypes.contains) { declarationKinds.append(.classHook(isSubclass: false)) }
-        if idents.contains(where: Self.subclassTypes.contains) { declarationKinds.append(.classHook(isSubclass: true)) }
-        if idents.contains(where: Self.functionHookTypes.contains) { declarationKinds.append(.functionHook) }
-        if idents.contains(where: Self.defaultTweakTypes.contains) { declarationKinds.append(.tweak(hasBackend: false)) }
-        if idents.contains(where: Self.backendTweakTypes.contains) { declarationKinds.append(.tweak(hasBackend: true)) }
+        }.compactMap { DeclarationKind.mapping[$0] }
+
         switch declarationKinds.count {
         case 0: return nil
         case 1:
             let kind = declarationKinds[0]
-            let uninheritable = modifiers?.filter { Self.uninheritableModifiers.contains($0.name.text) } ?? []
+            let uninheritable = modifiers?.filter { ModifierKind($0)?.isUninheritable == true } ?? []
             if !uninheritable.isEmpty {
                 diagnosticEngine.diagnose(
                     .invalidDeclAccess(declKind: "\(kind)"),

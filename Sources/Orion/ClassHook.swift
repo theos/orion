@@ -13,26 +13,19 @@ public protocol _ClassHookProtocol: class, _AnyHook {
     init(target: Target)
 }
 
+public protocol NamedClassHook: class, _AnyHook {
+    static var targetName: String { get }
+}
+
 @objcMembers open class ClassHook<Target: AnyObject>: _ClassHookProtocol {
     open var target: Target
     public required init(target: Target) { self.target = target }
 
-    open class func computeTarget() -> Target.Type { Target.self }
-}
-
-public protocol _NamedClassHookProtocol {
-    static var targetName: String { get }
-}
-
-open class _NamedClassHookClass<Target: AnyObject>: ClassHook<Target> {
-    open override class func computeTarget() -> Target.Type {
-        guard let targetName = (self as? _NamedClassHookProtocol.Type)?.targetName
-            else { fatalError("Use NamedClassHook") }
-        return Dynamic(targetName).as(type: Target.self)
+    open class func computeTarget() -> Target.Type {
+        (self as? NamedClassHook.Type).map { Dynamic($0.targetName).as(type: Target.self) }
+            ?? Target.self
     }
 }
-
-public typealias NamedClassHook<Target: AnyObject> = _NamedClassHookClass<Target> & _NamedClassHookProtocol
 
 // the glue adds this as an extension on the user's own class because that ensures
 // that, for example, if one has `class MySubclass: Subclass<NSObject>` they can
