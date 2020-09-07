@@ -8,7 +8,6 @@ open class Subclass<Target: AnyObject>: ClassHook<Target> {
     open class var superclass: Target.Type { Target.self }
 
     open override class func computeTarget() -> Target.Type {
-        print(className)
         guard let pair: AnyClass = objc_allocateClassPair(superclass, className, 0)
             else { fatalError("Could not allocate subclass for \(self)") }
         objc_registerClassPair(pair)
