@@ -60,7 +60,7 @@ var package = Package(
     ],
     dependencies: [
 //        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
-        .package(url: "https://github.com/apple/swift-syntax.git", .exact(swiftSyntaxVersion)),
+        .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", .exact(swiftSyntaxVersion)),
     ],
     targets: [
         .target(
