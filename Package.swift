@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.2
 
 import PackageDescription
 import Foundation
@@ -10,18 +10,17 @@ enum Builder {
 }
 
 let swiftSyntaxVersion: Version = {
-    #if swift(>=5.3)
+    #if swift(>=5.4)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
+    #elseif swift(>=5.3)
+    return "0.50300.0"
     #elseif swift(>=5.2)
     return "0.50200.0"
-    #elseif swift(>=5.1)
-    #error("Orion does not support Swift 5.1 yet, but support is coming soon.")
-    return "0.50100.0"
     #else
-    #error("Orion does not support versions of Swift lower than 5.1.")
+    #error("Orion does not support versions of Swift lower than 5.2.")
     #endif
 }()
 
