@@ -1,31 +1,17 @@
 import Foundation
 
-public struct Function: CustomStringConvertible {
-    public enum Descriptor: CustomStringConvertible {
-        case address(UnsafeMutableRawPointer)
-        case symbol(image: URL?, name: String)
+public enum Function: CustomStringConvertible {
+    case address(UnsafeMutableRawPointer)
+    case symbol(image: URL?, name: String)
 
-        public var description: String {
-            switch self {
-            case let .address(address):
-                return "\(address)"
-            case let .symbol(image, name):
-                return "\(image?.lastPathComponent ?? "<global>")`\(name)"
-            }
+    public var description: String {
+        switch self {
+        case let .address(address):
+            return "\(address)"
+        case let .symbol(image, name):
+            return "\(image?.lastPathComponent ?? "<global>")`\(name)"
         }
     }
-
-    public let descriptor: Descriptor
-
-    public init(address: UnsafeMutableRawPointer) {
-        self.descriptor = .address(address)
-    }
-
-    public init(image: URL?, name: String) {
-        self.descriptor = .symbol(image: image, name: name)
-    }
-
-    public var description: String { descriptor.description }
 }
 
 public protocol _FunctionHookProtocol: class, _AnyHook {

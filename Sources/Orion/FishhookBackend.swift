@@ -74,7 +74,7 @@ extension FishhookBackend.Builder {
         replacement: UnsafeMutableRawPointer,
         completion: @escaping (UnsafeMutableRawPointer) -> Void
     ) {
-        guard case .symbol(let image, let symbol) = function.descriptor else {
+        guard case .symbol(let image, let symbol) = function else {
             fatalError("""
             The fishhook backend cannot hook functions at raw addresses. If possible, provide \
             a symbol name and image instead.

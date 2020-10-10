@@ -3,11 +3,6 @@ import Foundation
 public protocol _ClassHookProtocol: class, _AnyHook {
     associatedtype Target: AnyObject
 
-    // since this may be expensive, rather than using a computed prop, when
-    // accessing the static `target` this function is only called once and
-    // then cached by the glue. Do not call this yourself.
-    static func initializeTargetType() -> Target.Type
-
     var target: Target { get }
 
     init(target: Target)
@@ -57,6 +52,9 @@ extension ClassHookWithTargetName {
     open var target: Target
     public required init(target: Target) { self.target = target }
 
+    // since this may be expensive, rather than using a computed prop, when
+    // accessing the static `target` this function is only called once and
+    // then cached by the glue. Do not call this yourself.
     public class func initializeTargetType() -> Target.Type {
         let baseTarget: Target.Type
         if let computed = self as? _AnyClassHookWithComputedTarget.Type {
