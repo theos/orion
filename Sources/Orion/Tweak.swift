@@ -9,7 +9,7 @@ public protocol Tweak {
 }
 
 extension Tweak {
-    public func activate<BackendType: Backend>(backend: BackendType, hooks: [_ConcreteHook.Type]) {
+    public func activate<BackendType: Backend>(backend: BackendType, hooks: [_AnyGlueHook.Type]) {
         #if SWIFT_PACKAGE
         // this is effectively a no-op but we need it in order to prevent the
         // compiler from stripping out the constructor because it doesn't see
@@ -37,7 +37,7 @@ public protocol TweakWithBackend: Tweak {
 }
 
 extension TweakWithBackend {
-    public func activate(hooks: [_ConcreteHook.Type]) {
+    public func activate(hooks: [_AnyGlueHook.Type]) {
         activate(backend: backend, hooks: hooks)
     }
 }

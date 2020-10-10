@@ -167,7 +167,7 @@ public struct ClassHookBuilder<Builder: HookBuilder> {
     }
 }
 
-public protocol _GlueClassHook: _AnyGlueClassHook, _ClassHookProtocol, _ConcreteHook {
+public protocol _GlueClassHook: _AnyGlueClassHook, _ClassHookProtocol, _AnyGlueHook {
     associatedtype OrigType: _ClassHookProtocol where OrigType.Target == Target
     associatedtype SuprType: _ClassHookProtocol where SuprType.Target == Target
 

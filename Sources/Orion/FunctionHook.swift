@@ -53,7 +53,7 @@ extension _FunctionHookProtocol {
     }
 }
 
-public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _FunctionHookProtocol, _ConcreteHook {
+public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _FunctionHookProtocol, _AnyGlueHook {
     associatedtype Code
     static var origFunction: Code { get set }
 

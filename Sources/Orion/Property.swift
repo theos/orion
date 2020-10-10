@@ -48,8 +48,8 @@ private class PropertyKeys {
         set { fatalError("@Property is only available on ClassHook types") }
     }
 
-    public enum Weak {
-        case weak
+    public enum Assign {
+        case assign
     }
 
     public enum Atomicity {
@@ -65,12 +65,15 @@ private class PropertyKeys {
     private let policy: objc_AssociationPolicy
     private let initialValue: T
 
-    public init(wrappedValue: T, _ weak: Weak) {
+    public init(wrappedValue: T, _ assign: Assign) {
+        // despite the documentation, this behaves closer to `assign` or
+        // `unsafe_unretained` than it does to `weak`
         self.policy = .OBJC_ASSOCIATION_ASSIGN
         self.initialValue = wrappedValue
     }
 
     public init(wrappedValue: T, _ atomicity: Atomicity, _ retainOrCopy: RetainOrCopy) {
+        // https://nshipster.com/associated-objects/
         switch (atomicity, retainOrCopy) {
         case (.atomic, .retain): policy = .OBJC_ASSOCIATION_RETAIN
         case (.atomic, .copy): policy = .OBJC_ASSOCIATION_COPY
