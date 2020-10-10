@@ -10,7 +10,7 @@ struct HooksTweak: TweakWithBackend {
 }
 
 class AtoiHook: FunctionHook {
-    static let target = Function.symbol(image: nil, name: "atoi")
+    static let target = Function.symbol("atoi", image: nil)
 
     func function(_ string: UnsafePointer<Int8>) -> Int32 {
         if strcmp(string, "1234") == 0 || strcmp(string, "2345") == 0 {
@@ -26,7 +26,7 @@ class AtofHook: FunctionHook {
     // symbol will be in the provided image. It does guarantee that the image *has* a function with the
     // given name though, but due to two level namespacing fishhook may end up hooking functions by the
     // same name in other images as well
-    static let target = Function.symbol(image: URL(fileURLWithPath: "/usr/lib/libc.dylib"), name: "atof")
+    static let target = Function.symbol("atof", image: "/usr/lib/libc.dylib")
 
     func function(_ string: UnsafePointer<Int8>) -> Double {
         if strcmp(string, "1.5") == 0 || strcmp(string, "2.5") == 0 {

@@ -2,13 +2,24 @@ import Foundation
 
 public enum Function: CustomStringConvertible {
     case address(UnsafeMutableRawPointer)
-    case symbol(image: URL?, name: String)
+    case symbol(_ name: String, image: URL?)
+
+    // Equivalent to `.symbol(name, image: URL(fileURLWithPath: image)`.
+    // This is a convenience. We don't allow `String?` since if you want to
+    // pass `nil` you can use `symbol(_:String image:URL?)` with `URL?.none`.
+    // Also allowing `String?` would result in disambiguation issues when passing
+    // nil. If you already have a `String?`, either `if let` to handle nil separately,
+    // or use something like `string.map(URL.init(fileURLWithPath:))` and then
+    // call the `image: URL?` initializer.
+    public static func symbol(_ name: String, image: String) -> Function {
+        .symbol(name, image: URL(fileURLWithPath: image))
+    }
 
     public var description: String {
         switch self {
         case let .address(address):
             return "\(address)"
-        case let .symbol(image, name):
+        case let .symbol(name, image):
             return "\(image?.lastPathComponent ?? "<global>")`\(name)"
         }
     }
