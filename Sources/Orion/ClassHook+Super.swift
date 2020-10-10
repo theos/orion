@@ -1,6 +1,9 @@
 import Foundation
+#if SWIFT_PACKAGE
 import OrionC
+#endif
 
+// based on https://github.com/SSheldon/rust-objc/tree/95bce4e0d7fa99efebbd135a47cb7dec54710261/src/message/apple
 enum MessageSendSuperType {
     case regular
     #if arch(i386) || arch(x86_64) || arch(arm)

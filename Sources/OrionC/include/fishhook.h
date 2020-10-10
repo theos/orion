@@ -5,8 +5,10 @@
 #define rebind_symbols orion_rebind_symbols
 #define rebind_symbols_image orion_rebind_symbols_image
 
+#if SWIFT_PACKAGE
 // We need the symbols to be visible from Orion, which is a separate
 // module
 #define FISHHOOK_EXPORT
+#endif
 
-#include "fishhook_internal.h"
+#include <fishhook_internal.h>

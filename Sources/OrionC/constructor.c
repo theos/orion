@@ -1,3 +1,5 @@
+#if SWIFT_PACKAGE
+
 #include <stdbool.h>
 
 // since Orion is linked statically, this symbol should be found while linking;
@@ -14,3 +16,5 @@ __attribute__((constructor)) void __orion_constructor_c() {
         __orion_constructor();
     }
 }
+
+#endif

@@ -1,0 +1,10 @@
+Package: dev.theos.orion
+Name: Orion
+Depends: firmware (>= 12.2)
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: The Orion library for Swift tweak support
+Maintainer: Theos Team <theos@kabiroberai.com>
+Author: Theos Team <theos@kabiroberai.com>
+Section: System
+Tag: role::developer

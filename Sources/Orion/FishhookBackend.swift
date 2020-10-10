@@ -1,5 +1,7 @@
 import Foundation
+#if SWIFT_PACKAGE
 import OrionC
+#endif
 
 public struct FishhookBackend<UnderlyingBackend: Backend>: Backend {
     let underlyingBackend: UnderlyingBackend
