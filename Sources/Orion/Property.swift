@@ -1,6 +1,7 @@
 import Foundation
 
-private class PropertyKeys {
+// not private so that we can test this
+final class PropertyKeys {
 
     // we could use DispatchQueue with a barrier but that's affected by the existence of other
     // queues and QoS stuff, so pthread is slightly faster.

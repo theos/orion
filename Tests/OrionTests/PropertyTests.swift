@@ -1,6 +1,14 @@
 import XCTest
-import Orion
+@testable import Orion
 import OrionTestSupport
+
+private struct Foo {
+    struct Bar {
+        let val: Int
+    }
+    let bar: Bar
+    let distinct: Int
+}
 
 final class PropertyTests: XCTestCase {
 
@@ -36,6 +44,23 @@ final class PropertyTests: XCTestCase {
         object1.setYValue(5)
         XCTAssertEqual(object1.getYValue(), 5)
         XCTAssertEqual(object1.getXValue(), 2)
+    }
+
+    func testPropertyKeys() {
+        let first = \Foo.bar.val
+        // equivalent to \Foo.bar.val, but since we're not using the same literal
+        // it won't be uniqued by the compiler and thus the address of `second` will
+        // be a different from `first`
+        let second = (\Foo.bar).appending(path: \.val)
+        let third = \Foo.distinct
+
+        let firstKey = PropertyKeys.shared.key(for: first)
+        let secondKey = PropertyKeys.shared.key(for: second)
+        let thirdKey = PropertyKeys.shared.key(for: third)
+
+        XCTAssertEqual(firstKey, secondKey)
+        XCTAssertNotEqual(firstKey, thirdKey)
+        XCTAssertNotEqual(secondKey, thirdKey)
     }
 
 }
