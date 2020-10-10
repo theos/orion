@@ -1,7 +1,8 @@
 .DS_Store
 /.build
-/Packages
+/packages
 xcuserdata/
 
 Output
 .framework_build
+.theos
