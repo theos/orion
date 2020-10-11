@@ -14,6 +14,14 @@
     return [NSString stringWithFormat:@"Original test class method with arg %i", arg];
 }
 
+- (NSString *)someDidActivateMethod {
+    return @"Original did activate method";
+}
+
+- (NSString *)someUnhookedMethod {
+    return @"Original unhooked method";
+}
+
 + (NSString *)someTestMethod3 {
     return @"Base test class method";
 }

@@ -144,7 +144,7 @@ public final class OrionGenerator {
 
         let hook = """
         extension \(classHook.name): _AnyClassHookWithInitializedTarget {
-            static let initializedTarget: AnyClass = initializeTargetType()
+            static let initializedTarget: AnyClass = _initializeTargetType()
         }
 
         private class \(className): \(classHook.name), _GlueClassHook {

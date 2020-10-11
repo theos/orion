@@ -5,7 +5,7 @@ import OrionC
 
 public protocol Tweak {
     init()
-    func didActivate()
+    func tweakDidActivate()
 }
 
 extension Tweak {
@@ -18,16 +18,15 @@ extension Tweak {
         #endif
 
         backend.hook { builder in
-            for hook in hooks where hook.willActivate() {
-                hook.activate(withHookBuilder: &builder)
-                hook.didActivate()
+            for hook in hooks {
+                hook.activateIfNeeded(withHookBuilder: &builder)
             }
         }
 
-        didActivate()
+        tweakDidActivate()
     }
 
-    public func didActivate() {}
+    public func tweakDidActivate() {}
 }
 
 // a tweak which forces a custom backend

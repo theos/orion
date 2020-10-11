@@ -34,6 +34,17 @@ final class ClassHookTests: XCTestCase {
         XCTAssertEqual(res, ["Hooked named class method", "hello", "Orion, or is it!"])
     }
 
+    func testDidActivateCalled() {
+        // if ActivationHook has been initialized correctly, hookWillActivate should be called, and then
+        // hookDidActivate, resulting in the output text being in the following order
+        XCTAssertEqual(BasicClass().someDidActivateMethod(), "not activated, will activate called, did activate called")
+    }
+
+    func testUnhookedMethod() {
+        // since NotHook.hookWillActivate returns false, this method should *not* be hooked
+        XCTAssertEqual(BasicClass().someUnhookedMethod(), "Original unhooked method")
+    }
+
     func testInheritedSuperClassHooks() {
         // test for calling supr on a class method
         let res = InheritedClass.someTestMethod3()

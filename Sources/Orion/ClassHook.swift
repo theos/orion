@@ -1,26 +1,34 @@
 import Foundation
 
-public protocol _ClassHookProtocol: class, _AnyHook {
+// marker protocol which sub-protocols can refine so that a user
+// can't accidentally mark their FunctionHook as a SubclassedHook
+// or something
+public protocol _AnyClassHook: class, _AnyHook {}
+
+public protocol _ClassHookProtocol: _AnyClassHook {
     associatedtype Target: AnyObject
+
+    // protocols which should be added to the target class
+    static var protocols: [Protocol] { get }
 
     var target: Target { get }
 
     init(target: Target)
 }
 
+extension _ClassHookProtocol {
+    public static var protocols: [Protocol] { [] }
+}
+
 // A SubclassedHook is effectively just a ClassHook where we've added a new class pair on top
 // of the original target. This protocol acts as an indicator that we need to do that. The
 // subclass itself can be accessed via the static `target` property.
-public protocol SubclassedHook: class, _AnyHook {
+public protocol SubclassedHook: _AnyClassHook {
     // has default implementation
     static var subclassName: String { get }
 }
 
-public protocol ClassHookWithProtocols: class, _AnyHook {
-    static var protocols: [Protocol] { get }
-}
-
-public protocol _AnyClassHookWithComputedTarget: class, _AnyHook {
+public protocol _AnyClassHookWithComputedTarget: _AnyClassHook {
     static var _computedTarget: AnyClass { get }
 }
 
@@ -48,14 +56,37 @@ extension ClassHookWithTargetName {
     public static var computedTarget: Target.Type { Dynamic(targetName).as(type: Target.self) }
 }
 
-@objcMembers open class ClassHook<Target: AnyObject>: _ClassHookProtocol {
-    open var target: Target
+@objcMembers open class _ClassHookClass<Target: AnyObject> {
+    public let target: Target
     public required init(target: Target) { self.target = target }
+}
+
+// we don't declare _ClassHookProtocol conformance on _ClassHookClass directly since that would
+// result in _ClassHookClass inheriting the default implementations of hook[Will|Did]Activate,
+// making it more complicated to allow those to be overridden
+public typealias ClassHook<Target: AnyObject> = _ClassHookClass<Target> & _ClassHookProtocol
+
+// the glue adds this as an extension on the user's own class because that ensures
+// that, for example, if one has `class MySubclass: ClassHook<NSObject>, SubclassedHook`
+// they can get the target with `MySubclass.target`. If this was part of _AnyGlueClassHook,
+// accessing `target` on `MySubclass` directly would crash; you'd only be able to do it
+// using Self inside a MySubclass method since that would refer to the concrete subclass.
+public protocol _AnyClassHookWithInitializedTarget {
+    static var initializedTarget: AnyClass { get }
+}
+
+extension _ClassHookProtocol {
+
+    public static var target: Target.Type {
+        guard let unwrapped = (self as? _AnyClassHookWithInitializedTarget.Type)?.initializedTarget as? Target.Type
+            else { fatalError("Could not get target. Has the Orion glue file been compiled?") }
+        return unwrapped
+    }
 
     // since this may be expensive, rather than using a computed prop, when
     // accessing the static `target` this function is only called once and
     // then cached by the glue. Do not call this yourself.
-    public class func initializeTargetType() -> Target.Type {
+    public static func _initializeTargetType() -> Target.Type {
         let baseTarget: Target.Type
         if let computed = self as? _AnyClassHookWithComputedTarget.Type {
             guard let _target = computed._computedTarget as? Target.Type
@@ -77,24 +108,16 @@ extension ClassHookWithTargetName {
             target = baseTarget
         }
 
-        (self as? ClassHookWithProtocols.Type)?.protocols.forEach {
+        protocols.forEach {
             guard class_addProtocol(target, $0)
                 else { fatalError("Could not add protocol \($0) to \(target)") }
         }
         return target
     }
+
 }
 
-// the glue adds this as an extension on the user's own class because that ensures
-// that, for example, if one has `class MySubclass: ClassHook<NSObject>, SubclassedHook`
-// they can get the target with `MySubclass.target`. If this was part of _AnyGlueClassHook,
-// accessing `target` on `MySubclass` directly would crash; you'd only be able to do it
-// using Self inside a MySubclass method since that would refer to the concrete subclass.
-public protocol _AnyClassHookWithInitializedTarget {
-    static var initializedTarget: AnyClass { get }
-}
-
-public protocol _AnyGlueClassHook {
+public protocol _AnyGlueClassHook: _AnyClassHook {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
 
@@ -103,12 +126,6 @@ public protocol _AnyGlueClassHook {
 }
 
 extension _ClassHookProtocol {
-
-    public static var target: Target.Type {
-        guard let unwrapped = (self as? _AnyClassHookWithInitializedTarget.Type)?.initializedTarget as? Target.Type
-            else { fatalError("Could not get target. Has the Orion glue file been compiled?") }
-        return unwrapped
-    }
 
     // yes, thse can indeed be made computed properties (`var orig: Self`) instead,
     // but unfortunately the Swift compiler emits a warning when it sees an orig/supr

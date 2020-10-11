@@ -78,6 +78,12 @@ class OrionVisitor: SyntaxVisitor {
         var isInvalidForFunctionHook: Bool { Self.invalidForFunctionHooks.contains(self) }
     }
 
+    // don't consider these names as method hooks
+    private static let ignoredMethodNames: Set<String> = [
+        // these are the optional _AnyHook protocol methods; don't treat them as hooks
+        "hookWillActivate", "hookDidActivate"
+    ]
+
     let converter: SourceLocationConverter
     let diagnosticEngine: DiagnosticEngine
     init(diagnosticEngine: DiagnosticEngine, sourceLocationConverter: SourceLocationConverter) {
@@ -212,6 +218,7 @@ class OrionVisitor: SyntaxVisitor {
                 // This allows users to use one of these declarations to add a helper function,
                 // which isn't actually a hook, to a hook type
                 return !modifiers.contains { ModifierKind($0)?.isIgnoredInMethod == true }
+                    && !Self.ignoredMethodNames.contains(decl.identifier.text)
             }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
                 // Although if the method is `final` we could technically skip this check because

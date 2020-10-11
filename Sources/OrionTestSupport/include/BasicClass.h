@@ -8,6 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)someTestMethodWithArgument:(int)arg;
 + (NSString *)someTestMethod2WithArgument:(int)arg;
 
+- (NSString *)someDidActivateMethod;
+- (NSString *)someUnhookedMethod;
+
 + (NSString *)someTestMethod3; // for supr class method test
 
 - (BOOL)methodForNamedTest;

@@ -51,6 +51,33 @@ class BasicHook: ClassHook<BasicClass> {
     }
 }
 
+class ActivationHook: ClassHook<BasicClass> {
+    static var activationSteps = ["not activated"]
+
+    static func hookWillActivate() -> Bool {
+        activationSteps.append("will activate called")
+        return true
+    }
+
+    static func hookDidActivate() {
+        activationSteps.append("did activate called")
+    }
+
+    func someDidActivateMethod() -> String {
+        Self.activationSteps.joined(separator: ", ")
+    }
+}
+
+class NotHook: ClassHook<BasicClass> {
+    static func hookWillActivate() -> Bool {
+        false
+    }
+
+    func someUnhookedMethod() -> String {
+        "Hooked unhooked method, oops"
+    }
+}
+
 class NamedBasicHook: ClassHook<BasicClass>, ClassHookWithTargetName {
     static let targetName = "BasicClass"
 
@@ -62,7 +89,7 @@ class NamedBasicHook: ClassHook<BasicClass>, ClassHookWithTargetName {
     }
 }
 
-class BasicSubclass: ClassHook<BasicClass>, SubclassedHook, ClassHookWithProtocols {
+class BasicSubclass: ClassHook<BasicClass>, SubclassedHook {
     static let subclassName = "CustomBasicSubclass"
 
     static var protocols: [Protocol] {

@@ -36,7 +36,7 @@ open class _FunctionHookClass {
 
 public typealias FunctionHook = _FunctionHookClass & _FunctionHookProtocol
 
-public protocol _AnyGlueFunctionHook {
+public protocol _AnyGlueFunctionHook: _FunctionHookProtocol {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
 }
@@ -50,7 +50,7 @@ extension _FunctionHookProtocol {
     }
 }
 
-public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _FunctionHookProtocol, _AnyGlueHook {
+public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _AnyGlueHook {
     associatedtype Code
     static var origFunction: Code { get set }
 
