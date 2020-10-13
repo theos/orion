@@ -38,16 +38,33 @@ private extension Diagnostic.Message {
 // and y'all thought *C* macros were bad
 public final class OrionGenerator {
 
+    // Backends should be declared as extensions on the `Backends` enum. The backend
+    // "name" is the name of the type minus `Backends.` will be the backend name. Orion
+    // will automatically try to import a module with the name OrionBackend_<backend name>
+    // if it exists, so it's best to name the backend framework that. If the backend name
+    // contains generic args, the <...> is stripped before determining the name of the
+    // auto-imported module. If the backend name contains dots, only the first component is
+    // used. For example the backend with the type `Backends.Foo.Bar<Int>` should be referred
+    // to by the name "Foo.Bar<Int>", and will result in Orion auto-importing `OrionBackend_Foo`.
+    // To import additional modules, pass them as `extraBackendModules` to the `generate` method.
     public struct Backend {
         public let name: String
-        public let module: String?
+        public let implicitModule: String?
 
-        public init(name: String, module: String? = nil) {
+        public init(nameWithoutModule name: String) {
             self.name = name
-            self.module = module
+            self.implicitModule = nil
         }
 
-        public static let `internal`: Self = .init(name: "InternalBackend")
+        public init?(name: String) {
+            self.name = name
+            guard let beforeGenerics = name.split(separator: "<").first,
+                  let beforeDot = beforeGenerics.split(separator: ".").first
+            else { return nil }
+            self.implicitModule = "OrionBackend_\(beforeDot)"
+        }
+
+        public static let `internal`: Self = .init(nameWithoutModule: "Internal")
     }
 
     public let diagnosticEngine: OrionDiagnosticEngine
@@ -189,7 +206,7 @@ public final class OrionGenerator {
         "\(items.joined(separator: separation))\(items.isEmpty ? "" : "\n\n")"
     }
 
-    public func generate(backend: Backend = .internal) throws -> String {
+    public func generate(backend: Backend = .internal, extraBackendModules: Set<String> = []) throws -> String {
         let (classes, classHookNames) = data.classHooks.enumerated()
             .map { generateConcreteClassHook(from: $1, idx: $0 + 1) }
             .unzip()
@@ -221,8 +238,13 @@ public final class OrionGenerator {
         }
 
         let importBackend: String
-        if !hasCustomBackend, let module = backend.module {
-            importBackend = "import \(module)\n\n"
+        if !hasCustomBackend, let module = backend.implicitModule {
+            importBackend = """
+            \(join(extraBackendModules.sorted().map { "import \($0)" }, separation: "\n"))\
+            #if canImport(\(module))
+            import \(module)
+            #endif\n\n
+            """
         } else {
             importBackend = ""
         }
@@ -240,7 +262,7 @@ public final class OrionGenerator {
         @_cdecl("__orion_constructor")
         func __orion_constructor() {
             \(tweakName)().activate(
-        \(hasCustomBackend ? "" : "        backend: \(backend.name)(),\n")\
+        \(hasCustomBackend ? "" : "        backend: Backends.\(backend.name)(),\n")\
                 hooks: [
                     \(allHooks)
                 ]

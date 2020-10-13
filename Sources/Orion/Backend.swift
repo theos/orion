@@ -54,3 +54,6 @@ extension Backend {
 public protocol DefaultBackend: Backend {
     init()
 }
+
+// namespace which can be extended to add backends
+public enum Backends {}

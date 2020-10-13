@@ -1,8 +1,12 @@
 import Foundation
 
-public struct InternalBackend: DefaultBackend {
-    public init() {}
+extension Backends {
+    public struct Internal: DefaultBackend {
+        public init() {}
+    }
+}
 
+extension Backends.Internal {
     public struct Builder: HookBuilder {
         fileprivate var actions: [() -> Void] = []
 

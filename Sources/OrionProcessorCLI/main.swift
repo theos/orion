@@ -1,15 +1,6 @@
 import Foundation
 import OrionProcessor
 
-extension OrionGenerator.Backend {
-    static let substrate: Self = .init(name: "SubstrateBackend", module: "SubstrateOrionBackend")
-
-    static let all: [String: Self] = [
-        "internal": .internal,
-        "MobileSubstrate": .substrate
-    ]
-}
-
 func catchingOrionFailures<Result>(block: () throws -> Result) throws -> Result {
     do {
         return try block()
@@ -27,12 +18,9 @@ func catchingOrionFailures<Result>(block: () throws -> Result) throws -> Result 
 let engine = OrionDiagnosticEngine()
 engine.addConsumer(.printing)
 
-let backends = OrionGenerator.Backend.all
-
 func usage() -> Never {
     let string = """
-    Usage: \(CommandLine.arguments[0]) <backend> <file1.swift...>
-    - backends: \(backends.keys.sorted().joined(separator: ", "))
+    Usage: \(CommandLine.arguments[0]) [<module>.]<backend> <file1.swift...>
     """
     fputs("\(string)\n", stderr)
     exit(EX_USAGE)
@@ -41,8 +29,9 @@ func usage() -> Never {
 var args = CommandLine.arguments.dropFirst()
 guard args.count >= 2 else { usage() }
 
-let backendKey = args.removeFirst() // shift
-guard let backend = backends[backendKey] else { usage() }
+let backendName = args.removeFirst() // shift
+guard let backend = OrionGenerator.Backend(name: backendName)
+    else { usage() }
 
 let files = args.map(URL.init(fileURLWithPath:))
 let allData = try files.map { file -> OrionData in

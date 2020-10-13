@@ -6,7 +6,7 @@ import Orion
 import OrionTestSupport
 
 struct HooksTweak: TweakWithBackend {
-    let backend = FishhookBackend<InternalBackend>()
+    let backend = Backends.Fishhook<Backends.Internal>()
 }
 
 class AtoiHook: FunctionHook {

@@ -3,13 +3,17 @@ import Foundation
 import OrionC
 #endif
 
-public struct FishhookBackend<UnderlyingBackend: Backend>: Backend {
-    let underlyingBackend: UnderlyingBackend
+extension Backends {
+    public struct Fishhook<UnderlyingBackend: Backend>: Backend {
+        let underlyingBackend: UnderlyingBackend
 
-    public init(underlyingBackend: UnderlyingBackend) {
-        self.underlyingBackend = underlyingBackend
+        public init(underlyingBackend: UnderlyingBackend) {
+            self.underlyingBackend = underlyingBackend
+        }
     }
+}
 
+extension Backends.Fishhook {
     public struct Builder: HookBuilder {
         fileprivate struct Request {
             let symbol: String
@@ -67,7 +71,7 @@ public struct FishhookBackend<UnderlyingBackend: Backend>: Backend {
     }
 }
 
-extension FishhookBackend.Builder {
+extension Backends.Fishhook.Builder {
 
     public mutating func addFunctionHook(
         _ function: Function,
@@ -120,7 +124,7 @@ extension FishhookBackend.Builder {
 
 }
 
-extension FishhookBackend: DefaultBackend where UnderlyingBackend: DefaultBackend {
+extension Backends.Fishhook: DefaultBackend where UnderlyingBackend: DefaultBackend {
     public init() {
         self.init(underlyingBackend: UnderlyingBackend())
     }
