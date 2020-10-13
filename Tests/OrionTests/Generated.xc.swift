@@ -2,8 +2,8 @@ import Foundation
 import Orion
 import OrionTestSupport
 
-extension BasicHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension BasicHook {
+    public static let _target: BasicClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook1: BasicHook, _GlueClassHook {
@@ -57,8 +57,8 @@ private class Orion_ClassHook1: BasicHook, _GlueClassHook {
     }
 }
 
-extension ActivationHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension ActivationHook {
+    public static let _target: BasicClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook2: ActivationHook, _GlueClassHook {
@@ -84,8 +84,8 @@ private class Orion_ClassHook2: ActivationHook, _GlueClassHook {
     }
 }
 
-extension NotHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension NotHook {
+    public static let _target: BasicClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook3: NotHook, _GlueClassHook {
@@ -111,8 +111,8 @@ private class Orion_ClassHook3: NotHook, _GlueClassHook {
     }
 }
 
-extension NamedBasicHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension NamedBasicHook {
+    public static let _target: NSObject.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook4: NamedBasicHook, _GlueClassHook {
@@ -152,8 +152,8 @@ private class Orion_ClassHook4: NamedBasicHook, _GlueClassHook {
     }
 }
 
-extension BasicSubclass: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension BasicSubclass {
+    public static let _target: BasicClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook5: BasicSubclass, _GlueClassHook {
@@ -213,8 +213,8 @@ private class Orion_ClassHook5: BasicSubclass, _GlueClassHook {
     }
 }
 
-extension NamedBasicSubclass: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension NamedBasicSubclass {
+    public static let _target: NSObject.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook6: NamedBasicSubclass, _GlueClassHook {
@@ -254,8 +254,8 @@ private class Orion_ClassHook6: NamedBasicSubclass, _GlueClassHook {
     }
 }
 
-extension AdditionHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension AdditionHook {
+    public static let _target: BasicClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook7: AdditionHook, _GlueClassHook {
@@ -279,8 +279,8 @@ private class Orion_ClassHook7: AdditionHook, _GlueClassHook {
     }
 }
 
-extension InheritedHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension InheritedHook {
+    public static let _target: InheritedClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook8: InheritedHook, _GlueClassHook {
@@ -306,8 +306,8 @@ private class Orion_ClassHook8: InheritedHook, _GlueClassHook {
     }
 }
 
-extension InitHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension InitHook {
+    public static let _target: InitClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook9: InitHook, _GlueClassHook {
@@ -347,8 +347,8 @@ private class Orion_ClassHook9: InitHook, _GlueClassHook {
     }
 }
 
-extension SuperHook: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension SuperHook {
+    public static let _target: MyClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook10: SuperHook, _GlueClassHook {
@@ -388,8 +388,8 @@ private class Orion_ClassHook10: SuperHook, _GlueClassHook {
     }
 }
 
-extension PropertyHookX: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension PropertyHookX {
+    public static let _target: PropertyClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook11: PropertyHookX, _GlueClassHook {
@@ -429,8 +429,8 @@ private class Orion_ClassHook11: PropertyHookX, _GlueClassHook {
     }
 }
 
-extension PropertyHookY: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension PropertyHookY {
+    public static let _target: PropertyClass.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook12: PropertyHookY, _GlueClassHook {
@@ -470,8 +470,8 @@ private class Orion_ClassHook12: PropertyHookY, _GlueClassHook {
     }
 }
 
-extension PropertyHook2: _AnyClassHookWithInitializedTarget {
-    static let initializedTarget: AnyClass = _initializeTargetType()
+extension PropertyHook2 {
+    public static let _target: PropertyClass2.Type = _initializeTargetType()
 }
 
 private class Orion_ClassHook13: PropertyHook2, _GlueClassHook {

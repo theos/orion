@@ -78,7 +78,7 @@ class NotHook: ClassHook<BasicClass> {
     }
 }
 
-class NamedBasicHook: ClassHook<BasicClass>, ClassHookWithTargetName {
+class NamedBasicHook: ClassHook<NSObject> {
     static let targetName = "BasicClass"
 
     func methodForNamedTest() -> Bool { true }
@@ -89,8 +89,8 @@ class NamedBasicHook: ClassHook<BasicClass>, ClassHookWithTargetName {
     }
 }
 
-class BasicSubclass: ClassHook<BasicClass>, SubclassedHook {
-    static let subclassName = "CustomBasicSubclass"
+class BasicSubclass: ClassHook<BasicClass> {
+    static let subclassMode = SubclassMode.createSubclassNamed("CustomBasicSubclass")
 
     static var protocols: [Protocol] {
         // we could use NewMethodProtocol.self but this also tests `Dynamic.protocol`
@@ -117,8 +117,9 @@ class BasicSubclass: ClassHook<BasicClass>, SubclassedHook {
     }
 }
 
-class NamedBasicSubclass: ClassHook<NSObject>, SubclassedHook, ClassHookWithTargetName {
+class NamedBasicSubclass: ClassHook<NSObject> {
     static let targetName = "BasicClass"
+    static let subclassMode = SubclassMode.createSubclass
 
     func subclassableNamedTestMethod() -> String {
         "Subclassed named: \(supr { $0.subclassableNamedTestMethod() })"

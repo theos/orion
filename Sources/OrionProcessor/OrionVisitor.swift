@@ -34,7 +34,7 @@ private extension Diagnostic.Message {
 
 class OrionVisitor: SyntaxVisitor {
     private enum DeclarationKind: CustomStringConvertible {
-        case classHook
+        case classHook(target: Syntax)
         case functionHook
         case tweak(hasBackend: Bool)
 
@@ -46,12 +46,22 @@ class OrionVisitor: SyntaxVisitor {
             }
         }
 
-        static let mapping: [String: DeclarationKind] = [
-            "ClassHook": .classHook,
-            "FunctionHook": .functionHook,
-            "Tweak": .tweak(hasBackend: false),
-            "TweakWithBackend": .tweak(hasBackend: true)
-        ]
+        init?(typeIdentifier: SimpleTypeIdentifierSyntax) {
+            let base = typeIdentifier.name.text
+            switch base {
+            case "ClassHook":
+                guard let target = typeIdentifier.genericArgumentClause?.arguments.first?.argumentType else { return nil }
+                self = .classHook(target: Syntax(target))
+            case "FunctionHook":
+                self = .functionHook
+            case "Tweak":
+                self = .tweak(hasBackend: false)
+            case "TweakWithBackend":
+                self = .tweak(hasBackend: true)
+            default:
+                return nil
+            }
+        }
     }
 
     private enum ModifierKind: String {
@@ -210,7 +220,7 @@ class OrionVisitor: SyntaxVisitor {
         function.attributes?.contains { $0.as(AttributeSyntax.self)?.attributeName.text == "objc" } == true
     }
 
-    private func handle(classHook node: ClassDeclSyntax) {
+    private func handle(classHook node: ClassDeclSyntax, target: Syntax) {
         let methods = node.members.members
             .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
@@ -256,6 +266,7 @@ class OrionVisitor: SyntaxVisitor {
             }
         data.classHooks.append(OrionData.ClassHook(
             name: node.identifier.text,
+            target: target,
             methods: methods,
             converter: converter
         ))
@@ -299,9 +310,9 @@ class OrionVisitor: SyntaxVisitor {
     private func declarationKind(for node: TypeInheritanceClauseSyntax?, modifiers: ModifierListSyntax?) -> DeclarationKind? {
         guard let node = node else { return nil }
 
-        let declarationKinds = node.inheritedTypeCollection.compactMap {
-            $0.typeName.as(SimpleTypeIdentifierSyntax.self)?.name.text
-        }.compactMap { DeclarationKind.mapping[$0] }
+        let declarationKinds = node.inheritedTypeCollection
+            .compactMap { $0.typeName.as(SimpleTypeIdentifierSyntax.self) }
+            .compactMap(DeclarationKind.init(typeIdentifier:))
 
         switch declarationKinds.count {
         case 0: return nil
@@ -350,8 +361,8 @@ class OrionVisitor: SyntaxVisitor {
         switch declarationKind(for: node.inheritanceClause, modifiers: node.modifiers) {
         case .tweak(let hasBackend):
             handle(tweak: node.identifier, hasBackend: hasBackend)
-        case .classHook:
-            handle(classHook: node)
+        case .classHook(let target):
+            handle(classHook: node, target: target)
         case .functionHook:
             handle(functionHook: node)
         case nil:

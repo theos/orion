@@ -1,14 +1,38 @@
 import Foundation
 
-// marker protocol which sub-protocols can refine so that a user
-// can't accidentally mark their FunctionHook as a SubclassedHook
-// or something
-public protocol _AnyClassHook: class, _AnyHook {}
+public enum SubclassMode {
+    case none
+    case createSubclass
+    case createSubclassNamed(String)
 
-public protocol _ClassHookProtocol: _AnyClassHook {
+    fileprivate func subclassName(withType type: AnyClass) -> String? {
+        switch self {
+        case .none:
+            return nil
+        case .createSubclass:
+            return "OrionSubclass.\(NSStringFromClass(type))"
+        case .createSubclassNamed(let name):
+            return name
+        }
+    }
+}
+
+public protocol _ClassHookProtocol: class, _AnyHook {
     associatedtype Target: AnyObject
 
-    // protocols which should be added to the target class
+    // Do not implement this yourself
+    static var _target: Target.Type { get }
+
+    // The name of the target class (must be a subclass of `Target`), or
+    // an empty string (the default) to use Target.self
+    static var targetName: String { get }
+
+    // If this is not .none, it indicates that this hook creates a subclass. In order to
+    // achieve this, we add a new class pair on top of the original target. The subclass
+    // itself can be accessed via the static `target` property. Defaults to .none.
+    static var subclassMode: SubclassMode { get }
+
+    // protocols which should be added to the target class. Defaults to an empty array.
     static var protocols: [Protocol] { get }
 
     var target: Target { get }
@@ -17,43 +41,17 @@ public protocol _ClassHookProtocol: _AnyClassHook {
 }
 
 extension _ClassHookProtocol {
-    public static var protocols: [Protocol] { [] }
-}
 
-// A SubclassedHook is effectively just a ClassHook where we've added a new class pair on top
-// of the original target. This protocol acts as an indicator that we need to do that. The
-// subclass itself can be accessed via the static `target` property.
-public protocol SubclassedHook: _AnyClassHook {
-    // has default implementation
-    static var subclassName: String { get }
-}
+    public static var targetName: String { "" }
 
-public protocol _AnyClassHookWithComputedTarget: _AnyClassHook {
-    static var _computedTarget: AnyClass { get }
-}
-
-// the target class to be hooked is computed via the `computedTarget` property
-public protocol ClassHookWithComputedTarget: _AnyClassHookWithComputedTarget, _ClassHookProtocol {
-    static var computedTarget: Target.Type { get }
-}
-
-// the target class is computed using the name `targetName`
-public protocol ClassHookWithTargetName: ClassHookWithComputedTarget {
-    static var targetName: String { get }
-}
-
-extension SubclassedHook {
-    public static var subclassName: String {
-        "OrionSubclass.\(NSStringFromClass(self))"
+    public static var _target: Target.Type {
+        fatalError("Could not get target. Has the Orion glue file been compiled?")
     }
-}
 
-extension ClassHookWithComputedTarget {
-    public static var _computedTarget: AnyClass { computedTarget }
-}
+    public static var subclassMode: SubclassMode { .none }
 
-extension ClassHookWithTargetName {
-    public static var computedTarget: Target.Type { Dynamic(targetName).as(type: Target.self) }
+    public static var protocols: [Protocol] { [] }
+
 }
 
 @objcMembers open class _ClassHookClass<Target: AnyObject> {
@@ -62,42 +60,24 @@ extension ClassHookWithTargetName {
 }
 
 // we don't declare _ClassHookProtocol conformance on _ClassHookClass directly since that would
-// result in _ClassHookClass inheriting the default implementations of hook[Will|Did]Activate,
-// making it more complicated to allow those to be overridden
+// result in _ClassHookClass inheriting the default implementations of _ClassHookProtocol and
+// _AnyHook requirements, making it more difficult to override them
 public typealias ClassHook<Target: AnyObject> = _ClassHookClass<Target> & _ClassHookProtocol
-
-// the glue adds this as an extension on the user's own class because that ensures
-// that, for example, if one has `class MySubclass: ClassHook<NSObject>, SubclassedHook`
-// they can get the target with `MySubclass.target`. If this was part of _AnyGlueClassHook,
-// accessing `target` on `MySubclass` directly would crash; you'd only be able to do it
-// using Self inside a MySubclass method since that would refer to the concrete subclass.
-public protocol _AnyClassHookWithInitializedTarget {
-    static var initializedTarget: AnyClass { get }
-}
 
 extension _ClassHookProtocol {
 
-    public static var target: Target.Type {
-        guard let unwrapped = (self as? _AnyClassHookWithInitializedTarget.Type)?.initializedTarget as? Target.Type
-            else { fatalError("Could not get target. Has the Orion glue file been compiled?") }
-        return unwrapped
-    }
+    // this is in an extension so users can't accidentally override it
+    public static var target: Target.Type { _target }
 
     // since this may be expensive, rather than using a computed prop, when
     // accessing the static `target` this function is only called once and
     // then cached by the glue. Do not call this yourself.
     public static func _initializeTargetType() -> Target.Type {
-        let baseTarget: Target.Type
-        if let computed = self as? _AnyClassHookWithComputedTarget.Type {
-            guard let _target = computed._computedTarget as? Target.Type
-                else { fatalError("Conform to ClassHookWithComputedTarget") }
-            baseTarget = _target
-        } else {
-            baseTarget = Target.self
-        }
+        let targetName = self.targetName // only call getter once
+        let baseTarget = targetName.isEmpty ? Target.self : Dynamic(targetName).as(type: Target.self)
 
         let target: Target.Type
-        if let subclassName = (self as? SubclassedHook.Type)?.subclassName {
+        if let subclassName = subclassMode.subclassName(withType: self) {
             guard let pair: AnyClass = objc_allocateClassPair(baseTarget, subclassName, 0)
                 else { fatalError("Could not allocate subclass for \(self)") }
             objc_registerClassPair(pair)
@@ -117,7 +97,7 @@ extension _ClassHookProtocol {
 
 }
 
-public protocol _AnyGlueClassHook: _AnyClassHook {
+public protocol _AnyGlueClassHook {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
 

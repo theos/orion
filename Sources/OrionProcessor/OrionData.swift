@@ -21,6 +21,7 @@ public struct OrionData {
         }
 
         var name: String
+        var target: Syntax
         var methods: [Method]
         var converter: SourceLocationConverter
     }
