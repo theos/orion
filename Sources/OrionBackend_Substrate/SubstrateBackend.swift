@@ -1,6 +1,6 @@
 import Foundation
 #if SWIFT_PACKAGE
-import CSubstrate
+import Substrate
 import Orion
 #endif
 

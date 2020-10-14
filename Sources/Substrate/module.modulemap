@@ -1,4 +1,4 @@
-module CSubstrate {
+module Substrate {
     header "substrate.h"
     link "substrate"
     export *
