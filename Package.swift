@@ -44,6 +44,7 @@ let rpathLinkerSettings: [LinkerSetting]? = builder == .xcode ? [
 
 var package = Package(
     name: "Orion",
+    platforms: [.macOS("10.12")],
     products: [
         .library(
             name: "OrionProcessor",
@@ -91,6 +92,14 @@ package.products += [
         name: "Orion",
         targets: ["Orion"]
     ),
+    .library(
+        name: "CSubstrate",
+        targets: ["CSubstrate"]
+    ),
+    .library(
+        name: "OrionBackend_Substrate",
+        targets: ["OrionBackend_Substrate"]
+    )
 ]
 
 package.targets += [
@@ -102,13 +111,27 @@ package.targets += [
         name: "Orion",
         dependencies: ["OrionC"]
     ),
+    .systemLibrary(
+        name: "CSubstrate"
+    ),
+    .target(
+        name: "OrionBackend_Substrate",
+        dependencies: ["CSubstrate", "Orion"]
+    ),
+    .target(
+        name: "Fishhook"
+    ),
+    .target(
+        name: "OrionBackend_Fishhook",
+        dependencies: ["Fishhook", "Orion"]
+    ),
     .target(
         name: "OrionTestSupport",
         dependencies: ["Orion"]
     ),
     .testTarget(
         name: "OrionTests",
-        dependencies: ["Orion", "OrionTestSupport"]
+        dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"]
     ),
 ]
 #endif

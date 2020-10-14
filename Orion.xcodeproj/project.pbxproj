@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		567AF4DD25367DE30056182E /* substrate.h in Headers */ = {isa = PBXBuildFile; fileRef = 567AF4DC25367DE30056182E /* substrate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		567AF4E225367DF20056182E /* SubstrateBackendOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567AF4E025367DF20056182E /* SubstrateBackendOld.swift */; };
+		567AF4E325367DF20056182E /* SubstrateBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567AF4E125367DF20056182E /* SubstrateBackend.swift */; };
 		568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749C252BBA15006F48E9 /* ClassHook.swift */; };
 		568974AB252BBA15006F48E9 /* Dynamic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749D252BBA15006F48E9 /* Dynamic.swift */; };
 		568974AC252BBA15006F48E9 /* FunctionHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749E252BBA15006F48E9 /* FunctionHook.swift */; };
@@ -17,22 +20,24 @@
 		568974B1252BBA15006F48E9 /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A3252BBA15006F48E9 /* Property.swift */; };
 		568974B2252BBA15006F48E9 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A4252BBA15006F48E9 /* Backend.swift */; };
 		568974B3252BBA15006F48E9 /* MutexLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A5252BBA15006F48E9 /* MutexLock.swift */; };
-		568974B4252BBA15006F48E9 /* FishhookBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A6252BBA15006F48E9 /* FishhookBackend.swift */; };
 		568974B5252BBA15006F48E9 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A7252BBA15006F48E9 /* ReadWriteLock.swift */; };
 		568974B6252BBA15006F48E9 /* Hook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A8252BBA15006F48E9 /* Hook.swift */; };
 		568974B7252BBA16006F48E9 /* Tweak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A9252BBA15006F48E9 /* Tweak.swift */; };
 		568974C4252BBA4F006F48E9 /* super.m in Sources */ = {isa = PBXBuildFile; fileRef = 568974BA252BBA4F006F48E9 /* super.m */; };
-		568974C5252BBA4F006F48E9 /* OrionC.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BC252BBA4F006F48E9 /* OrionC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		568974C6252BBA4F006F48E9 /* constructor.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BD252BBA4F006F48E9 /* constructor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		568974C7252BBA4F006F48E9 /* fishhook_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BE252BBA4F006F48E9 /* fishhook_internal.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		568974C8252BBA4F006F48E9 /* super.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BF252BBA4F006F48E9 /* super.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		568974C9252BBA4F006F48E9 /* fishhook.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974C0252BBA4F006F48E9 /* fishhook.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		568974CA252BBA4F006F48E9 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = 568974C2252BBA4F006F48E9 /* fishhook.c */; };
 		568974CB252BBA4F006F48E9 /* constructor.c in Sources */ = {isa = PBXBuildFile; fileRef = 568974C3252BBA4F006F48E9 /* constructor.c */; };
 		568974CE252BBA7F006F48E9 /* Orion.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974CD252BBA7F006F48E9 /* Orion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		567AF4DB25367DE30056182E /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
+		567AF4DC25367DE30056182E /* substrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = substrate.h; sourceTree = "<group>"; };
+		567AF4E025367DF20056182E /* SubstrateBackendOld.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubstrateBackendOld.swift; sourceTree = "<group>"; };
+		567AF4E125367DF20056182E /* SubstrateBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubstrateBackend.swift; sourceTree = "<group>"; };
+		567AF4E625367E460056182E /* libsubstrate.tbd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
+		567AF4ED253681030056182E /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
+		567AF4EF253681120056182E /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
 		5689748F252BB9C6006F48E9 /* Orion.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Orion.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5689749C252BBA15006F48E9 /* ClassHook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassHook.swift; sourceTree = "<group>"; };
 		5689749D252BBA15006F48E9 /* Dynamic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dynamic.swift; sourceTree = "<group>"; };
@@ -44,18 +49,12 @@
 		568974A3252BBA15006F48E9 /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
 		568974A4252BBA15006F48E9 /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		568974A5252BBA15006F48E9 /* MutexLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutexLock.swift; sourceTree = "<group>"; };
-		568974A6252BBA15006F48E9 /* FishhookBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FishhookBackend.swift; sourceTree = "<group>"; };
 		568974A7252BBA15006F48E9 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
 		568974A8252BBA15006F48E9 /* Hook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hook.swift; sourceTree = "<group>"; };
 		568974A9252BBA15006F48E9 /* Tweak.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tweak.swift; sourceTree = "<group>"; };
 		568974BA252BBA4F006F48E9 /* super.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = super.m; sourceTree = "<group>"; };
-		568974BC252BBA4F006F48E9 /* OrionC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrionC.h; sourceTree = "<group>"; };
 		568974BD252BBA4F006F48E9 /* constructor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constructor.h; sourceTree = "<group>"; };
-		568974BE252BBA4F006F48E9 /* fishhook_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook_internal.h; sourceTree = "<group>"; };
 		568974BF252BBA4F006F48E9 /* super.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = super.h; sourceTree = "<group>"; };
-		568974C0252BBA4F006F48E9 /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
-		568974C1252BBA4F006F48E9 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
-		568974C2252BBA4F006F48E9 /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
 		568974C3252BBA4F006F48E9 /* constructor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constructor.c; sourceTree = "<group>"; };
 		568974CD252BBA7F006F48E9 /* Orion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orion.h; sourceTree = "<group>"; };
 		568974D8252BBFF4006F48E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -72,11 +71,74 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		56897485252BB9C6006F48E9 = {
+		567AF4D625367DA40056182E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				568974B9252BBA4F006F48E9 /* OrionC */,
 				56897491252BB9C6006F48E9 /* Orion */,
+				567AF4DA25367DE30056182E /* CSubstrate */,
+				567AF4DF25367DF10056182E /* OrionBackend_Substrate */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		567AF4DA25367DE30056182E /* CSubstrate */ = {
+			isa = PBXGroup;
+			children = (
+				567AF4EA253680EF0056182E /* lib */,
+				567AF4DB25367DE30056182E /* module.modulemap */,
+				567AF4DC25367DE30056182E /* substrate.h */,
+			);
+			path = CSubstrate;
+			sourceTree = "<group>";
+		};
+		567AF4DF25367DF10056182E /* OrionBackend_Substrate */ = {
+			isa = PBXGroup;
+			children = (
+				567AF4E025367DF20056182E /* SubstrateBackendOld.swift */,
+				567AF4E125367DF20056182E /* SubstrateBackend.swift */,
+			);
+			path = OrionBackend_Substrate;
+			sourceTree = "<group>";
+		};
+		567AF4EA253680EF0056182E /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				567AF4EE253681100056182E /* macosx */,
+				567AF4EC253680FC0056182E /* iphonesimulator */,
+				567AF4EB253680F60056182E /* iphoneos */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		567AF4EB253680F60056182E /* iphoneos */ = {
+			isa = PBXGroup;
+			children = (
+				567AF4E625367E460056182E /* libsubstrate.tbd */,
+			);
+			path = iphoneos;
+			sourceTree = "<group>";
+		};
+		567AF4EC253680FC0056182E /* iphonesimulator */ = {
+			isa = PBXGroup;
+			children = (
+				567AF4ED253681030056182E /* libsubstrate.tbd */,
+			);
+			path = iphonesimulator;
+			sourceTree = "<group>";
+		};
+		567AF4EE253681100056182E /* macosx */ = {
+			isa = PBXGroup;
+			children = (
+				567AF4EF253681120056182E /* libsubstrate.tbd */,
+			);
+			path = macosx;
+			sourceTree = "<group>";
+		};
+		56897485252BB9C6006F48E9 = {
+			isa = PBXGroup;
+			children = (
+				567AF4D625367DA40056182E /* Sources */,
 				56897490252BB9C6006F48E9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -97,7 +159,6 @@
 				5689749C252BBA15006F48E9 /* ClassHook.swift */,
 				568974A0252BBA15006F48E9 /* ClassHook+Super.swift */,
 				5689749D252BBA15006F48E9 /* Dynamic.swift */,
-				568974A6252BBA15006F48E9 /* FishhookBackend.swift */,
 				5689749E252BBA15006F48E9 /* FunctionHook.swift */,
 				568974A8252BBA15006F48E9 /* Hook.swift */,
 				5689749F252BBA15006F48E9 /* InternalBackend.swift */,
@@ -109,8 +170,7 @@
 				568974D8252BBFF4006F48E9 /* Info.plist */,
 				568974CD252BBA7F006F48E9 /* Orion.h */,
 			);
-			name = Orion;
-			path = Sources/Orion;
+			path = Orion;
 			sourceTree = "<group>";
 		};
 		568974B9252BBA4F006F48E9 /* OrionC */ = {
@@ -118,22 +178,16 @@
 			children = (
 				568974BA252BBA4F006F48E9 /* super.m */,
 				568974BB252BBA4F006F48E9 /* include */,
-				568974C2252BBA4F006F48E9 /* fishhook.c */,
 				568974C3252BBA4F006F48E9 /* constructor.c */,
 			);
-			name = OrionC;
-			path = Sources/OrionC;
+			path = OrionC;
 			sourceTree = "<group>";
 		};
 		568974BB252BBA4F006F48E9 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				568974BC252BBA4F006F48E9 /* OrionC.h */,
 				568974BD252BBA4F006F48E9 /* constructor.h */,
-				568974BE252BBA4F006F48E9 /* fishhook_internal.h */,
 				568974BF252BBA4F006F48E9 /* super.h */,
-				568974C0252BBA4F006F48E9 /* fishhook.h */,
-				568974C1252BBA4F006F48E9 /* module.modulemap */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -147,10 +201,8 @@
 			files = (
 				568974CE252BBA7F006F48E9 /* Orion.h in Headers */,
 				568974C8252BBA4F006F48E9 /* super.h in Headers */,
-				568974C9252BBA4F006F48E9 /* fishhook.h in Headers */,
-				568974C5252BBA4F006F48E9 /* OrionC.h in Headers */,
+				567AF4DD25367DE30056182E /* substrate.h in Headers */,
 				568974C6252BBA4F006F48E9 /* constructor.h in Headers */,
-				568974C7252BBA4F006F48E9 /* fishhook_internal.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +213,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 56897497252BB9C6006F48E9 /* Build configuration list for PBXNativeTarget "Orion" */;
 			buildPhases = (
+				567AF4F32536817C0056182E /* ShellScript */,
 				5689748A252BB9C6006F48E9 /* Headers */,
 				5689748B252BB9C6006F48E9 /* Sources */,
 				5689748C252BB9C6006F48E9 /* Frameworks */,
@@ -217,6 +270,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		567AF4F32536817C0056182E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		5689748B252BB9C6006F48E9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -229,16 +302,16 @@
 				568974B7252BBA16006F48E9 /* Tweak.swift in Sources */,
 				568974CB252BBA4F006F48E9 /* constructor.c in Sources */,
 				568974AC252BBA15006F48E9 /* FunctionHook.swift in Sources */,
-				568974CA252BBA4F006F48E9 /* fishhook.c in Sources */,
 				568974AD252BBA15006F48E9 /* InternalBackend.swift in Sources */,
 				568974B6252BBA15006F48E9 /* Hook.swift in Sources */,
+				567AF4E225367DF20056182E /* SubstrateBackendOld.swift in Sources */,
 				568974B5252BBA15006F48E9 /* ReadWriteLock.swift in Sources */,
 				568974C4252BBA4F006F48E9 /* super.m in Sources */,
 				568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */,
 				568974B1252BBA15006F48E9 /* Property.swift in Sources */,
 				568974B3252BBA15006F48E9 /* MutexLock.swift in Sources */,
 				568974AB252BBA15006F48E9 /* Dynamic.swift in Sources */,
-				568974B4252BBA15006F48E9 /* FishhookBackend.swift in Sources */,
+				567AF4E325367DF20056182E /* SubstrateBackend.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -389,7 +462,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Sources/CSubstrate/lib/$(PLATFORM_NAME)",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
+				OTHER_LDFLAGS = "-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = NO;
@@ -424,7 +502,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Sources/CSubstrate/lib/$(PLATFORM_NAME)",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
+				OTHER_LDFLAGS = "-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = NO;

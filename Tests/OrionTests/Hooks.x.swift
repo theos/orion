@@ -3,6 +3,7 @@
 
 import Foundation
 import Orion
+import OrionBackend_Fishhook
 import OrionTestSupport
 
 struct HooksTweak: TweakWithBackend {

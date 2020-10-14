@@ -1,4 +1,0 @@
-module OrionC {
-    umbrella header "OrionC.h"
-    export *
-}

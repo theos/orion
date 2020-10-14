@@ -1,0 +1,5 @@
+module CSubstrate {
+    header "substrate.h"
+    link "substrate"
+    export *
+}

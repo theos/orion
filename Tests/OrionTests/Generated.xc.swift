@@ -1,5 +1,6 @@
 import Foundation
 import Orion
+import OrionBackend_Fishhook
 import OrionTestSupport
 
 extension BasicHook {

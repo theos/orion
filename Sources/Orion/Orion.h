@@ -3,6 +3,6 @@
 FOUNDATION_EXPORT double OrionVersionNumber;
 FOUNDATION_EXPORT const unsigned char OrionVersionString[];
 
-#define ORION_BINARY_FRAMEWORK
-
-#import "OrionC.h"
+#import "constructor.h"
+#import "super.h"
+#import "substrate.h"

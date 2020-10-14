@@ -1,6 +1,7 @@
 import Foundation
 #if SWIFT_PACKAGE
-import OrionC
+import Fishhook
+import Orion
 #endif
 
 extension Backends {
