@@ -255,6 +255,8 @@ public final class OrionGenerator {
         imports.insert("import Foundation")
 
         return """
+        // swiftlint:disable all
+
         \(join(imports.sorted(), separation: "\n"))\
         \(join(classes))\
         \(join(functions))\

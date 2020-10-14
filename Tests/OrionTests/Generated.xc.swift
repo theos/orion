@@ -1,3 +1,5 @@
+// swiftlint:disable all
+
 import Foundation
 import Orion
 import OrionBackend_Fishhook
