@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		567AF4DD25367DE30056182E /* substrate.h in Headers */ = {isa = PBXBuildFile; fileRef = 567AF4DC25367DE30056182E /* substrate.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		567AF4E225367DF20056182E /* SubstrateBackendOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567AF4E025367DF20056182E /* SubstrateBackendOld.swift */; };
 		567AF4E325367DF20056182E /* SubstrateBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567AF4E125367DF20056182E /* SubstrateBackend.swift */; };
 		568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749C252BBA15006F48E9 /* ClassHook.swift */; };
 		568974AB252BBA15006F48E9 /* Dynamic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749D252BBA15006F48E9 /* Dynamic.swift */; };
@@ -33,7 +32,6 @@
 /* Begin PBXFileReference section */
 		567AF4DB25367DE30056182E /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		567AF4DC25367DE30056182E /* substrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = substrate.h; sourceTree = "<group>"; };
-		567AF4E025367DF20056182E /* SubstrateBackendOld.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubstrateBackendOld.swift; sourceTree = "<group>"; };
 		567AF4E125367DF20056182E /* SubstrateBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubstrateBackend.swift; sourceTree = "<group>"; };
 		567AF4E625367E460056182E /* libsubstrate.tbd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
 		567AF4ED253681030056182E /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
@@ -76,26 +74,25 @@
 			children = (
 				568974B9252BBA4F006F48E9 /* OrionC */,
 				56897491252BB9C6006F48E9 /* Orion */,
-				567AF4DA25367DE30056182E /* CSubstrate */,
+				567AF4DA25367DE30056182E /* Substrate */,
 				567AF4DF25367DF10056182E /* OrionBackend_Substrate */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		567AF4DA25367DE30056182E /* CSubstrate */ = {
+		567AF4DA25367DE30056182E /* Substrate */ = {
 			isa = PBXGroup;
 			children = (
 				567AF4EA253680EF0056182E /* lib */,
 				567AF4DB25367DE30056182E /* module.modulemap */,
 				567AF4DC25367DE30056182E /* substrate.h */,
 			);
-			path = CSubstrate;
+			path = Substrate;
 			sourceTree = "<group>";
 		};
 		567AF4DF25367DF10056182E /* OrionBackend_Substrate */ = {
 			isa = PBXGroup;
 			children = (
-				567AF4E025367DF20056182E /* SubstrateBackendOld.swift */,
 				567AF4E125367DF20056182E /* SubstrateBackend.swift */,
 			);
 			path = OrionBackend_Substrate;
@@ -304,7 +301,6 @@
 				568974AC252BBA15006F48E9 /* FunctionHook.swift in Sources */,
 				568974AD252BBA15006F48E9 /* InternalBackend.swift in Sources */,
 				568974B6252BBA15006F48E9 /* Hook.swift in Sources */,
-				567AF4E225367DF20056182E /* SubstrateBackendOld.swift in Sources */,
 				568974B5252BBA15006F48E9 /* ReadWriteLock.swift in Sources */,
 				568974C4252BBA4F006F48E9 /* super.m in Sources */,
 				568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */,
@@ -464,7 +460,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Sources/CSubstrate/lib/$(PLATFORM_NAME)",
+					"$(PROJECT_DIR)/Sources/Substrate/lib/$(PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
 				OTHER_LDFLAGS = "-lsubstrate";
@@ -504,7 +500,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Sources/CSubstrate/lib/$(PLATFORM_NAME)",
+					"$(PROJECT_DIR)/Sources/Substrate/lib/$(PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
 				OTHER_LDFLAGS = "-lsubstrate";

@@ -9,6 +9,7 @@ include $(THEOS_MAKE_PATH)/xcodeproj.mk
 SDK_DIR = $(THEOS_PACKAGE_DIR)/Orion.framework
 
 internal-stage::
+	$(ECHO_NOTHING)mkdir -p $(THEOS_PACKAGE_DIR)$(ECHO_END)
 	$(ECHO_NOTHING)rm -rf $(SDK_DIR)$(ECHO_END)
 	$(ECHO_NOTHING)cp -a $(THEOS_STAGING_DIR)/Library/Frameworks/Orion.framework $(SDK_DIR)$(ECHO_END)
 	$(ECHO_NOTHING)xcrun tapi stubify $(SDK_DIR)/Orion$(ECHO_END)
