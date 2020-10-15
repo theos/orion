@@ -2,7 +2,4 @@
 /.build
 /packages
 xcuserdata/
-
-Output
-.framework_build
 .theos
