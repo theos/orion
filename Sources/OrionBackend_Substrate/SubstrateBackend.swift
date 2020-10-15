@@ -63,8 +63,10 @@ extension Backends.Substrate {
             actions.append {
                 var old: IMP?
                 MSHookMessageEx(cls, sel, IMP(replacement), &old)
-                guard let unwrapped = old
-                    else { fatalError("Could not hook method: \(cls).\(sel)") }
+                guard let unwrapped = old else {
+                    let method = "\(class_isMetaClass(cls) ? "+" : "-")[\(cls) \(sel)]"
+                    fatalError("Could not hook method \(method)")
+                }
                 completion(.init(unwrapped))
             }
         }
