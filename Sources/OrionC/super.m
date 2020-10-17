@@ -1,6 +1,5 @@
 #import <objc/message.h>
 #import "super.h"
-#import "constructor.h"
 
 extern void objc_msgSendSuper2(void);
 

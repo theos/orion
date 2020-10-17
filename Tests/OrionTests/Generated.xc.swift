@@ -542,8 +542,8 @@ private class Orion_FunctionHook2: AtofHook, _GlueFunctionHook {
     }
 }
 
-@_cdecl("__orion_constructor")
-func __orion_constructor() {
+@_cdecl("orion_init")
+func orion_init() {
     HooksTweak().activate(
         hooks: [
             Orion_ClassHook1.self,

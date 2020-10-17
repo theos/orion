@@ -107,9 +107,10 @@ public protocol _AnyGlueClassHook {
 
 extension _ClassHookProtocol {
 
-    // yes, thse can indeed be made computed properties (`var orig: Self`) instead,
+    // Yes, thse can indeed be made computed properties (`var orig: Self`) instead,
     // but unfortunately the Swift compiler emits a warning when it sees an orig/supr
-    // call like that, because it thinks it'll amount to infinite recursion
+    // call like that, because it thinks it'll amount to infinite recursion. Maybe
+    // someday... https://bugs.swift.org/browse/SR-7925
 
     @discardableResult
     public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {

@@ -23,9 +23,9 @@
 		568974B6252BBA15006F48E9 /* Hook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A8252BBA15006F48E9 /* Hook.swift */; };
 		568974B7252BBA16006F48E9 /* Tweak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A9252BBA15006F48E9 /* Tweak.swift */; };
 		568974C4252BBA4F006F48E9 /* super.m in Sources */ = {isa = PBXBuildFile; fileRef = 568974BA252BBA4F006F48E9 /* super.m */; };
-		568974C6252BBA4F006F48E9 /* constructor.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BD252BBA4F006F48E9 /* constructor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		568974C6252BBA4F006F48E9 /* init.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BD252BBA4F006F48E9 /* init.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		568974C8252BBA4F006F48E9 /* super.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BF252BBA4F006F48E9 /* super.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		568974CB252BBA4F006F48E9 /* constructor.c in Sources */ = {isa = PBXBuildFile; fileRef = 568974C3252BBA4F006F48E9 /* constructor.c */; };
+		568974CB252BBA4F006F48E9 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 568974C3252BBA4F006F48E9 /* init.c */; };
 		568974CE252BBA7F006F48E9 /* Orion.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974CD252BBA7F006F48E9 /* Orion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -51,9 +51,9 @@
 		568974A8252BBA15006F48E9 /* Hook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hook.swift; sourceTree = "<group>"; };
 		568974A9252BBA15006F48E9 /* Tweak.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tweak.swift; sourceTree = "<group>"; };
 		568974BA252BBA4F006F48E9 /* super.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = super.m; sourceTree = "<group>"; };
-		568974BD252BBA4F006F48E9 /* constructor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constructor.h; sourceTree = "<group>"; };
+		568974BD252BBA4F006F48E9 /* init.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = init.h; sourceTree = "<group>"; };
 		568974BF252BBA4F006F48E9 /* super.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = super.h; sourceTree = "<group>"; };
-		568974C3252BBA4F006F48E9 /* constructor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = constructor.c; sourceTree = "<group>"; };
+		568974C3252BBA4F006F48E9 /* init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
 		568974CD252BBA7F006F48E9 /* Orion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orion.h; sourceTree = "<group>"; };
 		568974D8252BBFF4006F48E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -175,7 +175,7 @@
 			children = (
 				568974BA252BBA4F006F48E9 /* super.m */,
 				568974BB252BBA4F006F48E9 /* include */,
-				568974C3252BBA4F006F48E9 /* constructor.c */,
+				568974C3252BBA4F006F48E9 /* init.c */,
 			);
 			path = OrionC;
 			sourceTree = "<group>";
@@ -183,7 +183,7 @@
 		568974BB252BBA4F006F48E9 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				568974BD252BBA4F006F48E9 /* constructor.h */,
+				568974BD252BBA4F006F48E9 /* init.h */,
 				568974BF252BBA4F006F48E9 /* super.h */,
 			);
 			path = include;
@@ -199,7 +199,7 @@
 				568974CE252BBA7F006F48E9 /* Orion.h in Headers */,
 				568974C8252BBA4F006F48E9 /* super.h in Headers */,
 				567AF4DD25367DE30056182E /* substrate.h in Headers */,
-				568974C6252BBA4F006F48E9 /* constructor.h in Headers */,
+				568974C6252BBA4F006F48E9 /* init.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +297,7 @@
 				568974B2252BBA15006F48E9 /* Backend.swift in Sources */,
 				568974B0252BBA15006F48E9 /* Ivars.swift in Sources */,
 				568974B7252BBA16006F48E9 /* Tweak.swift in Sources */,
-				568974CB252BBA4F006F48E9 /* constructor.c in Sources */,
+				568974CB252BBA4F006F48E9 /* init.c in Sources */,
 				568974AC252BBA15006F48E9 /* FunctionHook.swift in Sources */,
 				568974AD252BBA15006F48E9 /* InternalBackend.swift in Sources */,
 				568974B6252BBA15006F48E9 /* Hook.swift in Sources */,

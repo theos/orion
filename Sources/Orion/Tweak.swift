@@ -14,7 +14,7 @@ extension Tweak {
         // this is effectively a no-op but we need it in order to prevent the
         // compiler from stripping out the constructor because it doesn't see
         // it being used
-        __orion_constructor_c()
+        _orion_init_c()
         #endif
 
         backend.hook { builder in

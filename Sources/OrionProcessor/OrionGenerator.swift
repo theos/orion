@@ -261,8 +261,8 @@ public final class OrionGenerator {
         \(join(classes))\
         \(join(functions))\
         \(importBackend)\
-        @_cdecl("__orion_constructor")
-        func __orion_constructor() {
+        @_cdecl("orion_init")
+        func orion_init() {
             \(tweakName)().activate(
         \(hasCustomBackend ? "" : "        backend: Backends.\(backend.name)(),\n")\
                 hooks: [
