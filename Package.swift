@@ -34,13 +34,25 @@ if env["SPM_THEOS_BUILD"] == "1" {
     builder = .spm
 }
 
-let rpathLinkerSettings: [LinkerSetting]? = builder == .xcode ? [
-    .unsafeFlags([
-        // we need this for SwiftSyntax to find lib_InternalSwiftSyntaxParser.dylib. Not needed if we use
-        // generate-xcodeproj but it's required if the package is opened directly.
-        "-rpath", "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx"
-    ])
-] : nil
+// https://github.com/muter-mutation-testing/muter/blob/dc53a9cd1792b2ffd3c9a1a0795aae99e8c7334d/Package.swift#L40
+let rpathLinkerSettings: [LinkerSetting]? = {
+    guard builder == .xcode else { return nil }
+
+    let stdout = Pipe()
+    let select = Process()
+    select.launchPath = "/usr/bin/xcode-select"
+    select.arguments = ["-p"]
+    select.standardOutput = stdout
+    select.launch()
+    select.waitUntilExit()
+
+    let xcodeSelectPath = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)!
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+    let rpath = "\(xcodeSelectPath)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx"
+    return [
+        .unsafeFlags(["-rpath", rpath])
+    ]
+}()
 
 var package = Package(
     name: "Orion",
