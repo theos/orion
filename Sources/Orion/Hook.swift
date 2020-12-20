@@ -30,6 +30,8 @@ extension _AnyHook {
 
 /// A concrete hook, implemented in the glue file. Do not use
 /// this directly.
+///
+/// :nodoc:
 public protocol _AnyGlueHook: _AnyHook {
 
     /// Activates the hook. Do not call this directly.

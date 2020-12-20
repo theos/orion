@@ -85,6 +85,8 @@ open class _FunctionHookClass {
 public typealias FunctionHook = _FunctionHookClass & _FunctionHookProtocol
 
 /// An existential for glue function hooks. Do not use this directly.
+///
+/// :nodoc:
 public protocol _AnyGlueFunctionHook {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
@@ -110,6 +112,8 @@ extension _FunctionHookProtocol {
 
 /// A concrete function hook, implemented in the glue file. Do not use
 /// this directly.
+///
+/// :nodoc:
 public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _FunctionHookProtocol, _AnyGlueHook {
     associatedtype Code
     static var origFunction: Code { get set }

@@ -31,6 +31,8 @@ public protocol Tweak {
 extension Tweak {
 
     /// Activates the tweak. Do not call this yourself.
+    ///
+    /// :nodoc:
     public func activate<BackendType: Backend>(backend: BackendType, hooks: [_AnyGlueHook.Type]) {
         #if SWIFT_PACKAGE
         // this is effectively a no-op but we need it in order to prevent the
@@ -67,6 +69,8 @@ public protocol TweakWithBackend: Tweak {
 extension TweakWithBackend {
 
     /// Activates the tweak. Do not call this yourself.
+    ///
+    /// :nodoc:
     public func activate(hooks: [_AnyGlueHook.Type]) {
         activate(backend: backend, hooks: hooks)
     }
