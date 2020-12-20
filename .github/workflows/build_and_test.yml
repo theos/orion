@@ -3,10 +3,8 @@ name: Build and Test
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: macos-latest
-
     steps:
     - uses: actions/checkout@v2
       with:
@@ -15,5 +13,3 @@ jobs:
       run: swift build -v
     - name: Run tests
       run: swift test -v
-    - name: Run SwiftLint
-      uses: norio-nomura/action-swiftlint@3.2.1
