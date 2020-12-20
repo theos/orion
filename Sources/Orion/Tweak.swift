@@ -39,14 +39,9 @@ extension Tweak {
         _orion_init_c()
         #endif
 
-        // this filters out hooks that return false from willActivate
-        let hooksWithDescriptors = hooks.compactMap { hook in
-            hook.activateIfNeeded().map { (hook, $0) }
-        }
-
-        backend.apply(hooks: hooksWithDescriptors.flatMap { $0.1 })
-
-        hooksWithDescriptors.forEach { $0.0.hookDidActivate() }
+        let hooksToActivate = hooks.filter { $0.hookWillActivate() }
+        backend.apply(hooks: hooksToActivate.flatMap { $0.activate() })
+        hooksToActivate.forEach { $0.hookDidActivate() }
 
         tweakDidActivate()
     }
