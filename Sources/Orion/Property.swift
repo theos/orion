@@ -1,7 +1,8 @@
 import Foundation
 
-// not private so that we can test this
+/// Storage for associated object keys corresponding to `KeyPath`s.
 final class PropertyKeys {
+    // this class is not private so that we can test it
 
     // we could use DispatchQueue with a barrier but that's affected by the existence of other
     // queues and QoS stuff, so pthread is slightly faster.
@@ -35,6 +36,9 @@ final class PropertyKeys {
         }
     }
 
+    /// Provides a unique address corresponding to the provided `keyPath`.
+    ///
+    /// This method is injective: `key(for: k1) == key(for: k2)` iff `k1 == k2`.
     func key(for keyPath: AnyKeyPath) -> UnsafeRawPointer {
         // it's safe to not retain here because the Set retains the key path permanently
         UnsafeRawPointer(Unmanaged.passUnretained(unique(keyPath)).toOpaque())
@@ -42,6 +46,56 @@ final class PropertyKeys {
 
 }
 
+/// A property wrapper which allows `ClassHook` types to add new properties to their
+/// hooked class.
+///
+/// This type is an ergonomic wrapper around Objective-C associated objects. The
+/// type of the associated object is the generic argument `T`.
+///
+/// If you are declaring a property on a `ClassHook`, you likely want to use this.
+/// Note that this property _only_ works on types which conform to `ClassHook`.
+///
+/// - Important: All properties with this attribute **must** have a default value.
+///
+/// # Attributes
+///
+/// This property wrapper gives you the ability to specify attributes on the
+/// property, which are similar to those used by Objective-C's `@property`. For
+/// a description of each attribute, see `Property.Assign`, `Property.Atomicity`,
+/// and `Property.RetainOrCopy`.
+///
+/// The default attributes are `atomic` and `retain`. Specifying `assign`
+/// will replace both defaults, and specifying an atomicity and/or retain
+/// policy will only override the respective default.
+///
+/// # Example
+///
+/// ```
+/// @objcMembers class Person: NSObject {
+///     dynamic func sayHello() -> String {
+///         "hello"
+///     }
+/// }
+///
+/// class PersonHook: ClassHook<Person> {
+///     @Property(.nonatomic) var x = 0
+///
+///     func sayHello() -> String {
+///         x += 1
+///         return "Hi! I've been called \(x) time(s)"
+///     }
+/// }
+///
+/// // later...
+///
+/// let alice = Person()
+/// alice.sayHello() // Hi! I've been called 1 time(s)
+/// alice.sayHello() // Hi! I've been called 2 time(s)
+///
+/// let bob = Person()
+/// bob.sayHello() // Hi! I've been called 1 time(s)
+/// bob.sayHello() // Hi! I've been called 2 time(s)
+/// ```
 @propertyWrapper public struct Property<T> {
     @available(*, unavailable, message: "@Property is only available on ClassHook types")
     public var wrappedValue: T {
@@ -49,18 +103,51 @@ final class PropertyKeys {
         set { fatalError("@Property is only available on ClassHook types") }
     }
 
+    /// An enumeration indicating that the property should use the `assign`
+    /// attribute.
     public enum Assign {
+
+        /// Indicates that the target object is not responsible for keeping the
+        /// property alive.
+        ///
+        /// This attribute cannot be combined with any other attributes.
+        ///
+        /// - Warning: If the underlying value is deallocated, it becomes a
+        /// dangling pointer and accessing it is undefined behavior.
         case assign
+
     }
 
+    /// An enumeration containing attributes which allow specifying the
+    /// atomicity of the association.
     public enum Atomicity {
+
+        /// The association is made atomically.
+        ///
+        /// Mutually exclusive with `nonatomic`.
         case atomic
+
+        /// The association is made non-atomically.
+        ///
+        /// Mutually exclusive with `atomic`.
         case nonatomic
+
     }
 
+    /// An enumeration containing attributes which determine whether
+    /// the property is retained or copied.
     public enum RetainOrCopy {
+
+        /// The property is strongly retained by the target.
+        ///
+        /// Mutually exclusive with `copy`.
         case retain
+
+        /// The property is copied.
+        ///
+        /// Mutually exclusive with `assign`.
         case copy
+
     }
 
     private let policy: objc_AssociationPolicy
