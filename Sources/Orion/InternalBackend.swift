@@ -1,12 +1,21 @@
 import Foundation
 
 extension Backends {
+
+    /// The internal backend.
+    ///
+    /// This backend uses Objective-C runtime functions ("swizzling")
+    /// to apply method hooks.
+    ///
+    /// - Warning: This backend does not support function hooking.
     public struct Internal: DefaultBackend {
         public init() {}
     }
+
 }
 
 extension Backends.Internal {
+
     private func hookMethod(
         cls: AnyClass,
         sel: Selector,
@@ -48,4 +57,5 @@ extension Backends.Internal {
             }
         }
     }
+
 }

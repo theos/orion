@@ -5,6 +5,20 @@ import Orion
 #endif
 
 extension Backends {
+
+    /// A backend which uses Fishhook to hook functions.
+    ///
+    /// Other hook requests are forwarded to the `UnderlyingBackend`.
+    /// This backend conditionally conforms to `DefaultBackend` iff
+    /// `UnderlyingBackend` does as well.
+    ///
+    /// - Warning: This backend does not support hooking functions by
+    /// their address. It is also subject to the pitfalls of Fishhook,
+    /// for example calls to hooked functions from within the image in
+    /// which the function is declared may still use the original
+    /// implementation. In addition, all instances of symbols with
+    /// the same name as the target function are hooked, not just the
+    /// one in the requested image.
     public struct Fishhook<UnderlyingBackend: Backend>: Backend {
         let underlyingBackend: UnderlyingBackend
 
@@ -12,6 +26,7 @@ extension Backends {
             self.underlyingBackend = underlyingBackend
         }
     }
+
 }
 
 extension Backends.Fishhook {

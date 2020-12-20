@@ -5,9 +5,17 @@ import Orion
 #endif
 
 extension Backends {
-    public struct Substrate: Backend {
+
+    /// A backend which utilizes CydiaSubstrate APIs for hooking.
+    ///
+    /// This backend can hook most functions and methods. Therefore
+    /// if the target system has CydiaSubstrate – or another hooking
+    /// framework which vends its API – installed, this backend makes
+    /// for a sensible default choice.
+    public struct Substrate: DefaultBackend {
         public init() {}
     }
+
 }
 
 extension Backends.Substrate {
