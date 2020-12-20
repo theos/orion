@@ -103,6 +103,7 @@ final class PropertyKeys {
     @available(*, unavailable, message: "@Property is only available on ClassHook types")
     public var wrappedValue: T {
         get { fatalError("@Property is only available on ClassHook types") }
+        // swiftlint:disable:next unused_setter_value
         set { fatalError("@Property is only available on ClassHook types") }
     }
 

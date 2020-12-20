@@ -32,6 +32,8 @@ private extension Diagnostic.Message {
     }
 }
 
+// it do be like that for compiler stuff
+// swiftlint:disable:next type_body_length
 class OrionVisitor: SyntaxVisitor {
     private enum DeclarationKind: CustomStringConvertible {
         case classHook(target: Syntax)

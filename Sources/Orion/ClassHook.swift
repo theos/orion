@@ -100,6 +100,7 @@ extension ClassHookProtocol {
 
 }
 
+// swiftlint:disable line_length
 /// The base class hook type.
 ///
 /// This type allows hooking methods of one target class. All class hooks
@@ -181,6 +182,7 @@ extension ClassHookProtocol {
 /// ```
 ///
 public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHookProtocol
+// swiftlint:enable line_length
 // we don't declare _ClassHookProtocol conformance on _ClassHookClass directly since that would
 // result in _ClassHookClass inheriting the default implementations of _ClassHookProtocol and
 // _AnyHook requirements, making it more difficult to override them
@@ -330,8 +332,7 @@ extension _GlueClassHook {
     public static func addMethod<Code>(_ selector: Selector, _ implementation: Code, isClassMethod: Bool) {
         let methodDescription = { "\(isClassMethod ? "+" : "-")[\(self) \(selector)]" }
         guard let method = (isClassMethod ? class_getClassMethod : class_getInstanceMethod)(self, selector)
-            else { fatalError("Could not find method \(methodDescription())")}
-        // TODO: Figure out if there's a way to get the type encoding statically instead
+            else { fatalError("Could not find method \(methodDescription())") }
         guard let types = method_getTypeEncoding(method)
             else { fatalError("Could not get method signature for \(methodDescription())") }
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
