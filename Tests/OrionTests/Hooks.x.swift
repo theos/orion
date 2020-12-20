@@ -15,9 +15,9 @@ class AtoiHook: FunctionHook {
 
     func function(_ string: UnsafePointer<Int8>) -> Int32 {
         if strcmp(string, "1234") == 0 || strcmp(string, "2345") == 0 {
-            return 10 * orig { $0.function(string) }
+            return 10 * orig.function(string)
         } else {
-            return orig { $0.function(string) }
+            return orig.function(string)
         }
     }
 }
@@ -31,9 +31,9 @@ class AtofHook: FunctionHook {
 
     func function(_ string: UnsafePointer<Int8>) -> Double {
         if strcmp(string, "1.5") == 0 || strcmp(string, "2.5") == 0 {
-            return 10 * orig { $0.function(string) }
+            return 10 * orig.function(string)
         } else {
-            return orig { $0.function(string) }
+            return orig.function(string)
         }
     }
 }
@@ -44,11 +44,11 @@ class BasicHook: ClassHook<BasicClass> {
     }
 
     func someTestMethod(withArgument argument: Int32) -> String {
-        "Hooked: \(orig { $0.someTestMethod(withArgument: argument + 1) })"
+        "Hooked: \(orig.someTestMethod(withArgument: argument + 1))"
     }
 
     class func someTestMethod2(withArgument argument: Int32) -> String {
-        "Hooked class method: \(orig { $0.someTestMethod2(withArgument: argument + 1) })"
+        "Hooked class method: \(orig.someTestMethod2(withArgument: argument + 1))"
     }
 }
 
@@ -85,7 +85,7 @@ class NamedBasicHook: ClassHook<NSObject> {
     func methodForNamedTest() -> Bool { true }
 
     class func classMethodForNamedTest(withArgument arg: String) -> [String] {
-        let origVal = orig { $0.classMethodForNamedTest(withArgument: "\(arg), or is it") }
+        let origVal = orig.classMethodForNamedTest(withArgument: "\(arg), or is it")
         return ["Hooked named class method"] + origVal
     }
 }
@@ -110,11 +110,11 @@ class BasicSubclass: ClassHook<BasicClass> {
     }
 
     func subclassableTestMethod() -> String {
-        "Subclassed: \(supr { $0.subclassableTestMethod() })"
+        "Subclassed: \(supr.subclassableTestMethod())"
     }
 
     class func subclassableTestMethod1() -> String {
-        "Subclassed class: \(supr { $0.subclassableTestMethod1() })"
+        "Subclassed class: \(supr.subclassableTestMethod1())"
     }
 }
 
@@ -123,11 +123,11 @@ class NamedBasicSubclass: ClassHook<NSObject> {
     static let subclassMode = SubclassMode.createSubclass
 
     func subclassableNamedTestMethod() -> String {
-        "Subclassed named: \(supr { $0.subclassableNamedTestMethod() })"
+        "Subclassed named: \(supr.subclassableNamedTestMethod())"
     }
 
     class func subclassableNamedTestMethod1() -> String {
-        "Subclassed named class: \(supr { $0.subclassableNamedTestMethod1() })"
+        "Subclassed named class: \(supr.subclassableNamedTestMethod1())"
     }
 }
 
@@ -143,16 +143,16 @@ class AdditionHook: ClassHook<BasicClass> {
 
 class InheritedHook: ClassHook<InheritedClass> {
     class func someTestMethod3() -> String {
-        "Hooked test class method: \(supr { $0.someTestMethod3() })"
+        "Hooked test class method: \(supr.someTestMethod3())"
     }
 }
 
 class InitHook: ClassHook<InitClass> {
     // just a placeholder to allow forwarding
-    func `init`() -> Target { orig { $0.`init`() } }
+    func `init`() -> Target { orig.`init`() }
 
     func `init`(withX x: Int32) -> Target {
-        let this = supr { $0.`init`() }
+        let this = supr.`init`()
         Ivars(this)._x = x + 1
         return this
     }
@@ -162,7 +162,7 @@ class SuperHook: ClassHook<MyClass> {
     @Property(.nonatomic) var x = 11
 
     func description() -> String {
-        "hax description: \(supr { $0.description() })"
+        "hax description: \(supr.description())"
     }
 
     func hooked() -> String {
@@ -170,9 +170,7 @@ class SuperHook: ClassHook<MyClass> {
             return "zero"
         } else {
             x -= 1
-            return orig {
-                "orig: \($0.hooked()). hax hooked \(supr { $0.description() }). x=\(x), prev=\(hooked())"
-            }
+            return "orig: \(orig.hooked()). hax hooked \(supr.description()). x=\(x), prev=\(hooked())"
         }
     }
 }

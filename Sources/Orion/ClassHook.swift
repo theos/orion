@@ -107,37 +107,43 @@ public protocol _AnyGlueClassHook {
 
 extension _ClassHookProtocol {
 
-    // Yes, thse can indeed be made computed properties (`var orig: Self`) instead,
-    // but unfortunately the Swift compiler emits a warning when it sees an orig/supr
-    // call like that, because it thinks it'll amount to infinite recursion. Maybe
-    // someday... https://bugs.swift.org/browse/SR-7925
+    // @_transparent allows the compiler to incorporate these methods into the
+    // control flow analysis of the caller. This means it sees the possibility
+    // for the fatal errors, thereby not thinking that the function is infinitely
+    // recursive which it would otherwise do (see https://bugs.swift.org/browse/SR-7925)
+    // While that bug has technically been fixed, it still affects us because Swift
+    // won't normally see the glue overrides and so it'll not realise that there is
+    // an override point.
 
-    @discardableResult
-    public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
+    // Note that we have to add a level of indirection to fatalError because otherwise
+    // that code path isn't considered as part of the main control flow.
+
+    @_transparent
+    public var orig: Self {
         guard let unwrapped = (self as? _AnyGlueClassHook)?._orig as? Self
-            else { fatalError("Could not get orig") }
-        return try block(unwrapped)
+            else { _indirectFatalError("Could not get orig") }
+        return unwrapped
     }
 
-    @discardableResult
-    public static func orig<Result>(_ block: (Self.Type) throws -> Result) rethrows -> Result {
+    @_transparent
+    public static var orig: Self.Type {
         guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._orig as? Self.Type
-            else { fatalError("Could not get orig") }
-        return try block(unwrapped)
+            else { _indirectFatalError("Could not get orig") }
+        return unwrapped
     }
 
-    @discardableResult
-    public func supr<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
+    @_transparent
+    public var supr: Self {
         guard let unwrapped = (self as? _AnyGlueClassHook)?._supr as? Self
-            else { fatalError("Could not get supr") }
-        return try block(unwrapped)
+            else { _indirectFatalError("Could not get supr") }
+        return unwrapped
     }
 
-    @discardableResult
-    public static func supr<Result>(_ block: (Self.Type) throws -> Result) rethrows -> Result {
+    @_transparent
+    public static var supr: Self.Type {
         guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._supr as? Self.Type
-            else { fatalError("Could not get supr") }
-        return try block(unwrapped)
+            else { _indirectFatalError("Could not get supr") }
+        return unwrapped
     }
 
 }

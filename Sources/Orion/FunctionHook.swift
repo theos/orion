@@ -42,11 +42,11 @@ public protocol _AnyGlueFunctionHook {
 }
 
 extension _FunctionHookProtocol {
-    @discardableResult
-    public func orig<Result>(_ block: (Self) throws -> Result) rethrows -> Result {
+    @_transparent
+    public var orig: Self {
         guard let unwrapped = (self as? _AnyGlueFunctionHook)?._orig as? Self
-            else { fatalError("Could not get orig") }
-        return try block(unwrapped)
+            else { _indirectFatalError("Could not get orig") }
+        return unwrapped
     }
 }
 

@@ -27,6 +27,7 @@
 		568974C8252BBA4F006F48E9 /* super.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BF252BBA4F006F48E9 /* super.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		568974CB252BBA4F006F48E9 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 568974C3252BBA4F006F48E9 /* init.c */; };
 		568974CE252BBA7F006F48E9 /* Orion.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974CD252BBA7F006F48E9 /* Orion.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		568974C3252BBA4F006F48E9 /* init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
 		568974CD252BBA7F006F48E9 /* Orion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orion.h; sourceTree = "<group>"; };
 		568974D8252BBFF4006F48E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +158,7 @@
 				5689749C252BBA15006F48E9 /* ClassHook.swift */,
 				568974A0252BBA15006F48E9 /* ClassHook+Super.swift */,
 				5689749D252BBA15006F48E9 /* Dynamic.swift */,
+				56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */,
 				5689749E252BBA15006F48E9 /* FunctionHook.swift */,
 				568974A8252BBA15006F48E9 /* Hook.swift */,
 				5689749F252BBA15006F48E9 /* InternalBackend.swift */,
@@ -295,6 +298,7 @@
 				568974AE252BBA15006F48E9 /* ClassHook+Super.swift in Sources */,
 				568974AF252BBA15006F48E9 /* AnyBackend.swift in Sources */,
 				568974B2252BBA15006F48E9 /* Backend.swift in Sources */,
+				56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */,
 				568974B0252BBA15006F48E9 /* Ivars.swift in Sources */,
 				568974B7252BBA16006F48E9 /* Tweak.swift in Sources */,
 				568974CB252BBA4F006F48E9 /* init.c in Sources */,
