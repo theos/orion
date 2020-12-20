@@ -1,8 +1,15 @@
 import Foundation
 
+/// An enumeration describing a `ClassHook`'s subclassing behavior.
 public enum SubclassMode {
+
+    /// Do not create a subclass for this hook.
     case none
+
+    /// Create a subclass with a name derived from the hook name.
     case createSubclass
+
+    /// Create a subclass with the provided name.
     case createSubclassNamed(String)
 
     fileprivate func subclassName(withType type: AnyClass) -> String? {
@@ -15,9 +22,17 @@ public enum SubclassMode {
             return name
         }
     }
+
 }
 
+/// The protocol to which class hooks conform. Do not conform to this
+/// directly; use `ClassHook`.
 public protocol ClassHookProtocol: class, AnyHook {
+
+    /// The type of the target.
+    ///
+    /// This type must be either the target's own class or a class in
+    /// its inheritance chain.
     associatedtype Target: AnyObject
 
     /// The storage for the underlying target. Do not implement
@@ -26,23 +41,37 @@ public protocol ClassHookProtocol: class, AnyHook {
     /// :nodoc:
     static var _target: Target.Type { get }
 
-    // The name of the target class (must be a subclass of `Target`), or
-    // an empty string (the default) to use Target.self
+    /// The name of the target class, or the empty string to use `Target.self`.
+    ///
+    /// This class must be `Target` or a subclass of `Target`. Defaults to
+    /// an empty string.
     static var targetName: String { get }
 
-    // If this is not .none, it indicates that this hook creates a subclass. In order to
-    // achieve this, we add a new class pair on top of the original target. The subclass
-    // itself can be accessed via the static `target` property. Defaults to .none.
+    /// If this is not .none, it indicates that this hook creates a subclass.
+    ///
+    /// The created subclass can be accessed via the static `target` property. The
+    /// default value is `.none`.
+    ///
+    /// This property is implemented by creating a new class pair on top of the
+    /// original target, when the property is not `.none`.
     static var subclassMode: SubclassMode { get }
 
-    // protocols which should be added to the target class. Defaults to an empty array.
+    /// An array of protocols which should be added to the target class.
+    ///
+    /// The default value is an empty array.
     static var protocols: [Protocol] { get }
 
+    /// The current instance of the hooked class, upon which a hooked method
+    /// has been called.
     var target: Target { get }
 
+    /// Initializes the type with the provided target instance. Do not invoke
+    /// this yourself.
     init(target: Target)
+
 }
 
+/// :nodoc:
 extension ClassHookProtocol {
 
     public static var targetName: String { "" }
@@ -57,20 +86,99 @@ extension ClassHookProtocol {
 
 }
 
+/// The class which all class hooks inherit from. Do not subclass
+/// this directly; use `ClassHook`.
 @objcMembers open class ClassHookClass<Target: AnyObject> {
+
+    /// The current instance of the hooked class, upon which a hooked method
+    /// has been called.
     public let target: Target
+
+    /// Initializes the type with the provided target instance. Do not invoke
+    /// this yourself.
     public required init(target: Target) { self.target = target }
+
 }
 
+/// The base class hook type.
+///
+/// This type allows hooking methods of one target class.
+///
+/// # Specifying a Target Class
+///
+/// In order to hook a class which is known by the Swift compiler at
+/// compile-time, specialize `ClassHook` with that class as the `Target`
+/// type. For example, to hook `MyClass` one could declare
+/// `class MyHook: ClassHook<MyClass>`.
+///
+/// In order to hook a class which is not known by the Swift compiler
+/// at compile-time, specify a class in its inheritance chain as `Target`
+/// (you can use `NSObject` if no class which is more specific is available
+/// at compile-time), and provide the actual target class' name by implementing
+/// the static `targetName` property.
+///
+/// # Hooking Methods
+///
+/// To hook a method on the target class, simply declare a method with the same
+/// name and method signature in your hook class. The contents of your method
+/// will replace the original method implementation.
+///
+/// In order to hook a class method, declare the replacement method as a `class`
+/// method. The method must not be `final` or `static`. Methods which have a
+/// visibility of `fileprivate` or `private` will be ignored by Orion.
+///
+/// To call the original implementation of the method, call the method itself
+/// on the `orig` proxy. Similarly, the superclass implementation can be accessed
+/// via the `supr` proxy.
+///
+/// To figure out the required Swift name for an Objective-C method, you may want
+/// to follow the way that Objective-C APIs are [renamed](https://github.com/apple/swift-evolution/blob/main/proposals/0005-objective-c-name-translation.md)
+/// when they are imported into Swift, in reverse. If you cannot figure out the
+/// Swift name for the method, you can also provide the Objective-C selector name
+/// directly by declaring the function as `@objc(selector:name:) func`.
+///
+/// # Adding to the Class
+///
+/// ## Properties
+///
+/// Use the `@Property` property wrapper. For more information, refer to its
+/// documentation.
+///
+/// ## Protocols
+///
+/// You can specify a list of protocols for which conformance will be added
+/// to the class, by declaring the `ClassHookProtocol.protocols` property.
+///
+/// ## New Methods
+///
+/// To add a new method to the target class, simply declare it on the hook and mark
+/// it as `final`. This may be useful, for example, to make the target class conform
+/// to a protocol requirement.
+///
+/// # Creating Subclasses
+///
+/// In some situations, you may need to declare a subclass for a base class which is
+/// not known at compile-time. In this case, create a `ClassHook` with the `Target`
+/// or `targetName` as the base class, and declare the `subclassMode` property with
+/// a value of `SubclassMode.createSubclass` (to automatically pick a subclass name)
+/// or use `SubclassMode.createSubclassNamed(_:)` if you need a specific name.
+///
+/// The static `target` property will refer to the subclass type. It is possible
+/// to add methods, properties, protocols, and so on to the subclass as described
+/// above.
+public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHookProtocol
 // we don't declare _ClassHookProtocol conformance on _ClassHookClass directly since that would
 // result in _ClassHookClass inheriting the default implementations of _ClassHookProtocol and
 // _AnyHook requirements, making it more difficult to override them
-public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHookProtocol
 
 extension ClassHookProtocol {
 
-    // this is in an extension so users can't accidentally override it
-    public static var target: Target.Type { _target }
+    /// The concrete type of the hooked target (or its subclass depending on
+    /// `subclassMode`).
+    public static var target: Target.Type {
+        // this is in an extension so users can't accidentally override it
+        _target
+    }
 
     /// Initializes the target. Do not call this yourself.
     ///
@@ -128,6 +236,7 @@ extension ClassHookProtocol {
     // Note that we have to add a level of indirection to fatalError because otherwise
     // that code path isn't considered as part of the main control flow.
 
+    /// A proxy to access the original instance methods of the hooked class.
     @_transparent
     public var orig: Self {
         guard let unwrapped = (self as? _AnyGlueClassHook)?._orig as? Self
@@ -135,6 +244,7 @@ extension ClassHookProtocol {
         return unwrapped
     }
 
+    /// A proxy to access the original class methods of the hooked class.
     @_transparent
     public static var orig: Self.Type {
         guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._orig as? Self.Type
@@ -142,6 +252,7 @@ extension ClassHookProtocol {
         return unwrapped
     }
 
+    /// A proxy to access the hooked class' superclass instance methods.
     @_transparent
     public var supr: Self {
         guard let unwrapped = (self as? _AnyGlueClassHook)?._supr as? Self
@@ -149,6 +260,7 @@ extension ClassHookProtocol {
         return unwrapped
     }
 
+    /// A proxy to access the hooked class' superclass class methods.
     @_transparent
     public static var supr: Self.Type {
         guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._supr as? Self.Type
