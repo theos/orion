@@ -2,11 +2,8 @@ import Foundation
 
 final class ReadWriteLock {
 
-    // I have absolutely ZERO clue why but this has to either be an IUO
-    // or have a layer of indirection (eg a computed property with
-    // `get { lock } set { lock = newValue }`) or else we get deadlock on
-    // the *first* lock attempt.
-    private var lock: pthread_rwlock_t!
+    // we can't use `var lock: pthread_rwlock_t`. See http://www.russbishop.net/the-law
+    private let lock: UnsafeMutablePointer<pthread_rwlock_t>
 
     @discardableResult
     private static func check(
@@ -23,24 +20,25 @@ final class ReadWriteLock {
     }
 
     init() {
-        var lock = pthread_rwlock_t()
-        Self.check(pthread_rwlock_init(&lock, nil))
+        let lock: UnsafeMutablePointer<pthread_rwlock_t> = .allocate(capacity: 1)
+        Self.check(pthread_rwlock_init(lock, nil))
         self.lock = lock
     }
 
     deinit {
-        Self.check(pthread_rwlock_destroy(&lock), "Could not destroy read-write lock")
+        Self.check(pthread_rwlock_destroy(lock), "Could not destroy read-write lock")
+        lock.deallocate()
     }
 
     func unlock() {
-        Self.check(pthread_rwlock_unlock(&lock), "Could not unlock read-write lock")
+        Self.check(pthread_rwlock_unlock(lock), "Could not unlock read-write lock")
     }
 
     func readLock() {
-        Self.check(pthread_rwlock_rdlock(&lock), "Could not acquire read lock")
+        Self.check(pthread_rwlock_rdlock(lock), "Could not acquire read lock")
     }
     func tryReadLock() -> Bool {
-        let result = pthread_rwlock_tryrdlock(&lock)
+        let result = pthread_rwlock_tryrdlock(lock)
         return result != EBUSY && Self.check(result, "Could not acquire read lock")
     }
     func withReadLock<Result>(_ block: () throws -> Result) rethrows -> Result {
@@ -50,10 +48,10 @@ final class ReadWriteLock {
     }
 
     func writeLock() {
-        Self.check(pthread_rwlock_wrlock(&lock), "Could not acquire write lock")
+        Self.check(pthread_rwlock_wrlock(lock), "Could not acquire write lock")
     }
     func tryWriteLock() -> Bool {
-        let result = pthread_rwlock_trywrlock(&lock)
+        let result = pthread_rwlock_trywrlock(lock)
         return result != EBUSY && Self.check(result, "Could not acquire write lock")
     }
     func withWriteLock<Result>(_ block: () throws -> Result) rethrows -> Result {
