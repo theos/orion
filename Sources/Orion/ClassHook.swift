@@ -102,7 +102,8 @@ extension ClassHookProtocol {
 
 /// The base class hook type.
 ///
-/// This type allows hooking methods of one target class.
+/// This type allows hooking methods of one target class. All class hooks
+/// must subclass it.
 ///
 /// # Specifying a Target Class
 ///
@@ -166,6 +167,19 @@ extension ClassHookProtocol {
 /// The static `target` property will refer to the subclass type. It is possible
 /// to add methods, properties, protocols, and so on to the subclass as described
 /// above.
+///
+/// # Example
+///
+/// To change the text of all `UILabel`s to "hello", one could write something like this:
+///
+/// ```
+/// class MyHook: ClassHook<UILabel> {
+///     func setText(_ text: String) {
+///         orig.setText("hello")
+///     }
+/// }
+/// ```
+///
 public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHookProtocol
 // we don't declare _ClassHookProtocol conformance on _ClassHookClass directly since that would
 // result in _ClassHookClass inheriting the default implementations of _ClassHookProtocol and
