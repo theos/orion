@@ -53,7 +53,7 @@ private class Orion_ClassHook1: BasicHook, _GlueClassHook {
         Orion_ClassHook1.someTestMethod2(withArgument:)(arg1)
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
         builder.addHook(orion_sel3, orion_orig3, isClassMethod: true) { orion_orig3 = $0 }
@@ -82,7 +82,7 @@ private class Orion_ClassHook2: ActivationHook, _GlueClassHook {
         Orion_ClassHook2(target: target).someDidActivateMethod()
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
     }
 }
@@ -109,7 +109,7 @@ private class Orion_ClassHook3: NotHook, _GlueClassHook {
         Orion_ClassHook3(target: target).someUnhookedMethod()
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
     }
 }
@@ -149,7 +149,7 @@ private class Orion_ClassHook4: NamedBasicHook, _GlueClassHook {
         Orion_ClassHook4.classMethodForNamedTest(withArgument:)(arg1)
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: true) { orion_orig2 = $0 }
     }
@@ -208,7 +208,7 @@ private class Orion_ClassHook5: BasicSubclass, _GlueClassHook {
         Orion_ClassHook5.subclassableTestMethod1()
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         addMethod(orion_sel2, orion_imp2, isClassMethod: false)
         builder.addHook(orion_sel3, orion_orig3, isClassMethod: false) { orion_orig3 = $0 }
@@ -251,7 +251,7 @@ private class Orion_ClassHook6: NamedBasicSubclass, _GlueClassHook {
         Orion_ClassHook6.subclassableNamedTestMethod1()
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: true) { orion_orig2 = $0 }
     }
@@ -276,7 +276,7 @@ private class Orion_ClassHook7: AdditionHook, _GlueClassHook {
         Orion_ClassHook7.someTestProtocolClassMethod()
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         addMethod(orion_sel1, orion_imp1, isClassMethod: false)
         addMethod(orion_sel2, orion_imp2, isClassMethod: true)
     }
@@ -304,7 +304,7 @@ private class Orion_ClassHook8: InheritedHook, _GlueClassHook {
         Orion_ClassHook8.someTestMethod3()
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: true) { orion_orig1 = $0 }
     }
 }
@@ -344,7 +344,7 @@ private class Orion_ClassHook9: InitHook, _GlueClassHook {
         Orion_ClassHook9(target: target).`init`(withX:)(arg1)
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
@@ -385,7 +385,7 @@ private class Orion_ClassHook10: SuperHook, _GlueClassHook {
         Orion_ClassHook10(target: target).hooked()
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
@@ -426,7 +426,7 @@ private class Orion_ClassHook11: PropertyHookX, _GlueClassHook {
         Orion_ClassHook11(target: target).setXValue(_:)(arg1)
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
@@ -467,7 +467,7 @@ private class Orion_ClassHook12: PropertyHookY, _GlueClassHook {
         Orion_ClassHook12(target: target).setYValue(_:)(arg1)
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }
@@ -508,7 +508,7 @@ private class Orion_ClassHook13: PropertyHook2, _GlueClassHook {
         Orion_ClassHook13(target: target).setXValue(_:)(arg1)
     }
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
         builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
         builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
     }

@@ -58,10 +58,10 @@ public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _FunctionHookProtocol, 
 }
 
 extension _GlueFunctionHook {
-    public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
-        builder.addFunctionHook(target, replacement: unsafeBitCast(origFunction, to: UnsafeMutableRawPointer.self)) {
+    public static func activate() -> [HookDescriptor] {
+        [.function(function: target, replacement: unsafeBitCast(origFunction, to: UnsafeMutableRawPointer.self)) {
             origFunction = unsafeBitCast($0, to: Code.self)
-        }
+        }]
     }
 
     public static var _orig: AnyClass { OrigType.self }

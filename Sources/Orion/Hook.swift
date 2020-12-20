@@ -22,18 +22,15 @@ extension _AnyHook {
 }
 
 public protocol _AnyGlueHook: _AnyHook {
-    // we can't use HookBuilder as an existential here because that would allow the
-    // function to re-assign the builder to one of a different type
-    static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder)
+    static func activate() -> [HookDescriptor]
 }
 
 extension _AnyGlueHook {
 
     // activate the hook, handling lifecycle logic
-    static func activateIfNeeded<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
-        guard hookWillActivate() else { return }
-        activate(withHookBuilder: &builder)
-        hookDidActivate()
+    static func activateIfNeeded() -> [HookDescriptor]? {
+        guard hookWillActivate() else { return nil }
+        return activate()
     }
 
 }

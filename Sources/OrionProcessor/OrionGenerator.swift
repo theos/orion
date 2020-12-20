@@ -169,7 +169,7 @@ public final class OrionGenerator {
 
             final class SuprType: \(className) {\(indentedSuprs)}
         \(indentedMains)
-            static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>) {
+            static func activate(withClassHookBuilder builder: inout ClassHookBuilder) {
                 \(registers.joined(separator: "\n        "))
             }
         }

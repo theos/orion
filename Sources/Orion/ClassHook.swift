@@ -148,9 +148,10 @@ extension _ClassHookProtocol {
 
 }
 
-public struct ClassHookBuilder<Builder: HookBuilder> {
+public struct ClassHookBuilder {
     let target: AnyClass
-    var builder: Builder
+
+    var descriptors: [HookDescriptor] = []
 
     public mutating func addHook<Code>(
         _ sel: Selector,
@@ -159,13 +160,11 @@ public struct ClassHookBuilder<Builder: HookBuilder> {
         completion: @escaping (Code) -> Void
     ) {
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
-        builder.addMethodHook(
-            cls: cls,
-            sel: sel,
-            replacement: unsafeBitCast(replacement, to: UnsafeMutableRawPointer.self)
-        ) { orig in
-            completion(unsafeBitCast(orig, to: Code.self))
-        }
+        descriptors.append(
+            .method(cls: cls, sel: sel, replacement: unsafeBitCast(replacement, to: UnsafeMutableRawPointer.self)) {
+                completion(unsafeBitCast($0, to: Code.self))
+            }
+        )
     }
 }
 
@@ -173,7 +172,7 @@ public protocol _GlueClassHook: _AnyGlueClassHook, _ClassHookProtocol, _AnyGlueH
     associatedtype OrigType: _ClassHookProtocol where OrigType.Target == Target
     associatedtype SuprType: _ClassHookProtocol where SuprType.Target == Target
 
-    static func activate<Builder: HookBuilder>(withClassHookBuilder builder: inout ClassHookBuilder<Builder>)
+    static func activate(withClassHookBuilder builder: inout ClassHookBuilder)
 }
 
 extension _GlueClassHook {
@@ -195,9 +194,9 @@ extension _GlueClassHook {
             else { fatalError("Failed to add method \(methodDescription())") }
     }
 
-    public static func activate<Builder: HookBuilder>(withHookBuilder builder: inout Builder) {
-        var classHookBuilder = ClassHookBuilder(target: target, builder: builder)
-        defer { builder = classHookBuilder.builder }
+    public static func activate() -> [HookDescriptor] {
+        var classHookBuilder = ClassHookBuilder(target: target)
         activate(withClassHookBuilder: &classHookBuilder)
+        return classHookBuilder.descriptors
     }
 }
