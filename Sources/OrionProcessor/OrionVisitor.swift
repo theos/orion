@@ -90,7 +90,7 @@ class OrionVisitor: SyntaxVisitor {
 
     // don't consider these names as method hooks
     private static let ignoredMethodNames: Set<String> = [
-        // these are the optional _AnyHook protocol methods; don't treat them as hooks
+        // these are the optional AnyHook protocol methods; don't treat them as hooks
         "hookWillActivate", "hookDidActivate"
     ]
 

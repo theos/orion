@@ -3,7 +3,7 @@ import Foundation
 /// The base protocol for all hook types. Do not use this directly.
 ///
 /// See `ClassHook` and `FunctionHook`.
-public protocol _AnyHook {
+public protocol AnyHook {
     // these are named hook[Will|Did]Activate instead of [will|did]Activate because
     // they're special cased in the generator so that in class hooks, we don't end
     // up thinking the user wants to hook methods by those names in the target class.
@@ -20,10 +20,12 @@ public protocol _AnyHook {
     static func hookWillActivate() -> Bool
 
     /// Called after the hook is activated.
+    ///
+    /// The default implementation does nothing.
     static func hookDidActivate()
 }
 
-extension _AnyHook {
+extension AnyHook {
     public static func hookWillActivate() -> Bool { true }
     public static func hookDidActivate() {}
 }
@@ -32,7 +34,7 @@ extension _AnyHook {
 /// this directly.
 ///
 /// :nodoc:
-public protocol _AnyGlueHook: _AnyHook {
+public protocol _AnyGlueHook: AnyHook {
 
     /// Activates the hook. Do not call this directly.
     static func activate() -> [HookDescriptor]

@@ -17,10 +17,13 @@ public enum SubclassMode {
     }
 }
 
-public protocol _ClassHookProtocol: class, _AnyHook {
+public protocol ClassHookProtocol: class, AnyHook {
     associatedtype Target: AnyObject
 
-    // Do not implement this yourself
+    /// The storage for the underlying target. Do not implement
+    /// or use this yourself.
+    ///
+    /// :nodoc:
     static var _target: Target.Type { get }
 
     // The name of the target class (must be a subclass of `Target`), or
@@ -40,7 +43,7 @@ public protocol _ClassHookProtocol: class, _AnyHook {
     init(target: Target)
 }
 
-extension _ClassHookProtocol {
+extension ClassHookProtocol {
 
     public static var targetName: String { "" }
 
@@ -54,7 +57,7 @@ extension _ClassHookProtocol {
 
 }
 
-@objcMembers open class _ClassHookClass<Target: AnyObject> {
+@objcMembers open class ClassHookClass<Target: AnyObject> {
     public let target: Target
     public required init(target: Target) { self.target = target }
 }
@@ -62,16 +65,20 @@ extension _ClassHookProtocol {
 // we don't declare _ClassHookProtocol conformance on _ClassHookClass directly since that would
 // result in _ClassHookClass inheriting the default implementations of _ClassHookProtocol and
 // _AnyHook requirements, making it more difficult to override them
-public typealias ClassHook<Target: AnyObject> = _ClassHookClass<Target> & _ClassHookProtocol
+public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHookProtocol
 
-extension _ClassHookProtocol {
+extension ClassHookProtocol {
 
     // this is in an extension so users can't accidentally override it
     public static var target: Target.Type { _target }
 
-    // since this may be expensive, rather than using a computed prop, when
-    // accessing the static `target` this function is only called once and
-    // then cached by the glue. Do not call this yourself.
+    /// Initializes the target. Do not call this yourself.
+    ///
+    /// Since this may be expensive, rather than using a computed prop, when
+    /// accessing the static `target` this function is only called once and
+    /// cached by the glue.
+    ///
+    /// :nodoc:
     public static func _initializeTargetType() -> Target.Type {
         let targetName = self.targetName // only call getter once
         let baseTarget = targetName.isEmpty ? Target.self : Dynamic(targetName).as(type: Target.self)
@@ -97,6 +104,9 @@ extension _ClassHookProtocol {
 
 }
 
+/// An existential for glue class hooks. Do not use this directly.
+///
+/// :nodoc:
 public protocol _AnyGlueClassHook {
     static var _orig: AnyClass { get }
     var _orig: AnyObject { get }
@@ -105,7 +115,7 @@ public protocol _AnyGlueClassHook {
     var _supr: AnyObject { get }
 }
 
-extension _ClassHookProtocol {
+extension ClassHookProtocol {
 
     // @_transparent allows the compiler to incorporate these methods into the
     // control flow analysis of the caller. This means it sees the possibility
@@ -148,7 +158,11 @@ extension _ClassHookProtocol {
 
 }
 
-public struct ClassHookBuilder {
+/// A helper type used in the glue file for applying class hooks. Do not
+/// use this directly.
+///
+/// :nodoc:
+public struct _ClassHookBuilder {
     let target: AnyClass
 
     var descriptors: [HookDescriptor] = []
@@ -168,13 +182,18 @@ public struct ClassHookBuilder {
     }
 }
 
-public protocol _GlueClassHook: _AnyGlueClassHook, _ClassHookProtocol, _AnyGlueHook {
-    associatedtype OrigType: _ClassHookProtocol where OrigType.Target == Target
-    associatedtype SuprType: _ClassHookProtocol where SuprType.Target == Target
+/// A concrete class hook, implemented in the glue file. Do not use
+/// this directly.
+///
+/// :nodoc:
+public protocol _GlueClassHook: _AnyGlueClassHook, ClassHookProtocol, _AnyGlueHook {
+    associatedtype OrigType: ClassHookProtocol where OrigType.Target == Target
+    associatedtype SuprType: ClassHookProtocol where SuprType.Target == Target
 
-    static func activate(withClassHookBuilder builder: inout ClassHookBuilder)
+    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder)
 }
 
+/// :nodoc:
 extension _GlueClassHook {
     public static var _orig: AnyClass { OrigType.self }
     public var _orig: AnyObject { OrigType(target: target) }
@@ -195,7 +214,7 @@ extension _GlueClassHook {
     }
 
     public static func activate() -> [HookDescriptor] {
-        var classHookBuilder = ClassHookBuilder(target: target)
+        var classHookBuilder = _ClassHookBuilder(target: target)
         activate(withClassHookBuilder: &classHookBuilder)
         return classHookBuilder.descriptors
     }

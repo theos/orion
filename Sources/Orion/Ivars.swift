@@ -7,20 +7,21 @@ import Foundation
 /// an ivar with the given name does not exist, the dynamic member access
 /// will result in a crash.
 ///
-/// Example usage:
+/// - To access a pointer to the ivar instead, use `Ivars.withIvar(_:_:)`.
+///
+/// - To fail gracefully if the ivar does not exist, use `Ivars.subscript(safelyAccessing:)`.
+///
+/// - To access an ivar with a name that clashes with an actual member on this type,
+/// it is possible to use `Ivars.subscript(dynamicMember:)` directly.
+///
+/// # Example
+///
 /// ```
 /// let object = MyObject(foo: 5)
 /// Ivars<Int>(object)._foo // 5
 /// Ivars(object)._foo = 7
 /// print(object.foo) // 7
 /// ```
-///
-/// - To access a pointer to the ivar instead, use `withIvar(_:_:)`.
-///
-/// - To fail gracefully if the ivar does not exist, use `subscript(safelyAccessing:)`.
-///
-/// - To access an ivar with a name that clashes with an actual member on this type,
-/// it is possible to use `subscript(dynamicMember:)` directly.
 @dynamicMemberLookup public struct Ivars<IvarType> {
     private let object: AnyObject
 
@@ -104,7 +105,7 @@ import Foundation
     /// If an ivar with the given name is not present, using this subscript
     /// will result in a crash.
     ///
-    /// To fail gracefully, use `subscript(safelyAccessing:)` or `withIvar(_:_:)`
+    /// To fail gracefully, use `Ivars.subscript(safelyAccessing:)` or `Ivars.withIvar(_:_:)`.
     public subscript(dynamicMember ivarName: String) -> IvarType {
         get {
             withIvar(ivarName) {

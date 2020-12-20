@@ -56,7 +56,7 @@ extension Backend {
     /// - Parameter function: The function which is to be hooked.
     ///
     /// - Parameter replacement: The replacement function implementation. See
-    /// `HookDescriptor.function` for details.
+    /// `HookDescriptor.function(function:replacement:completion:)` for details.
     ///
     /// - Returns: The original function implementation.
     ///
@@ -79,7 +79,7 @@ extension Backend {
     /// - Parameter sel: The selector of the method to be hooked.
     ///
     /// - Parameter replacement: The replacement method implementation. See
-    /// `HookDescriptor.method` for details.
+    /// `HookDescriptor.method(cls:sel:replacement:completion:)` for details.
     ///
     /// - Returns: The original method implementation.
     ///

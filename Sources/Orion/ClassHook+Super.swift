@@ -46,6 +46,7 @@ enum MessageSendSuperType {
     }
 }
 
+/// :nodoc:
 extension _GlueClassHook {
     private static func callSuper<ReturnType, MessageType>(
         _ type: MessageType.Type,

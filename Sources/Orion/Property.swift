@@ -97,6 +97,9 @@ final class PropertyKeys {
 /// bob.sayHello() // Hi! I've been called 2 time(s)
 /// ```
 @propertyWrapper public struct Property<T> {
+    /// `@propertyWrapper` implementation. Do not use this property.
+    ///
+    /// :nodoc:
     @available(*, unavailable, message: "@Property is only available on ClassHook types")
     public var wrappedValue: T {
         get { fatalError("@Property is only available on ClassHook types") }
@@ -153,6 +156,9 @@ final class PropertyKeys {
     private let policy: objc_AssociationPolicy
     private let initialValue: T
 
+    /// Initialize the property wrapper.
+    ///
+    /// :nodoc:
     public init(wrappedValue: T, _ assign: Assign) {
         // despite the documentation, this behaves closer to `assign` or
         // `unsafe_unretained` than it does to `weak`
@@ -160,6 +166,9 @@ final class PropertyKeys {
         self.initialValue = wrappedValue
     }
 
+    /// Initialize the property wrapper.
+    ///
+    /// :nodoc:
     public init(wrappedValue: T, _ atomicity: Atomicity, _ retainOrCopy: RetainOrCopy) {
         // https://nshipster.com/associated-objects/
         switch (atomicity, retainOrCopy) {
@@ -171,28 +180,43 @@ final class PropertyKeys {
         self.initialValue = wrappedValue
     }
 
+    /// Initialize the property wrapper.
+    ///
+    /// :nodoc:
     public init(wrappedValue: T, _ retainOrCopy: RetainOrCopy, _ atomicity: Atomicity) {
         self.init(wrappedValue: wrappedValue, atomicity, retainOrCopy)
     }
 
+    /// Initialize the property wrapper.
+    ///
+    /// :nodoc:
     public init(wrappedValue: T, _ retainOrCopy: RetainOrCopy) {
         self.init(wrappedValue: wrappedValue, .atomic, retainOrCopy)
     }
 
+    /// Initialize the property wrapper.
+    ///
+    /// :nodoc:
     public init(wrappedValue: T, _ atomicity: Atomicity) {
         self.init(wrappedValue: wrappedValue, atomicity, .retain)
     }
 
+    /// Initialize the property wrapper.
+    ///
+    /// :nodoc:
     public init(wrappedValue: T) {
         self.policy = .OBJC_ASSOCIATION_RETAIN
         self.initialValue = wrappedValue
     }
 
+    /// `@propertyWrapper` implementation.
+    ///
+    /// :nodoc:
     public static subscript<EnclosingSelf>(
         _enclosingInstance object: EnclosingSelf,
         wrapped wrappedKeyPath: ReferenceWritableKeyPath<EnclosingSelf, T>,
         storage storageKeyPath: ReferenceWritableKeyPath<EnclosingSelf, Property<T>>
-    ) -> T where EnclosingSelf: _ClassHookProtocol {
+    ) -> T where EnclosingSelf: ClassHookProtocol {
         get {
             objc_getAssociatedObject(
                 object.target,

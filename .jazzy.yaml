@@ -1,6 +1,5 @@
 author: Theos Team
 author_url: https://theos.dev
 module: Orion
-theme: jony
 output: jazzy
 swift_build_tool: spm

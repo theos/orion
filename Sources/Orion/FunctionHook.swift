@@ -40,19 +40,27 @@ public enum Function: CustomStringConvertible {
 
 /// The protocol to which function hooks conform. Do not conform to this
 /// directly; use `FunctionHook`.
-public protocol _FunctionHookProtocol: class, _AnyHook {
+public protocol FunctionHookProtocol: class, AnyHook {
 
     /// The function which is to be hooked.
     static var target: Function { get }
 
+    /// Initialize the function hook type. Do not override this;
+    /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for lifecycle
+    /// events.
     init()
 
 }
 
 /// The class which all function hooks inherit from. Do not subclass
 /// this directly; use `FunctionHook`.
-open class _FunctionHookClass {
+open class FunctionHookClass {
+
+    /// Initialize the function hook type. Do not override this;
+    /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for lifecycle
+    /// events.
     required public init() {}
+
 }
 
 /// The base function hook type.
@@ -82,7 +90,7 @@ open class _FunctionHookClass {
 ///     }
 /// }
 /// ```
-public typealias FunctionHook = _FunctionHookClass & _FunctionHookProtocol
+public typealias FunctionHook = FunctionHookClass & FunctionHookProtocol
 
 /// An existential for glue function hooks. Do not use this directly.
 ///
@@ -92,7 +100,7 @@ public protocol _AnyGlueFunctionHook {
     var _orig: AnyObject { get }
 }
 
-extension _FunctionHookProtocol {
+extension FunctionHookProtocol {
 
     /// A proxy which allows invoking the original function.
     ///
@@ -114,13 +122,14 @@ extension _FunctionHookProtocol {
 /// this directly.
 ///
 /// :nodoc:
-public protocol _GlueFunctionHook: _AnyGlueFunctionHook, _FunctionHookProtocol, _AnyGlueHook {
+public protocol _GlueFunctionHook: _AnyGlueFunctionHook, FunctionHookProtocol, _AnyGlueHook {
     associatedtype Code
     static var origFunction: Code { get set }
 
-    associatedtype OrigType: _FunctionHookProtocol
+    associatedtype OrigType: FunctionHookProtocol
 }
 
+/// :nodoc:
 extension _GlueFunctionHook {
     public static func activate() -> [HookDescriptor] {
         [.function(function: target, replacement: unsafeBitCast(origFunction, to: UnsafeMutableRawPointer.self)) {
