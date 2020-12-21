@@ -10,7 +10,7 @@ elif [[ $# = 2 ]]; then
 	file_prefix="https://github.com/theos/orion/tree/$1"
 	root_url="https://orion.theos.dev/"
 	version="$2"
-	latest_args=(--module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}")
+	latest_args=(--module-version "latest (${version})" --github-file-prefix "${file_prefix}" --root-url "${root_url}")
 	perma_args=(--module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}versions/${version}/")
 	outdir=".."
 else
