@@ -26,11 +26,15 @@ jobs:
     - name: Commit docs
       run: |
         version="${GITHUB_REF#refs/tags/}"
+        ls ../docs-perm
         mv ../docs-perm "versions/${version}"
         mv versions .git ../docs
         cd ../docs
-        ls versions
+        ls "versions/${version}"
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-        git commit -am "[docs] Update to ${version}"
+        git status
+        git add -A
+        git commit -m "[docs] Update to ${version}"
+        git status
         git push
