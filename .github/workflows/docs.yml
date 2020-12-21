@@ -1,0 +1,31 @@
+name: Update Docs
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Generate docs
+      run: |
+        sudo gem install jazzy
+        jazzy --module-version "${GITHUB_REF#refs/tags/}" --github-file-prefix "https://github.com/theos/orion/tree/${GITHUB_SHA}" -o ../docs
+    - uses: actions/checkout@v2
+      with:
+        ref: docs
+    - name: Commit docs
+      run: |
+        version="${GITHUB_REF#refs/tags/}"
+        cp -a ../docs "versions/${version}"
+        mv versions .git ../docs
+        cd ../docs
+        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+        git commit -am "[docs] Update to ${version}"
+        git push
