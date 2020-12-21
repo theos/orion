@@ -22,6 +22,11 @@ extension Backends {
     public struct Fishhook<UnderlyingBackend: Backend>: Backend {
         let underlyingBackend: UnderlyingBackend
 
+        /// Initializes the Fishhook backend with the provided underlying
+        /// backend.
+        ///
+        /// - Parameter underlyingBackend: The backend to fall back to
+        /// for non-function hooking.
         public init(underlyingBackend: UnderlyingBackend) {
             self.underlyingBackend = underlyingBackend
         }

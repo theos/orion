@@ -20,20 +20,21 @@ jobs:
     - name: Update docs
       run: |
         cd master-branch
-        file_prefix="https://github.com/theos/orion/tree/${GITHUB_SHA}"
-        root_url="https://orion.theos.dev/"
         version="${GITHUB_REF#refs/tags/}"
+
         for v in ../docs-branch/versions/*; do
           base="$(basename "${v}")"
           echo "- [${base}](/versions/${base})" >> "Guides/Previous Versions.md"
         done
+
         sudo gem install jazzy
-        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}" -o ../docs
-        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}versions/${version}/" -o ../docs-perm
+        ./generate-docs.sh "${GITHUB_SHA}" "${version}"
+
         cd ../docs-branch
         mv ../docs-perm "versions/${version}"
         mv versions .git ../docs
         cd ../docs
+
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
         git add -A
