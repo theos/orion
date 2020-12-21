@@ -1,6 +1,5 @@
 author: Theos Team
 author_url: https://theos.dev
-root_url: https://orion.theos.dev/docs/
 github_url: https://github.com/theos/orion
 module: Orion
 swift_build_tool: spm

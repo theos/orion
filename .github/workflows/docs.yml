@@ -14,15 +14,19 @@ jobs:
         submodules: true
     - name: Generate docs
       run: |
+        file_prefix="https://github.com/theos/orion/tree/${GITHUB_SHA}"
+        root_url="https://orion.theos.dev/"
+        version="${GITHUB_REF#refs/tags/}"
         sudo gem install jazzy
-        jazzy --module-version "${GITHUB_REF#refs/tags/}" --github-file-prefix "https://github.com/theos/orion/tree/${GITHUB_SHA}" -o ../docs
+        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}" -o ../docs
+        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}versions/${version}/" -o ../docs-perm
     - uses: actions/checkout@v2
       with:
         ref: docs
     - name: Commit docs
       run: |
         version="${GITHUB_REF#refs/tags/}"
-        cp -a ../docs "versions/${version}"
+        mv ../docs-perm "versions/${version}"
         mv versions .git ../docs
         cd ../docs
         git config --global user.name "${GITHUB_ACTOR}"
