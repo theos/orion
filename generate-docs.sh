@@ -18,8 +18,10 @@ else
 	exit 1
 fi
 
+sourcekitten_path="$(VISUAL=echo gem open jazzy)/bin/sourcekitten"
+
 for module in Orion OrionBackend_{Substrate,Fishhook}; do
-  mod_docs="$(sourcekitten doc --spm --module-name "${module}")"
+  mod_docs="$("${sourcekitten_path}" doc --spm --module-name "${module}")"
   mod_docs="${mod_docs#?}"
   [[ -z "${combined_docs}" ]] || delimiter=","
   combined_docs="${combined_docs}${delimiter}${mod_docs%?}"
