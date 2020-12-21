@@ -17,6 +17,6 @@
     <key>DashDocSetFamily</key>
       <string>dashtoc</string>
     <key>DashDocSetFallbackURL</key>
-      <string>https://orion.theos.dev/docs/</string>
+      <string>https://orion.theos.dev/</string>
   </dict>
 </plist>
