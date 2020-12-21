@@ -2,8 +2,6 @@ author: Theos Team
 author_url: https://theos.dev
 root_url: https://orion.theos.dev/docs/
 github_url: https://github.com/theos/orion
-github_file_prefix: https://github.com/theos/orion/tree/1.0.0-beta1
-module_version: 1.0.0-beta1
 module: Orion
 swift_build_tool: spm
 documentation: Guides/*.md
