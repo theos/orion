@@ -47,7 +47,7 @@ public protocol ClassHookProtocol: class, AnyHook {
     /// an empty string.
     static var targetName: String { get }
 
-    /// If this is not .none, it indicates that this hook creates a subclass.
+    /// If this is not `.none`, it indicates that this hook creates a subclass.
     ///
     /// The created subclass can be accessed via the static `target` property. The
     /// default value is `.none`.

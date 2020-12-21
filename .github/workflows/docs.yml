@@ -22,15 +22,16 @@ jobs:
         cd master-branch
         version="${GITHUB_REF#refs/tags/}"
 
-        for v in ../docs-branch/versions/*; do
+        for v in `sort -rV <(printf '%s\n%s' "${version}" "$(ls versions)")`; do
           base="$(basename "${v}")"
-          echo "- [${base}](/versions/${base})" >> "Guides/Previous Versions.md"
+          echo "- [${base}](/versions/${base})" >> "Guides/Versions.md"
         done
 
         sudo gem install jazzy
         ./generate-docs.sh "${GITHUB_SHA}" "${version}"
 
         cd ../docs-branch
+        mkdir -p versions
         mv ../docs-perm "versions/${version}"
         mv versions .git ../docs
         cd ../docs
