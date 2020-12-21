@@ -12,29 +12,30 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - name: Generate docs
-      run: |
-        file_prefix="https://github.com/theos/orion/tree/${GITHUB_SHA}"
-        root_url="https://orion.theos.dev/"
-        version="${GITHUB_REF#refs/tags/}"
-        sudo gem install jazzy
-        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}" -o ../docs
-        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}versions/${version}/" -o ../docs-perm
+        path: master-branch
     - uses: actions/checkout@v2
       with:
         ref: docs
-    - name: Commit docs
+        path: docs-branch
+    - name: Update docs
       run: |
+        cd master-branch
+        file_prefix="https://github.com/theos/orion/tree/${GITHUB_SHA}"
+        root_url="https://orion.theos.dev/"
         version="${GITHUB_REF#refs/tags/}"
-        ls ../docs-perm
+        for v in ../docs-branch/versions/*; do
+          base="$(basename "${v}")"
+          echo "- [${base}](/versions/${base})" >> "Guides/Previous Versions.md"
+        done
+        sudo gem install jazzy
+        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}" -o ../docs
+        jazzy --module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}versions/${version}/" -o ../docs-perm
+        cd ../docs-branch
         mv ../docs-perm "versions/${version}"
         mv versions .git ../docs
         cd ../docs
-        ls "versions/${version}"
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-        git status
         git add -A
         git commit -m "[docs] Update to ${version}"
-        git status
         git push
