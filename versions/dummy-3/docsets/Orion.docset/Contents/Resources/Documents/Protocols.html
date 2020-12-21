@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Protocols  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Section/Protocols" class="dashAnchor"></a>
+    <a title="Protocols  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">Orion dummy-3 Docs</a> (100% documented)</p>
+        <p class="header-right"><a href="https://github.com/theos/orion"><img src="img/gh.png"/>View on GitHub</a></p>
+        <p class="header-right"><a href="dash-feed://https%3A%2F%2Forion.theos.dev%2Fversions%2Fdummy-3%2Fdocsets%2FOrion.xml"><img src="img/dash.png"/>Install in Dash</a></p>
+        <p class="header-right">
+          <form role="search" action="search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">Orion Reference</a>
+        <img id="carat" src="img/carat.png" />
+        Protocols  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="getting-started.html">Getting Started</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/ClassHookClass.html">ClassHookClass</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/FunctionHookClass.html">FunctionHookClass</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/Backends.html">Backends</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/Backends/Internal.html">– Internal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/Function.html">Function</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/HookDescriptor.html">HookDescriptor</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/SubclassMode.html">SubclassMode</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Extensions/NSObject.html">NSObject</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Protocols/AnyHook.html">AnyHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Backend.html">Backend</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/ClassHookProtocol.html">ClassHookProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/DefaultBackend.html">DefaultBackend</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/FunctionHookProtocol.html">FunctionHookProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Tweak.html">Tweak</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/TweakWithBackend.html">TweakWithBackend</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Structs/DefaultTweak.html">DefaultTweak</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Dynamic.html">Dynamic</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Ivars.html">Ivars</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Property.html">Property</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Property/Assign.html">– Assign</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Property/Atomicity.html">– Atomicity</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Property/RetainOrCopy.html">– RetainOrCopy</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Typealiases.html#/s:5Orion9ClassHooka">ClassHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Typealiases.html#/s:5Orion12FunctionHooka">FunctionHook</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>Protocols</h1>
+            <p>The following protocols are available globally.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion7BackendP"></a>
+                    <a name="//apple_ref/swift/Protocol/Backend" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion7BackendP">Backend</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The type that handles hooking of methods and functions.</p>
+
+<p>If your <code>Backend</code> implementation is intended for distribution,
+create it as a nested type in an extension on <code><a href="Enums/Backends.html">Backends</a></code>. The backend&rsquo;s
+name is then the type name minus the <code><a href="Enums/Backends.html">Backends.</a></code> prefix.</p>
+
+<p>If a custom backend name is specified via the Orion CLI, Orion will
+automatically attempt to import a module named <code>OrionBackend_&lt;backend name&gt;</code>
+if it exists, so it is recommended that you follow this nomenclature while
+naming your framework. Note that when determining the framework name, any
+generic arguments are stripped from the type name, and only the first
+component of the name is used.</p>
+
+<p>For example, a backend with the type <code>Backends.Foo.Bar&lt;Int&gt;</code> will be referred
+to by the name <code>Foo.Bar&lt;Int&gt;</code>, and Orion will attempt to auto-import a module
+named <code>OrionBackend_Foo</code>.</p>
+
+<p>For more information on backends, consult the Orion CLI documentation.</p>
+
+                        <a href="Protocols/Backend.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Backend</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/29b421f1f4631f213c131b6d78c20c09ff1bd9a0/Sources/Orion/Backend.swift#L43-L50">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion14DefaultBackendP"></a>
+                    <a name="//apple_ref/swift/Protocol/DefaultBackend" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion14DefaultBackendP">DefaultBackend</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A backend which Orion can use as a default.</p>
+
+                        <a href="Protocols/DefaultBackend.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">DefaultBackend</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Backend.html">Backend</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/29b421f1f4631f213c131b6d78c20c09ff1bd9a0/Sources/Orion/Backend.swift#L99-L104">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion17ClassHookProtocolP"></a>
+                    <a name="//apple_ref/swift/Protocol/ClassHookProtocol" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion17ClassHookProtocolP">ClassHookProtocol</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The protocol to which class hooks conform. Do not conform to this
+directly; use <code><a href="Typealiases.html#/s:5Orion9ClassHooka">ClassHook</a></code>.</p>
+
+                        <a href="Protocols/ClassHookProtocol.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">ClassHookProtocol</span> <span class="p">:</span> <span class="kt">AnyObject</span><span class="p">,</span> <span class="kt"><a href="Protocols/AnyHook.html">AnyHook</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/29b421f1f4631f213c131b6d78c20c09ff1bd9a0/Sources/Orion/ClassHook.swift#L30-L72">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion20FunctionHookProtocolP"></a>
+                    <a name="//apple_ref/swift/Protocol/FunctionHookProtocol" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion20FunctionHookProtocolP">FunctionHookProtocol</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The protocol to which function hooks conform. Do not conform to this
+directly; use <code><a href="Typealiases.html#/s:5Orion12FunctionHooka">FunctionHook</a></code>.</p>
+
+                        <a href="Protocols/FunctionHookProtocol.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">FunctionHookProtocol</span> <span class="p">:</span> <span class="kt">AnyObject</span><span class="p">,</span> <span class="kt"><a href="Protocols/AnyHook.html">AnyHook</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/29b421f1f4631f213c131b6d78c20c09ff1bd9a0/Sources/Orion/FunctionHook.swift#L43-L53">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion7AnyHookP"></a>
+                    <a name="//apple_ref/swift/Protocol/AnyHook" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion7AnyHookP">AnyHook</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The base protocol for all hook types. Do not use this directly.</p>
+
+<p>See <code><a href="Typealiases.html#/s:5Orion9ClassHooka">ClassHook</a></code> and <code><a href="Typealiases.html#/s:5Orion12FunctionHooka">FunctionHook</a></code>.</p>
+
+                        <a href="Protocols/AnyHook.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">AnyHook</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/29b421f1f4631f213c131b6d78c20c09ff1bd9a0/Sources/Orion/Hook.swift#L6-L26">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion5TweakP"></a>
+                    <a name="//apple_ref/swift/Protocol/Tweak" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion5TweakP">Tweak</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A type representing an Orion tweak.</p>
+
+<p>A module should contain zero or one types conforming to this
+protocol. If there are zero, Orion will use <code><a href="Structs/DefaultTweak.html">DefaultTweak</a></code>.</p>
+
+<p>Tweaks will default to the backend specified via the Orion CLI.
+In order to override the backend programmatically, conform to
+<code><a href="Protocols/TweakWithBackend.html">TweakWithBackend</a></code> instead.</p>
+
+                        <a href="Protocols/Tweak.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Tweak</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/29b421f1f4631f213c131b6d78c20c09ff1bd9a0/Sources/Orion/Tweak.swift#L14-L29">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion16TweakWithBackendP"></a>
+                    <a name="//apple_ref/swift/Protocol/TweakWithBackend" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion16TweakWithBackendP">TweakWithBackend</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A tweak with a custom <code><a href="Protocols/Backend.html">Backend</a></code>.</p>
+
+<p>The specified backend will override the one provided
+via the Orion CLI.</p>
+
+                        <a href="Protocols/TweakWithBackend.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">TweakWithBackend</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Tweak.html">Tweak</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/29b421f1f4631f213c131b6d78c20c09ff1bd9a0/Sources/Orion/Tweak.swift#L59-L67">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external">Theos Team</a>. All rights reserved. (Last updated: 2020-12-21)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
