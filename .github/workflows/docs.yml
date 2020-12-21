@@ -22,7 +22,7 @@ jobs:
         cd master-branch
         version="${GITHUB_REF#refs/tags/}"
 
-        for v in `sort -rV <(printf '%s\n%s' "${version}" "$(ls versions)")`; do
+        for v in `sort -rV <(printf '%s\n%s' "${version}" "$(ls ../docs-branch/versions)")`; do
           base="$(basename "${v}")"
           echo "- [${base}](/versions/${base})" >> "Guides/Versions.md"
         done
