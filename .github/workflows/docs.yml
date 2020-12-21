@@ -6,7 +6,7 @@ on:
     - '*'
 
 jobs:
-  build-and-test:
+  docs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -29,6 +29,7 @@ jobs:
         mv ../docs-perm "versions/${version}"
         mv versions .git ../docs
         cd ../docs
+        ls versions
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
         git commit -am "[docs] Update to ${version}"
