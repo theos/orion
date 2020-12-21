@@ -14,7 +14,10 @@ jobs:
     - name: Run tests
       run: swift test -v
     - name: Generate docs
-      run: jazzy --module-version "$(git describe --tags --abbrev=0)" --github-file-prefix "https://github.com/theos/orion/tree/${GITHUB_SHA}" -o ../docs
+      run: |
+        git fetch --prune --unshallow --tags
+        sudo gem install jazzy
+        jazzy --module-version "$(git describe --tags --abbrev=0)" --github-file-prefix "https://github.com/theos/orion/tree/${GITHUB_SHA}" -o ../docs
     - uses: actions/checkout@v2
       with:
         ref: docs
