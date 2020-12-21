@@ -54,6 +54,8 @@ public protocol FunctionHookProtocol: class, AnyHook {
 
 /// The class which all function hooks inherit from. Do not subclass
 /// this directly; use `FunctionHook`.
+///
+/// :nodoc:
 open class FunctionHookClass {
 
     /// Initialize the function hook type. Do not override this;

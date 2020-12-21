@@ -24,9 +24,13 @@ public enum HookDescriptor {
 
 /// The type that handles hooking of methods and functions.
 ///
-/// If your `Backend` implementation is intended for distribution,
-/// create it as a nested type in an extension on `Backends`. The backend's
-/// name is then the type name minus the `Backends.` prefix.
+/// Unless you have specific requirements, you should be able to use one
+/// of the pre-defined backends declared on `Backends`.
+///
+/// If you are creating a custom `Backend` implementation which is intended
+/// for distribution, declare it as a nested type in an extension on the
+/// `Backends` enumeration. The backend's name is then the type name minus
+/// the `Backends.` prefix.
 ///
 /// If a custom backend name is specified via the Orion CLI, Orion will
 /// automatically attempt to import a module named `OrionBackend_<backend name>`
@@ -98,10 +102,10 @@ extension Backend {
 /// A backend which Orion can use as a default.
 public protocol DefaultBackend: Backend {
 
-    /// Initializes the backend.
+    /// Initializes the backend with a default configuration.
     init()
 
 }
 
-/// A namespace to which backends are added as nested types.
+/// A namespace to which `Backend`s are added as nested types.
 public enum Backends {}

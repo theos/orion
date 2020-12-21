@@ -88,6 +88,8 @@ extension ClassHookProtocol {
 
 /// The class which all class hooks inherit from. Do not subclass
 /// this directly; use `ClassHook`.
+///
+/// :nodoc:
 @objcMembers open class ClassHookClass<Target: AnyObject> {
 
     /// The current instance of the hooked class, upon which a hooked method

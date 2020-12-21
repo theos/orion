@@ -149,7 +149,7 @@ final class PropertyKeys {
 
         /// The property is copied.
         ///
-        /// Mutually exclusive with `assign`.
+        /// Mutually exclusive with `retain`.
         case copy
 
     }

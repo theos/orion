@@ -1,6 +1,48 @@
 author: Theos Team
 author_url: https://theos.dev
 github_url: https://github.com/theos/orion
+copyright: |
+  © 2020 [Theos Team](https://theos.dev). Licensed under the [MIT License](https://github.com/theos/orion/blob/master/LICENSE.md).
+
 module: Orion
 swift_build_tool: spm
+
 documentation: Guides/*.md
+
+custom_categories:
+  - name: Guides
+    children:
+      - Getting Started
+  - name: Class Hooking
+    children:
+      - ClassHook
+      - ClassHookProtocol
+      - Property
+      - SubclassMode
+  - name: Function Hooking
+    children:
+      - FunctionHook
+      - FunctionHookProtocol
+      - Function
+  - name: All Hooks
+    children:
+      - AnyHook
+  - name: Tweaks
+    children:
+      - Tweak
+      - TweakWithBackend
+      - DefaultTweak
+  - name: Utilities
+    children:
+      - Ivars
+      - Dynamic
+      - NSObject
+  - name: Backends
+    children:
+      - Backends
+      - Backend
+      - DefaultBackend
+      - HookDescriptor
+  - name: Versions
+    children:
+      - Versions
