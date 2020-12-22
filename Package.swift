@@ -105,8 +105,8 @@ package.products += [
         targets: ["Orion"]
     ),
     .library(
-        name: "Substrate",
-        targets: ["Substrate"]
+        name: "CydiaSubstrate",
+        targets: ["CydiaSubstrate"]
     ),
     .library(
         name: "OrionBackend_Substrate",
@@ -124,11 +124,11 @@ package.targets += [
         dependencies: ["OrionC"]
     ),
     .systemLibrary(
-        name: "Substrate"
+        name: "CydiaSubstrate"
     ),
     .target(
         name: "OrionBackend_Substrate",
-        dependencies: ["Substrate", "Orion"]
+        dependencies: ["CydiaSubstrate", "Orion"]
     ),
     .target(
         name: "Fishhook"

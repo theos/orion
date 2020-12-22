@@ -1,6 +1,6 @@
 import Foundation
+@_implementationOnly import CydiaSubstrate
 #if SWIFT_PACKAGE
-import Substrate
 import Orion
 #endif
 

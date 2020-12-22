@@ -1,0 +1,4 @@
+module CydiaSubstrate {
+    header "CydiaSubstrate.h"
+    export *
+}
