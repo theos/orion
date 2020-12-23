@@ -2,7 +2,7 @@ import Foundation
 
 /// The base protocol for all hook types. Do not use this directly.
 ///
-/// See `ClassHook` and `FunctionHook`.
+/// - See: `ClassHook` and `FunctionHook`.
 public protocol AnyHook {
     // these are named hook[Will|Did]Activate instead of [will|did]Activate because
     // they're special cased in the generator so that in class hooks, we don't end

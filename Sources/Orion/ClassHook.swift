@@ -29,7 +29,8 @@ public enum SubclassMode {
 /// directly; use `ClassHook`.
 public protocol ClassHookProtocol: class, AnyHook {
 
-    /// The type of the target.
+    /// The type of the target. Specify this via the generic argument on
+    /// `ClassHook`.
     ///
     /// This type must be either the target's own class or a class in
     /// its inheritance chain.
@@ -66,7 +67,7 @@ public protocol ClassHookProtocol: class, AnyHook {
     var target: Target { get }
 
     /// Initializes the type with the provided target instance. Do not invoke
-    /// this yourself.
+    /// or override this.
     init(target: Target)
 
 }
@@ -97,7 +98,7 @@ extension ClassHookProtocol {
     public let target: Target
 
     /// Initializes the type with the provided target instance. Do not invoke
-    /// this yourself.
+    /// or override this.
     public required init(target: Target) { self.target = target }
 
 }

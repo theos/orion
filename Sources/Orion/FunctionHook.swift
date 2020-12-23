@@ -45,7 +45,7 @@ public protocol FunctionHookProtocol: class, AnyHook {
     /// The function which is to be hooked.
     static var target: Function { get }
 
-    /// Initialize the function hook type. Do not override this;
+    /// Initialize the function hook type. Do not invoke or override this;
     /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for lifecycle
     /// events.
     init()
@@ -58,7 +58,7 @@ public protocol FunctionHookProtocol: class, AnyHook {
 /// :nodoc:
 open class FunctionHookClass {
 
-    /// Initialize the function hook type. Do not override this;
+    /// Initialize the function hook type. Do not invoke or override this;
     /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for lifecycle
     /// events.
     required public init() {}

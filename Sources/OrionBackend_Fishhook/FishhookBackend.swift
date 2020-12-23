@@ -1,6 +1,6 @@
 import Foundation
 #if SWIFT_PACKAGE
-import Fishhook
+@_implementationOnly import Fishhook
 import Orion
 #endif
 
