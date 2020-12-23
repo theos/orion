@@ -4,173 +4,396 @@
     <title>Getting Started  Reference</title>
     <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="css/highlight.css" />
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <script src="js/jquery.min.js" defer></script>
     <script src="js/jazzy.js" defer></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://use.typekit.net/cve8hhe.css">
+
+<style>
+    @media screen and (max-width: 880px) {
+        .header {
+            flex-direction: column;
+        }
+
+        .twitter-typeahead {
+            width: 100%;
+        }
+
+        form[role=search] {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        form[role=search] input {
+            width: 100%;
+        }
+    }
+
+    /* undo the media query which makes it two columns */
+    @media (max-width: 1150px) {
+        .content-wrapper {
+            flex-direction: column !important;
+        }
+
+        .navigation {
+            order: 2;
+            width: inherit;
+            max-width: inherit;
+            padding-bottom: inherit;
+            overflow: inherit;
+            word-wrap: inherit;
+            background: inherit;
+            border-right: inherit;
+        }
+
+        .main-content {
+            order: 1;
+            flex: inherit;
+            padding-bottom: inherit;
+        }
+    }
+
+    .nav-group-task {
+        white-space: normal;
+    }
+
+    .inp {
+        color: #d14;
+    }
+
+    .trunc {
+        color: gray;
+    }
+
+    body {
+        font: 16px/1.7 sofia-pro, sans-serif !important;
+    }
+
+    /* .header {
+        background: white;
+        color: black;
+        margin: 13px;
+        padding: 0;
+        padding-bottom: 8px;
+        border-bottom: 3px solid #1da7ea;
+    }
+
+    form[role=search] input {
+        background-color: #c2c2c2;
+    }
+
+    input {
+        color: white !important;
+    }
+
+    .header-link {
+        color: black;
+    }
+
+    .header-icon {
+        filter: brightness(0%);
+    }
+
+    .navigation {
+        background: #fff !important;
+        border-right: 1px solid #fff !important;
+    }
+
+    .nav-group-name {
+        border-bottom: 1px solid #fff;
+    }
+
+    .breadcrumbs {
+        width: max-content;
+        padding: .75rem 1rem;
+        list-style: none;
+        background-color: #e9ecef;
+        border-radius: .25rem;
+        margin: 1rem 0 1rem 1rem;
+    } */
+</style>
     <script src="js/lunr.min.js" defer></script>
     <script src="js/typeahead.jquery.js" defer></script>
     <script src="js/jazzy.search.js" defer></script>
   </head>
   <body>
+
+
     <a title="Getting Started  Reference"></a>
-    <header>
-      <div class="content-wrapper">
-        <p><a href="index.html">Orion latest (dummy-8) Docs</a> (100% documented)</p>
-        <p class="header-right"><a href="https://github.com/theos/orion"><img src="img/gh.png"/>View on GitHub</a></p>
-        <p class="header-right"><a href="dash-feed://https%3A%2F%2Forion.theos.dev%2Fdocsets%2FOrion.xml"><img src="img/dash.png"/>Install in Dash</a></p>
-        <p class="header-right">
-          <form role="search" action="search.json">
-            <input type="text" placeholder="Search documentation" data-typeahead>
-          </form>
-        </p>
-      </div>
-    </header>
-    <div class="content-wrapper">
-      <p id="breadcrumbs">
-        <a href="index.html">Orion Reference</a>
-        <img id="carat" src="img/carat.png" />
-        Getting Started  Reference
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Orion latest (dummy-9) Docs
+        </a>
+         (100% documented)
       </p>
-    </div>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/theos/orion">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Forion.theos.dev%2Fdocsets%2FOrion.xml">
+            <img class="header-icon" src="img/dash.png"/>
+            Install in Dash
+          </a>
+        </p>
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Orion Reference</a>
+      <img class="carat" src="img/carat.png" />
+      Getting Started  Reference
+    </p>
+
     <div class="content-wrapper">
-      <nav class="sidebar">
+      <nav class="navigation">
         <ul class="nav-groups">
           <li class="nav-group-name">
-            <a href="Guides.html">Guides</a>
+            <a class="nav-group-name-link" href="Basic%20Guides.html">Basic Guides</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="getting-started.html">Getting Started</a>
+                <a class="nav-group-task-link" href="getting-started.html">Getting Started</a>
               </li>
               <li class="nav-group-task">
-                <a href="versions.html">Versions</a>
+                <a class="nav-group-task-link" href="using-orion-without-theos.html">Using Orion Without Theos</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="Classes.html">Classes</a>
+            <a class="nav-group-name-link" href="Advanced%20Guides.html">Advanced Guides</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Classes/ClassHookClass.html">ClassHookClass</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Classes/FunctionHookClass.html">FunctionHookClass</a>
+                <a class="nav-group-task-link" href="advanced-theos-usage.html">Advanced Theos Usage</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="Enums.html">Enumerations</a>
+            <a class="nav-group-name-link" href="Class%20Hooking.html">Class Hooking</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Enums/Backends.html">Backends</a>
+                <a class="nav-group-task-link" href="Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHook</a>
               </li>
               <li class="nav-group-task">
-                <a href="Enums/Backends/Internal.html">– Internal</a>
+                <a class="nav-group-task-link" href="Protocols/ClassHookProtocol.html">ClassHookProtocol</a>
               </li>
               <li class="nav-group-task">
-                <a href="Enums/Backends/Substrate.html">– Substrate</a>
+                <a class="nav-group-task-link" href="Structs/Property.html">Property</a>
               </li>
               <li class="nav-group-task">
-                <a href="Enums/Backends/Fishhook.html">– Fishhook</a>
+                <a class="nav-group-task-link" href="Structs/Property/Assign.html">– Assign</a>
               </li>
               <li class="nav-group-task">
-                <a href="Enums/Function.html">Function</a>
+                <a class="nav-group-task-link" href="Structs/Property/Atomicity.html">– Atomicity</a>
               </li>
               <li class="nav-group-task">
-                <a href="Enums/HookDescriptor.html">HookDescriptor</a>
+                <a class="nav-group-task-link" href="Structs/Property/RetainOrCopy.html">– RetainOrCopy</a>
               </li>
               <li class="nav-group-task">
-                <a href="Enums/SubclassMode.html">SubclassMode</a>
+                <a class="nav-group-task-link" href="Enums/SubclassMode.html">SubclassMode</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="Extensions.html">Extensions</a>
+            <a class="nav-group-name-link" href="Function%20Hooking.html">Function Hooking</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Extensions/NSObject.html">NSObject</a>
+                <a class="nav-group-task-link" href="Function%20Hooking.html#/s:5Orion12FunctionHooka">FunctionHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/FunctionHookProtocol.html">FunctionHookProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Function.html">Function</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="Protocols.html">Protocols</a>
+            <a class="nav-group-name-link" href="All%20Hooks.html">All Hooks</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Protocols/AnyHook.html">AnyHook</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Protocols/Backend.html">Backend</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Protocols/ClassHookProtocol.html">ClassHookProtocol</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Protocols/DefaultBackend.html">DefaultBackend</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Protocols/FunctionHookProtocol.html">FunctionHookProtocol</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Protocols/Tweak.html">Tweak</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Protocols/TweakWithBackend.html">TweakWithBackend</a>
+                <a class="nav-group-task-link" href="Protocols/AnyHook.html">AnyHook</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="Structs.html">Structures</a>
+            <a class="nav-group-name-link" href="Tweaks.html">Tweaks</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Structs/DefaultTweak.html">DefaultTweak</a>
+                <a class="nav-group-task-link" href="Protocols/Tweak.html">Tweak</a>
               </li>
               <li class="nav-group-task">
-                <a href="Structs/Dynamic.html">Dynamic</a>
+                <a class="nav-group-task-link" href="Protocols/TweakWithBackend.html">TweakWithBackend</a>
               </li>
               <li class="nav-group-task">
-                <a href="Structs/Ivars.html">Ivars</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/Property.html">Property</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/Property/Assign.html">– Assign</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/Property/Atomicity.html">– Atomicity</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Structs/Property/RetainOrCopy.html">– RetainOrCopy</a>
+                <a class="nav-group-task-link" href="Structs/DefaultTweak.html">DefaultTweak</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="Typealiases.html">Type Aliases</a>
+            <a class="nav-group-name-link" href="Utilities.html">Utilities</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Typealiases.html#/s:5Orion9ClassHooka">ClassHook</a>
+                <a class="nav-group-task-link" href="Structs/Ivars.html">Ivars</a>
               </li>
               <li class="nav-group-task">
-                <a href="Typealiases.html#/s:5Orion12FunctionHooka">FunctionHook</a>
+                <a class="nav-group-task-link" href="Structs/Dynamic.html">Dynamic</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/NSObject.html">NSObject</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Backends.html">Backends</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Backends.html">Backends</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Backends/Internal.html">– Internal</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Backends/Substrate.html">– Substrate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Backends/Fishhook.html">– Fishhook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Backend.html">Backend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/DefaultBackend.html">DefaultBackend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/HookDescriptor.html">HookDescriptor</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Versions.html">Versions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="versions.html">Versions</a>
               </li>
             </ul>
           </li>
         </ul>
       </nav>
       <article class="main-content">
-        <section>
-          <section class="section">
-            
-            <h1 id='hello-world' class='heading'>Hello, world!</h1>
 
-          </section>
+        <section class="section">
+          <div class="section-content top-matter">
+            
+            <h1 id='getting-started' class='heading'>Getting Started</h1>
+<h2 id='preface' class='heading'>Preface</h2>
+
+<p>If you are using Orion for tweak development, it is recommended that you use it with Theos. This guide assumes that you have Theos installed; if you haven&rsquo;t done that yet, please follow the <a href="https://github.com/theos/theos/wiki/Installation">installation instructions</a> for Theos and then return to this guide.</p>
+
+<p>If you wish to use Orion without Theos, please refer to the &ldquo;<a href="/using-orion-without-theos.html">Using Orion Without Theos</a>&rdquo; guide.</p>
+
+<p>This guide will show you how to make a simple SpringBoard tweak with Orion, which changes the opacity of the dock. This means you need to have a jailbroken iOS device to code along. If you do not have a jailbroken iOS device, you can make tweaks for non-jailbroken devices as well using <a href="https://github.com/kabiroberai/theos-jailed">Theos Jailed</a>.</p>
+
+<p>Note that this guide will use the format <pre>&lt;current directory&gt; $ <span class="inp">&lt;command&gt;</span></pre> for all shell commands. User input will be in <code><span class="inp">red</span></code>. Some text may be truncated using <code><span class="trunc">[...]</span></code>.</p>
+<h2 id='initializing-an-orion-tweak' class='heading'>Initializing an Orion Tweak</h2>
+
+<p>Theos comes with a <code>tweak_swift</code> template which uses Orion.</p>
+
+<p>To get started, run the New Instance Creator <code>nic.pl</code>.  Enter the template number corresponding to <code>iphone/tweak_swift</code>. Pick a name and <a href="https://cocoacasts.com/what-are-app-ids-and-bundle-identifiers/">bundle identifier</a> for your tweak. We&rsquo;re going to be creating a SpringBoard tweak, so leave the bundle filter and list of apps to terminate as is (simply hit return for both those prompts).</p>
+
+<pre>
+~ $ <span class="inp">nic.pl</span>
+NIC 2.0 - New Instance Creator
+------------------------------
+  [1.] iphone/activator_event
+  [2.] iphone/activator_listener
+  <span class="trunc">[...]</span>
+  [16.] iphone/tweak
+  [17.] iphone/tweak_swift
+  [18.] iphone/tweak_with_simple_preferences
+  [19.] iphone/xpc_service
+Choose a Template (required): <span class="inp">17</span>
+Project Name (required): <span class="inp">My Tweak</span>     
+Package Name [com.yourcompany.mytweak]: <span class="inp">com.kabiroberai.mytweak</span>
+Author/Maintainer Name [Your Name]: <span class="inp">Kabir Oberai</span>
+[iphone/tweak_swift] MobileSubstrate Bundle filter [com.apple.springboard]: 
+[iphone/tweak_swift] List of applications to terminate upon installation (space-separated, '-' for none) [SpringBoard]: 
+Instantiating iphone/tweak_swift in mytweak/...
+Done.
+</pre>
+
+<p>NIC will create a directory with the same name as your tweak. <code>cd</code> into this directory and take a minute to look around. The file structure looks like this:</p>
+
+<pre>
+- Makefile
+- MyTweak.plist
+- control
+- Package.swift
+- Sources
+  - MyTweak
+    - Tweak.x.swift
+  - MyTweakC
+    - <span class="trunc">[...]</span>
+</pre>
+
+<p>The number of files might seem daunting at first, but each one has a specific purpose which you&rsquo;ll quickly come to learn. Here&rsquo;s a brief description:</p>
+
+<ul>
+<li><code>Makefile</code>: This file is the keystone of any Theos project. It describes how your tweak should be built, including the list of source files as well as the flags that should be passed to the compiler.</li>
+<li><code>MyTweak.plist</code>: This is the <a href="https://iphonedevwiki.net/index.php/Cydia_Substrate#Filters">CydiaSubstrate bundle filter</a> for your tweak. It tells CydiaSubstrate (or an equivalent tweak loader) which processes your tweak should be loaded into.</li>
+<li><code>control</code>:  The Debian <a href="https://iphonedevwiki.net/index.php/Packaging#Control_file">control file</a> which describes your tweak&rsquo;s .deb package to package managers.</li>
+<li><code>Package.swift</code>: This file is <strong>not</strong> used by Theos itself, but it helps provide Xcode with a description of your tweak&rsquo;s files and compiler flags which is similar to that provided to Theos by the Makefile. This allows you to edit your tweak using the Xcode IDE, with full code completion and whatnot. You&rsquo;ll want to keep this in sync with any changes you make to your Makefile.</li>
+<li><code>Sources</code>: This is where your source code goes. C/Objective-C files (<code>.m</code>, <code>.mm</code>, <code>.c</code>, <code>.cpp</code>) go in the folder with the <code>C</code> suffix, and Swift/Orion files (<code>.swift</code>, <code>.x.swift</code>) go into the folder without the suffix. Theos will automatically find these files while building your tweak, so you need not manually specify them in the <code>Makefile</code>.</li>
+</ul>
+
+<p>For more details about the Theos side of things, see <a href="/advanced-theos-usage.html">Advanced Theos Usage</a>.</p>
+<h2 id='editing-your-tweak' class='heading'>Editing your Tweak</h2>
+
+<p>Orion uses a preprocessor, and Theos passes all <code>.x.swift</code> files through this preprocessor while building. All hooks <strong>must</strong> therefore go into files with a <code>.x.swift</code> extension. The template creates a <code>Tweak.x.swift</code> for you, so we&rsquo;ll start by editing this.</p>
+
+<p>Now, while one option is to open <code>Sources/MyTweak/Tweak.x.swift</code> in your favorite text editor, Orion offers an even better option on macOS: editing your tweak in Xcode!</p>
+
+<p>Opening your tweak in Xcode is simple:</p>
+
+<pre>
+~/mytweak $ <span class="inp">make dev</span>
+</pre>
+
+<p>This should open Xcode with your tweak as a Swift Package. Drill down to <code>Sources/MyTweak/</code> and select <code>Tweak.x.swift</code>. Delete the contents of the file and replace them with the following:</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">UIKit</span>
+<span class="c1">// 1</span>
+<span class="kd">import</span> <span class="kt">Orion</span>
+
+<span class="c1">// 2</span>
+<span class="kd">class</span> <span class="kt">MyHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UIView</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c1">// 3</span>
+    <span class="kd">static</span> <span class="k">let</span> <span class="nv">targetName</span> <span class="o">=</span> <span class="s">"SBDockView"</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>TODO: Finish this tutorial</p>
+
+          </div>
         </section>
-        <section id="footer">
-          <p>&copy; 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external">Theos Team</a>. All rights reserved. (Last updated: 2020-12-21)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
-        </section>
+
+
       </article>
     </div>
+    <section class="footer">
+      <p>© 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external">Theos</a>. Licensed under the <a class="link" href="https://github.com/theos/orion/blob/master/LICENSE.md" target="_blank" rel="external">MIT License</a>.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
   </body>
 </div>
 </html>
