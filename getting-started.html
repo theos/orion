@@ -70,48 +70,11 @@
         font: 16px/1.7 sofia-pro, sans-serif !important;
     }
 
-    /* .header {
-        background: white;
-        color: black;
-        margin: 13px;
-        padding: 0;
-        padding-bottom: 8px;
-        border-bottom: 3px solid #1da7ea;
-    }
-
-    form[role=search] input {
-        background-color: #c2c2c2;
-    }
-
-    input {
-        color: white !important;
-    }
-
-    .header-link {
-        color: black;
-    }
-
-    .header-icon {
-        filter: brightness(0%);
-    }
-
-    .navigation {
-        background: #fff !important;
-        border-right: 1px solid #fff !important;
-    }
-
-    .nav-group-name {
-        border-bottom: 1px solid #fff;
-    }
-
-    .breadcrumbs {
-        width: max-content;
-        padding: .75rem 1rem;
-        list-style: none;
-        background-color: #e9ecef;
-        border-radius: .25rem;
-        margin: 1rem 0 1rem 1rem;
-    } */
+    .ansi-r { color: red; }
+    .ansi-g { color: green; }
+    .ansi-b { color: blue; }
+    .ansi-y { color: darkgoldenrod; }
+    .ansi-lb { color: skyblue; }
 </style>
     <script src="js/lunr.min.js" defer></script>
     <script src="js/typeahead.jquery.js" defer></script>
@@ -125,7 +88,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Orion latest (dummy-9) Docs
+          Orion latest (dummy-10) Docs
         </a>
          (100% documented)
       </p>
@@ -303,14 +266,23 @@
 
 <p>If you wish to use Orion without Theos, please refer to the &ldquo;<a href="/using-orion-without-theos.html">Using Orion Without Theos</a>&rdquo; guide.</p>
 
-<p>This guide will show you how to make a simple SpringBoard tweak with Orion, which changes the opacity of the dock. This means you need to have a jailbroken iOS device to code along. If you do not have a jailbroken iOS device, you can make tweaks for non-jailbroken devices as well using <a href="https://github.com/kabiroberai/theos-jailed">Theos Jailed</a>.</p>
+<p>This guide will show you how to make a simple Orion tweak which… spices up text labels a little. We will target the VLC Media Player iOS app since it is <a href="https://github.com/videolan/vlc-ios">open source</a> and supports a large range of iOS versions, however most other apps should work too.</p>
+
+<p>To follow along, you will require the following things:</p>
+
+<ul>
+<li><a href="https://github.com/theos/theos/wiki/Installation">Theos</a></li>
+<li>A machine running macOS, Windows 10 with WSL, or Linux. If using WSL or Linux, an iOS Swift toolchain is also required.</li>
+<li>A jailbroken iOS device with Orion installed.</li>
+<li>The target app (in this tutorial, VLC for iOS) installed on your iOS device.</li>
+</ul>
 
 <p>Note that this guide will use the format <pre>&lt;current directory&gt; $ <span class="inp">&lt;command&gt;</span></pre> for all shell commands. User input will be in <code><span class="inp">red</span></code>. Some text may be truncated using <code><span class="trunc">[...]</span></code>.</p>
 <h2 id='initializing-an-orion-tweak' class='heading'>Initializing an Orion Tweak</h2>
 
 <p>Theos comes with a <code>tweak_swift</code> template which uses Orion.</p>
 
-<p>To get started, run the New Instance Creator <code>nic.pl</code>.  Enter the template number corresponding to <code>iphone/tweak_swift</code>. Pick a name and <a href="https://cocoacasts.com/what-are-app-ids-and-bundle-identifiers/">bundle identifier</a> for your tweak. We&rsquo;re going to be creating a SpringBoard tweak, so leave the bundle filter and list of apps to terminate as is (simply hit return for both those prompts).</p>
+<p>To get started, run the New Instance Creator <code>nic.pl</code>.  Enter the template number corresponding to <code>iphone/tweak_swift</code>. Pick a name and <a href="https://cocoacasts.com/what-are-app-ids-and-bundle-identifiers/">bundle identifier</a> for your tweak. Provide VLC&rsquo;s bundle ID: <code>org.videolan.vlc-ios</code>, as well as the full name of the VLC app <em>in single quotes</em>.</p>
 
 <pre>
 ~ $ <span class="inp">nic.pl</span>
@@ -324,11 +296,11 @@ NIC 2.0 - New Instance Creator
   [18.] iphone/tweak_with_simple_preferences
   [19.] iphone/xpc_service
 Choose a Template (required): <span class="inp">17</span>
-Project Name (required): <span class="inp">My Tweak</span>     
+Project Name (required): <span class="inp">My Tweak</span>
 Package Name [com.yourcompany.mytweak]: <span class="inp">com.kabiroberai.mytweak</span>
 Author/Maintainer Name [Your Name]: <span class="inp">Kabir Oberai</span>
-[iphone/tweak_swift] MobileSubstrate Bundle filter [com.apple.springboard]: 
-[iphone/tweak_swift] List of applications to terminate upon installation (space-separated, '-' for none) [SpringBoard]: 
+[iphone/tweak_swift] MobileSubstrate Bundle filter [com.apple.springboard]: <span class="inp">org.videolan.vlc-ios</span>
+[iphone/tweak_swift] List of applications to terminate upon installation (space-separated, '-' for none) [SpringBoard]: <span class="inp">'VLC for iOS'</span> 
 Instantiating iphone/tweak_swift in mytweak/...
 Done.
 </pre>
@@ -371,18 +343,123 @@ Done.
 </pre>
 
 <p>This should open Xcode with your tweak as a Swift Package. Drill down to <code>Sources/MyTweak/</code> and select <code>Tweak.x.swift</code>. Delete the contents of the file and replace them with the following:</p>
-<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">UIKit</span>
-<span class="c1">// 1</span>
+<pre class="highlight swift"><code><span class="c1">// 1</span>
 <span class="kd">import</span> <span class="kt">Orion</span>
+<span class="kd">import</span> <span class="kt">UIKit</span>
 
 <span class="c1">// 2</span>
-<span class="kd">class</span> <span class="kt">MyHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UIView</span><span class="o">&gt;</span> <span class="p">{</span>
-    <span class="c1">// 3</span>
-    <span class="kd">static</span> <span class="k">let</span> <span class="nv">targetName</span> <span class="o">=</span> <span class="s">"SBDockView"</span>
+<span class="kd">class</span> <span class="kt">LabelHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UILabel</span><span class="o">&gt;</span> <span class="p">{</span>
 <span class="p">}</span>
 </code></pre>
 
-<p>TODO: Finish this tutorial</p>
+<p>Here&rsquo;s an explanation of the important lines:</p>
+
+<ol>
+<li>We first import Orion&rsquo;s APIs into the Swift file using <code>import Orion</code>. We also import <code>UIKit</code> since we need the compiler to know about the <code>UILabel</code> class.</li>
+<li>Next, we declare a <strong>hook</strong>. A hook is the fundamental unit of Orion tweaks. It is used to modify the behavior of existing code. A <code><a href="Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHook</a></code> allows you to replace methods on a &ldquo;target&rdquo; class (in this case, <code>UILabel</code>) by writing own implementations.</li>
+</ol>
+
+<p>Next, insert the following code between the curly braces (right before the last line):</p>
+<pre class="highlight swift"><code><span class="c1">// 1</span>
+<span class="kd">func</span> <span class="nf">setText</span><span class="p">(</span><span class="n">_</span> <span class="nv">text</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 2</span>
+    <span class="n">orig</span><span class="o">.</span><span class="nf">setText</span><span class="p">(</span>
+        <span class="c1">// 3</span>
+        <span class="n">text</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span><span class="o">.</span><span class="nf">replacingOccurrences</span><span class="p">(</span><span class="nv">of</span><span class="p">:</span> <span class="s">" "</span><span class="p">,</span> <span class="nv">with</span><span class="p">:</span> <span class="s">"👏"</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Here&rsquo;s a breakdown of this code:</p>
+
+<ol>
+<li>In brief, any function declared within a class hook replaces (&ldquo;swizzles&rdquo;) the implementation of the Objective-C function with the same name in the target class. In this case, we are therefore changing the behavior of the <code>setText</code> function of <code>UILabel</code>, which is called whenever the <a href="https://developer.apple.com/documentation/uikit/uilabel/1620538-text"><code>text</code> property</a> is set. In Objective-C land, this is called a <a href="https://developer.apple.com/library/archive/documentation/General/Conceptual/DevPedia-CocoaCore/AccessorMethod.html">setter</a>.</li>
+<li>In our replaced implementation, we call back to the original implementation of <code>setText</code> but we replace the argument with our own. The original implementations of our swizzled methods can be accessed via <code>orig</code> as shown in the above code.</li>
+<li>The replaced argument is the text in all caps with all spaces replaced with the 👏 emoji.</li>
+</ol>
+
+<p>All in all, your code should look like this:</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Orion</span>
+<span class="kd">import</span> <span class="kt">UIKit</span>
+
+<span class="kd">class</span> <span class="kt">LabelHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UILabel</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">setText</span><span class="p">(</span><span class="n">_</span> <span class="nv">text</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">orig</span><span class="o">.</span><span class="nf">setText</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span><span class="o">.</span><span class="nf">replacingOccurrences</span><span class="p">(</span><span class="nv">of</span><span class="p">:</span> <span class="s">" "</span><span class="p">,</span> <span class="nv">with</span><span class="p">:</span> <span class="s">"👏"</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>That&rsquo;s all for the code! You can now build, package, and install the tweak in one go:</p>
+
+<pre>
+~/mytweak $ <span class="inp">make do</span>
+<span class="ansi-r">></span> <b>Making all for tweak MyTweak…</b>
+<span class="ansi-r">==></span> <b>Preprocessing Sources/MyTweak/Tweak.x.swift…</b>
+<span class="ansi-r">==></span> <b>Preprocessing Sources/MyTweak/Tweak.x.swift…</b>
+<span class="ansi-g">==></span> <b>Compiling Sources/MyTweak/Tweak.x.swift (arm64e)…</b>
+<span class="ansi-g">==></span> <b>Compiling Sources/MyTweak/Tweak.x.swift (arm64)…</b>
+<span class="ansi-b">==></span> <b>Generating MyTweak-Swift.h (arm64)…</b>
+<span class="ansi-b">==></span> <b>Generating MyTweak-Swift.h (arm64e)…</b>
+<span class="ansi-g">==></span> <b>Compiling Sources/MyTweakC/Tweak.m (arm64e)…</b>
+<span class="ansi-g">==></span> <b>Compiling Sources/MyTweakC/Tweak.m (arm64)…</b>
+<span class="ansi-y">==></span> <b>Linking tweak MyTweak (arm64)…</b>
+<span class="ansi-y">==></span> <b>Linking tweak MyTweak (arm64e)…</b>
+<span class="ansi-b">==></span> <b>Generating debug symbols for MyTweak…</b>
+<span class="ansi-b">==></span> <b>Generating debug symbols for MyTweak…</b>
+<span class="ansi-b">==></span> <b>Merging tweak MyTweak…</b>
+<span class="ansi-b">==></span> <b>Signing MyTweak…</b>
+<span class="ansi-r">></span> <b>Making stage for tweak MyTweak…</b>
+dm.pl: building package `com.kabiroberai.mytweak:iphoneos-arm' in `./packages/com.kabiroberai.mytweak_0.0.1-1+debug_iphoneos-arm.deb'
+<span class="ansi-lb">==></span> <b>Installing…</b>
+(Reading database ... 3540 files and directories currently installed.)
+Preparing to unpack /tmp/_theos_install.deb ...
+Unpacking com.kabiroberai.mytweak (0.0.1-1+debug) ...
+Setting up com.kabiroberai.mytweak (0.0.1-1+debug) ...
+<span class="ansi-lb">==></span> <b>Unloading 'VLC for iOS'…</b>
+</pre>
+
+<p>Finally, open up the VLC app on your device. You should see that all (or most) text labels have become uppercase with 👏 emojis instead of spaces.</p>
+
+<p><img src="/assets/vlc-tweak.png" alt="Tweaked VLC for iOS app" style="width: 100%"></p>
+<h2 id='bonus-challenge' class='heading'>Bonus Challenge</h2>
+
+<p>Can you change the text to sPonGEboB cAsE? Try making the characters alternate between upper- and lowercase, or randomize whether each character is upper- or lowercase. Optionally, force certain letters to be either lowercase or uppercase; for example, try making it so the letter &ldquo;L&rdquo; is always uppercase and the letter &ldquo;i&rdquo; is always lowercase to avoid ambiguity.</p>
+
+<details>
+<summary style="cursor: pointer">Solution</summary>
+
+<!-- pretty much just put the code in triple backticks and copied the HTML output -->
+
+Here&rsquo;s one way to achieve this (tailored towards English-based locales):
+
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Orion</span>
+<span class="kd">import</span> <span class="kt">UIKit</span>
+
+<span class="kd">class</span> <span class="kt">LabelHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UILabel</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">alwaysLower</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[</span><span class="s">"I"</span><span class="p">]</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">alwaysUpper</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[</span><span class="s">"L"</span><span class="p">]</span>
+
+    <span class="kd">func</span> <span class="nf">setText</span><span class="p">(</span><span class="n">_</span> <span class="nv">text</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">modifiedText</span> <span class="o">=</span> <span class="kt">String</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="p">(</span><span class="nv">char</span><span class="p">:</span> <span class="kt">Character</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="k">in</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s">" "</span> <span class="p">{</span> <span class="k">return</span> <span class="s">"👏"</span> <span class="p">}</span>
+            <span class="k">let</span> <span class="nv">uppercased</span> <span class="o">=</span> <span class="n">char</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span>
+            <span class="k">if</span> <span class="kt">LabelHook</span><span class="o">.</span><span class="n">alwaysLower</span><span class="o">.</span><span class="nf">contains</span><span class="p">(</span><span class="n">uppercased</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">char</span><span class="o">.</span><span class="nf">lowercased</span><span class="p">()</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="kt">LabelHook</span><span class="o">.</span><span class="n">alwaysUpper</span><span class="o">.</span><span class="nf">contains</span><span class="p">(</span><span class="n">uppercased</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">uppercased</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="kt">Bool</span><span class="o">.</span><span class="nf">random</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">char</span><span class="o">.</span><span class="nf">lowercased</span><span class="p">()</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">uppercased</span>
+            <span class="p">}</span>
+        <span class="p">})</span>
+        <span class="n">orig</span><span class="o">.</span><span class="nf">setText</span><span class="p">(</span><span class="n">modifiedText</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</details>
 
           </div>
         </section>

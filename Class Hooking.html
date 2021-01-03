@@ -70,48 +70,11 @@
         font: 16px/1.7 sofia-pro, sans-serif !important;
     }
 
-    /* .header {
-        background: white;
-        color: black;
-        margin: 13px;
-        padding: 0;
-        padding-bottom: 8px;
-        border-bottom: 3px solid #1da7ea;
-    }
-
-    form[role=search] input {
-        background-color: #c2c2c2;
-    }
-
-    input {
-        color: white !important;
-    }
-
-    .header-link {
-        color: black;
-    }
-
-    .header-icon {
-        filter: brightness(0%);
-    }
-
-    .navigation {
-        background: #fff !important;
-        border-right: 1px solid #fff !important;
-    }
-
-    .nav-group-name {
-        border-bottom: 1px solid #fff;
-    }
-
-    .breadcrumbs {
-        width: max-content;
-        padding: .75rem 1rem;
-        list-style: none;
-        background-color: #e9ecef;
-        border-radius: .25rem;
-        margin: 1rem 0 1rem 1rem;
-    } */
+    .ansi-r { color: red; }
+    .ansi-g { color: green; }
+    .ansi-b { color: blue; }
+    .ansi-y { color: darkgoldenrod; }
+    .ansi-lb { color: skyblue; }
 </style>
     <script src="js/lunr.min.js" defer></script>
     <script src="js/typeahead.jquery.js" defer></script>
@@ -126,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Orion latest (dummy-9) Docs
+          Orion latest (dummy-10) Docs
         </a>
          (100% documented)
       </p>
@@ -318,10 +281,11 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>The base class hook type.</p>
+                        <p>The base class hook type. All class hooks must subclass this.</p>
 
-<p>This type allows hooking methods of one target class. All class hooks
-must subclass it.</p>
+<p>This type allows hooking methods of a chosen target class. For
+a detailed description of all available configuration options,
+see <code><a href="Protocols/ClassHookProtocol.html">ClassHookProtocol</a></code>.</p>
 <h1 id='specifying-a-target-class' class='heading'>Specifying a Target Class</h1>
 
 <p>In order to hook a class which is known by the Swift compiler at
@@ -344,9 +308,10 @@ will replace the original method implementation.</p>
 method. The method must not be <code>final</code> or <code>static</code>. Methods which have a
 visibility of <code>fileprivate</code> or <code>private</code> will be ignored by Orion.</p>
 
-<p>To call the original implementation of the method, call the method itself
-on the <code>orig</code> proxy. Similarly, the superclass implementation can be accessed
-via the <code>supr</code> proxy.</p>
+<p>Within a method hook function, the object upon which the hooked method was
+invoked can be accessed via <code>target</code>. To call the original implementation
+of the method, call the method itself on the <code>orig</code> proxy. Similarly, the
+superclass implementation can be accessed via the <code>supr</code> proxy.</p>
 
 <p>To figure out the required Swift name for an Objective-C method, you may want
 to follow the way that Objective-C APIs are <a href="https://github.com/apple/swift-evolution/blob/main/proposals/0005-objective-c-name-translation.md">renamed</a>
@@ -398,7 +363,7 @@ above.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b2edcda24cd82b376d2a50f6dcef36680805d17e/Sources/Orion/ClassHook.swift#L187">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/ClassHook.swift#L189">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -430,7 +395,7 @@ directly; use <code><a href="Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHoo
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b2edcda24cd82b376d2a50f6dcef36680805d17e/Sources/Orion/ClassHook.swift#L30-L73">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/ClassHook.swift#L30-L73">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -510,7 +475,7 @@ policy will only override the respective default.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b2edcda24cd82b376d2a50f6dcef36680805d17e/Sources/Orion/Property.swift#L99-L237">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/Property.swift#L99-L237">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -541,7 +506,7 @@ policy will only override the respective default.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b2edcda24cd82b376d2a50f6dcef36680805d17e/Sources/Orion/ClassHook.swift#L4-L26">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/ClassHook.swift#L4-L26">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
