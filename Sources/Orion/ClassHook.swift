@@ -104,10 +104,11 @@ extension ClassHookProtocol {
 }
 
 // swiftlint:disable line_length
-/// The base class hook type.
+/// The base class hook type. All class hooks must subclass this.
 ///
-/// This type allows hooking methods of one target class. All class hooks
-/// must subclass it.
+/// This type allows hooking methods of a chosen target class. For
+/// a detailed description of all available configuration options,
+/// see `ClassHookProtocol`.
 ///
 /// # Specifying a Target Class
 ///
@@ -132,9 +133,10 @@ extension ClassHookProtocol {
 /// method. The method must not be `final` or `static`. Methods which have a
 /// visibility of `fileprivate` or `private` will be ignored by Orion.
 ///
-/// To call the original implementation of the method, call the method itself
-/// on the `orig` proxy. Similarly, the superclass implementation can be accessed
-/// via the `supr` proxy.
+/// Within a method hook function, the object upon which the hooked method was
+/// invoked can be accessed via `target`. To call the original implementation
+/// of the method, call the method itself on the `orig` proxy. Similarly, the
+/// superclass implementation can be accessed via the `supr` proxy.
 ///
 /// To figure out the required Swift name for an Objective-C method, you may want
 /// to follow the way that Objective-C APIs are [renamed](https://github.com/apple/swift-evolution/blob/main/proposals/0005-objective-c-name-translation.md)

@@ -65,7 +65,7 @@ open class FunctionHookClass {
 
 }
 
-/// The base function hook type.
+/// The base function hook type. All function hooks must subclass this.
 ///
 /// In order to make a function hook, create a class which conforms
 /// to this type. Satisfy the protocol requirement by providing a

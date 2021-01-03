@@ -4,7 +4,7 @@ set -e
 
 root_url="https://orion.theos.dev/"
 
-if [[ $# = 0 || ($# = 1 && $1 = "cached") ]]; then
+if [[ $# = 0 || ($# = 1 && ($1 = "cached" || $1 = "watch")) ]]; then
 	# Manual mode
 	outdir="."
 	# While the Install in Dash button doesn't function correctly locally,
@@ -22,8 +22,10 @@ else
 	exit 1
 fi
 
+rm -rf "${outdir}/docs" "${outdir}/docs-perm"
+
 # if $# = 1 then it's a cached build; use the existing docs.json
-if [[ $# = 1 ]]; then
+if [[ $# = 1 && $1 = "cached" ]]; then
 	if [[ ! -r docs.json ]]; then
 		echo "Error: You cannot perform a cached build without having normally generated the docs at least once." >&2
 		exit 1
@@ -42,7 +44,15 @@ else
 fi
 
 jazzy "${latest_args[@]}" --head "$(cat head.html)" --sourcekitten-sourcefile docs.json -o "${outdir}/docs"
+cp -a 'Site Assets' "${outdir}/docs/assets"
 
 if [[ $# = 2 ]]; then
 	jazzy "${perma_args[@]}" --head "$(cat head.html)" --sourcekitten-sourcefile docs.json -o "${outdir}/docs-perm"
+	cp -a 'Site Assets' "${outdir}/docs-perm/assets"
+fi
+
+if [[ $# = 1 && $1 = "watch" ]]; then
+	php -S 0.0.0.0:8080 -t docs &
+	fswatch -o README.md -o Guides -o head.html -o .jazzy.yaml -o 'Site Assets' \
+		| xargs -n1 -I{} "$0" cached
 fi

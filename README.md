@@ -33,4 +33,4 @@ class MyHook: ClassHook<UILabel> {
 
 ## License
 
-See [LICENSE.md](LICENSE.md) for licensing information.
+See [LICENSE.md](https://github.com/theos/orion/blob/master/LICENSE.md) for licensing information.

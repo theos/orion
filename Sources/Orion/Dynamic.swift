@@ -10,6 +10,8 @@ import Foundation
 /// classes and protocols by name, and also to call undeclared
 /// methods on them in a relatively type-safe manner.
 ///
+/// This type is inspired by [mhdhejazi/Dynamic](https://github.com/mhdhejazi/Dynamic).
+///
 /// # Obtaining an Instance
 ///
 /// Use `Dynamic.TypeName` to get an instance of `Dynamic`. Accessing
@@ -130,7 +132,6 @@ import Foundation
 /// additional syntactic sugar, in this case replacing `Dynamic.MyClass` with
 /// simply `MyClass`.
 @dynamicMemberLookup public struct Dynamic {
-    // API inspired by https://github.com/mhdhejazi/Dynamic
 
     private enum Guts {
         case cls(AnyClass)
