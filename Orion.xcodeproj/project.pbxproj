@@ -25,6 +25,9 @@
 		568974C8252BBA4F006F48E9 /* super.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BF252BBA4F006F48E9 /* super.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		568974CB252BBA4F006F48E9 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 568974C3252BBA4F006F48E9 /* init.c */; };
 		568974CE252BBA7F006F48E9 /* Orion.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974CD252BBA7F006F48E9 /* Orion.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		56AFA08B25A3CE5F00884E2D /* dealloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 56AFA08A25A3CE5F00884E2D /* dealloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		56AFA08D25A3CE6500884E2D /* dealloc.m in Sources */ = {isa = PBXBuildFile; fileRef = 56AFA08C25A3CE6500884E2D /* dealloc.m */; };
+		56AFA08F25A3CE8B00884E2D /* ClassHook+Deinit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */; };
 		56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +57,9 @@
 		568974C3252BBA4F006F48E9 /* init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
 		568974CD252BBA7F006F48E9 /* Orion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orion.h; sourceTree = "<group>"; };
 		568974D8252BBFF4006F48E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		56AFA08A25A3CE5F00884E2D /* dealloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dealloc.h; sourceTree = "<group>"; };
+		56AFA08C25A3CE6500884E2D /* dealloc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dealloc.m; sourceTree = "<group>"; };
+		56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ClassHook+Deinit.swift"; sourceTree = "<group>"; };
 		56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -152,6 +158,7 @@
 			children = (
 				568974A4252BBA15006F48E9 /* Backend.swift */,
 				5689749C252BBA15006F48E9 /* ClassHook.swift */,
+				56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */,
 				568974A0252BBA15006F48E9 /* ClassHook+Super.swift */,
 				5689749D252BBA15006F48E9 /* Dynamic.swift */,
 				56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */,
@@ -172,9 +179,10 @@
 		568974B9252BBA4F006F48E9 /* OrionC */ = {
 			isa = PBXGroup;
 			children = (
-				568974BA252BBA4F006F48E9 /* super.m */,
 				568974BB252BBA4F006F48E9 /* include */,
+				56AFA08C25A3CE6500884E2D /* dealloc.m */,
 				568974C3252BBA4F006F48E9 /* init.c */,
+				568974BA252BBA4F006F48E9 /* super.m */,
 			);
 			path = OrionC;
 			sourceTree = "<group>";
@@ -182,6 +190,7 @@
 		568974BB252BBA4F006F48E9 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				56AFA08A25A3CE5F00884E2D /* dealloc.h */,
 				568974BD252BBA4F006F48E9 /* init.h */,
 				568974BF252BBA4F006F48E9 /* super.h */,
 			);
@@ -198,6 +207,7 @@
 				568974CE252BBA7F006F48E9 /* Orion.h in Headers */,
 				568974C8252BBA4F006F48E9 /* super.h in Headers */,
 				568974C6252BBA4F006F48E9 /* init.h in Headers */,
+				56AFA08B25A3CE5F00884E2D /* dealloc.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,8 +302,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				568974AE252BBA15006F48E9 /* ClassHook+Super.swift in Sources */,
+				56AFA08D25A3CE6500884E2D /* dealloc.m in Sources */,
 				568974B2252BBA15006F48E9 /* Backend.swift in Sources */,
 				56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */,
+				56AFA08F25A3CE8B00884E2D /* ClassHook+Deinit.swift in Sources */,
 				568974B0252BBA15006F48E9 /* Ivars.swift in Sources */,
 				568974B7252BBA16006F48E9 /* Tweak.swift in Sources */,
 				568974CB252BBA4F006F48E9 /* init.c in Sources */,

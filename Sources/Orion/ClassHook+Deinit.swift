@@ -20,10 +20,13 @@ extension _ClassHookBuilder {
 
     public typealias Deinitializer = @convention(c) (Any, Selector) -> Void
 
-    public mutating func addDeinitializer<T: _GlueClassHook>(
+    // for some reason using `@escaping Deinitializer` instead of `Code`
+    // works in SPM but not with the binary framework (maybe a swiftinterface
+    // bug or library evolution thing?)
+    public mutating func addDeinitializer<T: _GlueClassHook, Code>(
         to classHook: T.Type,
         getOrig: @escaping () -> Deinitializer,
-        setOrig: @escaping (@escaping Deinitializer) -> Void
+        setOrig: @escaping (Code) -> Void
     ) {
         // although arguments are +0 in recent Swift versions, we use
         // Unmanaged anyway for semantic correctness. This ensures that
@@ -51,7 +54,7 @@ extension _ClassHookBuilder {
                 }
             }
         } as @convention(block) (Unmanaged<AnyObject>) -> Void)
-        let method = unsafeBitCast(imp, to: Deinitializer.self)
+        let method = unsafeBitCast(imp, to: Code.self)
         addHook(Self.deallocSelector, method, isClassMethod: false, completion: setOrig)
     }
 }
