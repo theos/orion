@@ -178,23 +178,25 @@ Here's one way to achieve this (tailored towards English-based locales):
 <span class="kd">import</span> <span class="kt">UIKit</span>
 
 <span class="kd">class</span> <span class="kt">LabelHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UILabel</span><span class="o">&gt;</span> <span class="p">{</span>
-    <span class="kd">private</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">alwaysLower</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[</span><span class="s">"I"</span><span class="p">]</span>
-    <span class="kd">private</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">alwaysUpper</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">[</span><span class="s">"L"</span><span class="p">]</span>
+    <span class="c1">// a dictionary representing characters that should always</span>
+    <span class="c1">// map to a specific corresponding value</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">mappings</span><span class="p">:</span> <span class="p">[</span><span class="kt">Character</span><span class="p">:</span> <span class="kt">Character</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s">"i"</span><span class="p">:</span> <span class="s">"i"</span><span class="p">,</span> <span class="s">"I"</span><span class="p">:</span> <span class="s">"i"</span><span class="p">,</span>
+        <span class="s">"l"</span><span class="p">:</span> <span class="s">"L"</span><span class="p">,</span> <span class="s">"L"</span><span class="p">:</span> <span class="s">"L"</span><span class="p">,</span>
+        <span class="s">" "</span><span class="p">:</span> <span class="s">"👏"</span>
+    <span class="p">]</span>
 
     <span class="kd">func</span> <span class="nf">setText</span><span class="p">(</span><span class="n">_</span> <span class="nv">text</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">let</span> <span class="nv">modifiedText</span> <span class="o">=</span> <span class="kt">String</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">flatMap</span> <span class="p">{</span> <span class="p">(</span><span class="nv">char</span><span class="p">:</span> <span class="kt">Character</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="k">in</span>
-            <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s">" "</span> <span class="p">{</span> <span class="k">return</span> <span class="s">"👏"</span> <span class="p">}</span>
-            <span class="k">let</span> <span class="nv">uppercased</span> <span class="o">=</span> <span class="n">char</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span>
-            <span class="k">if</span> <span class="kt">LabelHook</span><span class="o">.</span><span class="n">alwaysLower</span><span class="o">.</span><span class="nf">contains</span><span class="p">(</span><span class="n">uppercased</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="n">char</span><span class="o">.</span><span class="nf">lowercased</span><span class="p">()</span>
-            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="kt">LabelHook</span><span class="o">.</span><span class="n">alwaysUpper</span><span class="o">.</span><span class="nf">contains</span><span class="p">(</span><span class="n">uppercased</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="n">uppercased</span>
+        <span class="k">var</span> <span class="nv">modifiedText</span> <span class="o">=</span> <span class="s">""</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="k">in</span> <span class="n">text</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="k">let</span> <span class="nv">mapping</span> <span class="o">=</span> <span class="kt">LabelHook</span><span class="o">.</span><span class="n">mappings</span><span class="p">[</span><span class="n">char</span><span class="p">]</span> <span class="p">{</span>
+                <span class="n">modifiedText</span><span class="o">.</span><span class="nf">append</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
             <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="kt">Bool</span><span class="o">.</span><span class="nf">random</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="n">char</span><span class="o">.</span><span class="nf">lowercased</span><span class="p">()</span>
+                <span class="n">modifiedText</span> <span class="o">+=</span> <span class="n">char</span><span class="o">.</span><span class="nf">lowercased</span><span class="p">()</span>
             <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="n">uppercased</span>
+                <span class="n">modifiedText</span> <span class="o">+=</span> <span class="n">char</span><span class="o">.</span><span class="nf">uppercased</span><span class="p">()</span>
             <span class="p">}</span>
-        <span class="p">})</span>
+        <span class="p">}</span>
         <span class="n">orig</span><span class="o">.</span><span class="nf">setText</span><span class="p">(</span><span class="n">modifiedText</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>

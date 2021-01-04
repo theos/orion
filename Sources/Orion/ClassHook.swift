@@ -125,24 +125,54 @@ extension ClassHookProtocol {
 ///
 /// # Hooking Methods
 ///
-/// To hook a method on the target class, simply declare a method with the same
-/// name and method signature in your hook class. The contents of your method
-/// will replace the original method implementation.
+/// ## Instance/Class Methods
+///
+/// To hook an instance method on the target class, simply declare an instance
+/// method with the same name and method signature in your hook class. The
+/// contents of your method will replace the original method implementation.
 ///
 /// In order to hook a class method, declare the replacement method as a `class`
-/// method. The method must not be `final` or `static`. Methods which have a
-/// visibility of `fileprivate` or `private` will be ignored by Orion.
+/// method.
+///
+/// In either case, the method must not be `final` or `static`. Methods which have
+/// a visibility of `fileprivate` or `private` will be ignored by Orion and can
+/// thus be used as helper methods.
+///
+/// ## Accessing Target Information
 ///
 /// Within a method hook function, the object upon which the hooked method was
 /// invoked can be accessed via `target`. To call the original implementation
 /// of the method, call the method itself on the `orig` proxy. Similarly, the
 /// superclass implementation can be accessed via the `supr` proxy.
 ///
+/// ## Method Naming
+///
 /// To figure out the required Swift name for an Objective-C method, you may want
 /// to follow the way that Objective-C APIs are [renamed](https://github.com/apple/swift-evolution/blob/main/proposals/0005-objective-c-name-translation.md)
 /// when they are imported into Swift, in reverse. If you cannot figure out the
 /// Swift name for the method, you can also provide the Objective-C selector name
 /// directly by declaring the function as `@objc(selector:name:) func`.
+///
+/// ## Initializers
+///
+/// In order to hook an initializer with Orion, declare an _instance_ method with
+/// the initializer's name and Objective-C method signature, with a return type of
+/// `Target`. For example `func initWithFrame(_ frame: CGRect) -> Target`. Inside
+/// the method, your first statement should be a call to an initializer on `supr`
+/// or `orig`, after which you can configure `target` as you desire before you
+/// return it. To hook `NSObject.init`, use backticks to escape the init keyword:
+/// ```func `init`() -> Target```.
+///
+/// Example of hooking `initWithFrame`:
+/// ```
+/// class ViewHook: ClassHook<UIView> {
+///     func initWithFrame(_ frame: CGRect) -> Target {
+///         let target = orig.initWithFrame(frame)
+///         // configure target
+///         return target
+///     }
+/// }
+/// ```
 ///
 /// # Adding to the Class
 ///
