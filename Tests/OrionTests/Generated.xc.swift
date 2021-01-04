@@ -514,6 +514,70 @@ private class Orion_ClassHook13: PropertyHook2, _GlueClassHook {
     }
 }
 
+extension DeHook {
+    public static let _target: DeClass.Type = _initializeTargetType()
+}
+
+private class Orion_ClassHook14: DeHook, _GlueClassHook {
+    final class OrigType: Orion_ClassHook14 {
+        override func deinitializer() -> DeinitPolicy {
+            deinitOrigError()
+        }
+    }
+
+    final class SuprType: Orion_ClassHook14 {
+        override func deinitializer() -> DeinitPolicy {
+            deinitSuprError()
+        }
+    }
+
+    private static var orion_orig1: @convention(c) (Any, Selector) -> Void = { _, _ in }
+
+    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder) {
+        builder.addDeinitializer(to: self, getOrig: { orion_orig1 }, setOrig: { orion_orig1 = $0 })
+    }
+}
+
+extension DeSubHook1 {
+    public static let _target: DeSubclass1.Type = _initializeTargetType()
+}
+
+private class Orion_ClassHook15: DeSubHook1, _GlueClassHook {
+    final class OrigType: Orion_ClassHook15 {}
+
+    final class SuprType: Orion_ClassHook15 {}
+
+    private static var orion_imp1: @convention(c) (Any, Selector) -> Void = { _, _ in }
+
+    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder) {
+        builder.addDeinitializer(to: self, getOrig: { orion_imp1 }, setOrig: { orion_imp1 = $0 })
+    }
+}
+
+extension DeSubHook2 {
+    public static let _target: DeSubclass2.Type = _initializeTargetType()
+}
+
+private class Orion_ClassHook16: DeSubHook2, _GlueClassHook {
+    final class OrigType: Orion_ClassHook16 {
+        override func deinitializer() -> DeinitPolicy {
+            deinitOrigError()
+        }
+    }
+
+    final class SuprType: Orion_ClassHook16 {
+        override func deinitializer() -> DeinitPolicy {
+            deinitSuprError()
+        }
+    }
+
+    private static var orion_orig1: @convention(c) (Any, Selector) -> Void = { _, _ in }
+
+    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder) {
+        builder.addDeinitializer(to: self, getOrig: { orion_orig1 }, setOrig: { orion_orig1 = $0 })
+    }
+}
+
 private class Orion_FunctionHook1: AtoiHook, _GlueFunctionHook {
     static let orion_shared = Orion_FunctionHook1()
 
@@ -559,6 +623,9 @@ func orion_init() {
             Orion_ClassHook11.self,
             Orion_ClassHook12.self,
             Orion_ClassHook13.self,
+            Orion_ClassHook14.self,
+            Orion_ClassHook15.self,
+            Orion_ClassHook16.self,
             Orion_FunctionHook1.self,
             Orion_FunctionHook2.self
         ]

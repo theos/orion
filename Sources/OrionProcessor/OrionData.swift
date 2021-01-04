@@ -15,6 +15,7 @@ public struct OrionData {
             var isAddition: Bool // implies the method should be added, not swizzled
             var isClassMethod: Bool
             var hasObjcAttribute: Bool
+            var isDeinitializer: Bool
             var function: Function
             var methodClosure: Syntax // (<Target|AnyClass>, Selector, Blah) -> Blah
             var superClosure: Syntax // (UnsafeRawPointer, Selector, Blah) -> Blah

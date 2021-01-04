@@ -1,6 +1,6 @@
 import Foundation
 #if SWIFT_PACKAGE
-import OrionC
+@_implementationOnly import OrionC
 #endif
 
 /// A type representing an Orion tweak.

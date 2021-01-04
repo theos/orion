@@ -1,0 +1,68 @@
+import Foundation
+#if SWIFT_PACKAGE
+@_implementationOnly import OrionC
+#endif
+
+/// The action to perform after a `ClassHookProtocol.deinitializer()` is run.
+///
+/// Unless you're managing the target class' own resources, you usually want
+/// to use `callOrig`.
+public enum DeinitPolicy {
+    /// Call the target's original deinitializer implementation.
+    case callOrig
+    /// Call the target's superclass deinitializer implementation.
+    case callSupr
+}
+
+/// :nodoc:
+extension _ClassHookBuilder {
+    private static let deallocSelector = NSSelectorFromString("dealloc")
+
+    public typealias Deinitializer = @convention(c) (Any, Selector) -> Void
+
+    public mutating func addDeinitializer<T: _GlueClassHook>(
+        to classHook: T.Type,
+        getOrig: @escaping () -> Deinitializer,
+        setOrig: @escaping (@escaping Deinitializer) -> Void
+    ) {
+        // although arguments are +0 in recent Swift versions, we use
+        // Unmanaged anyway for semantic correctness. This ensures that
+        // the object isn't automatically retained before the orig/supr
+        // dealloc is called.
+        let imp = imp_implementationWithBlock({ target in
+            // we use an autorelease pool here to ensure that `target`
+            // remains at +0 going into the orig/supr deinit call
+            let policy: DeinitPolicy = autoreleasepool {
+                let value = target.takeUnretainedValue()
+                guard let castTarget = value as? T.Target else {
+                    fatalError("""
+                    Could not convert value of type \(type(of: value)) to expected \
+                    type \(classHook.target)
+                    """)
+                }
+                return classHook.init(target: castTarget).deinitializer()
+            }
+            withUnsafePointer(to: target) {
+                switch policy {
+                case .callOrig:
+                    _orion_call_dealloc(getOrig(), $0, Self.deallocSelector)
+                case .callSupr:
+                    _orion_call_super_dealloc(classHook.target, $0, Self.deallocSelector)
+                }
+            }
+        } as @convention(block) (Unmanaged<AnyObject>) -> Void)
+        let method = unsafeBitCast(imp, to: Deinitializer.self)
+        addHook(Self.deallocSelector, method, isClassMethod: false, completion: setOrig)
+    }
+}
+
+/// :nodoc:
+extension _GlueClassHook {
+    public func deinitOrigError(file: StaticString = #file, line: UInt = #line) -> Never {
+        fatalError("Do not call `orig.deinitializer()`.", file: file, line: line)
+    }
+
+    public func deinitSuprError(file: StaticString = #file, line: UInt = #line) -> Never {
+        fatalError("Do not call `supr.deinitializer()`.", file: file, line: line)
+    }
+}

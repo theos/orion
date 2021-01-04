@@ -201,3 +201,26 @@ class PropertyHook2: ClassHook<PropertyClass2> {
         self.x = x
     }
 }
+
+class DeHook: ClassHook<DeClass> {
+    func deinitializer() -> DeinitPolicy {
+        Self.target.watcher?.classWillDeallocate(withIdentifier: target.identifier, cls: DeHook.self)
+        return .callOrig
+    }
+}
+
+class DeSubHook1: ClassHook<DeSubclass1> {
+    // final just to ensure that we can adapt when a deinitializer is `final`
+    // (even though it makes no effective difference)
+    final func deinitializer() -> DeinitPolicy {
+        Self.target.watcher?.classWillDeallocate(withIdentifier: target.identifier, cls: DeSubHook1.self)
+        return .callOrig
+    }
+}
+
+class DeSubHook2: ClassHook<DeSubclass2> {
+    func deinitializer() -> DeinitPolicy {
+        Self.target.watcher?.classWillDeallocate(withIdentifier: target.identifier, cls: DeSubHook2.self)
+        return .callSupr
+    }
+}

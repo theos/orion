@@ -24,6 +24,7 @@ custom_categories:
       - ClassHookProtocol
       - Property
       - SubclassMode
+      - DeinitPolicy
   - name: Function Hooking
     children:
       - FunctionHook

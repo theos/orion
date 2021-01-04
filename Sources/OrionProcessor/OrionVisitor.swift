@@ -30,6 +30,9 @@ private extension Diagnostic.Message {
             """
         )
     }
+    static func classDeinit() -> Diagnostic.Message {
+        .init(.error, "A deinitializer cannot be a class method")
+    }
 }
 
 // it do be like that for compiler stuff
@@ -214,12 +217,16 @@ class OrionVisitor: SyntaxVisitor {
         function.modifiers?.contains { ModifierKind($0) == .final } == true
     }
 
-    private func functionHasClass(_ function: FunctionDeclSyntax) -> Bool {
-        function.modifiers?.contains { ModifierKind($0) == .class } == true
+    private func classModifier(in function: FunctionDeclSyntax) -> DeclModifierSyntax? {
+        function.modifiers?.first { ModifierKind($0) == .class }
     }
 
     private func functionHasObjc(_ function: FunctionDeclSyntax) -> Bool {
         function.attributes?.contains { $0.as(AttributeSyntax.self)?.attributeName.text == "objc" } == true
+    }
+
+    private func functionIsDeinitializer(_ function: FunctionDeclSyntax) -> Bool {
+        function.identifier.text == "deinitializer"
     }
 
     private func handle(classHook node: ClassDeclSyntax, target: Syntax) {
@@ -255,12 +262,25 @@ class OrionVisitor: SyntaxVisitor {
                 }
                 return true
             }
-            .map { function -> OrionData.ClassHook.Method in
-                let isClass = functionHasClass(function)
+            .compactMap { function -> OrionData.ClassHook.Method? in
+                let classModifier = self.classModifier(in: function)
+                let isClass = classModifier != nil
+                let isDeinit = functionIsDeinitializer(function)
+                if isDeinit, let classModifier = classModifier {
+                    diagnosticEngine.diagnose(
+                        .classDeinit(),
+                        location: function.startLocation(converter: converter)
+                    ) { builder in
+                        builder.fixItRemove(classModifier.sourceRange(converter: self.converter))
+                    }
+                    didFail = true
+                    return nil
+                }
                 return OrionData.ClassHook.Method(
                     isAddition: functionIsAddition(function),
                     isClassMethod: isClass,
                     hasObjcAttribute: functionHasObjc(function),
+                    isDeinitializer: isDeinit,
                     function: orionFunction(for: function),
                     methodClosure: makeClosure(for: function, kind: .method(firstType: isClass ? "AnyClass" : "Target")),
                     superClosure: makeClosure(for: function, kind: .method(firstType: "UnsafeRawPointer"))

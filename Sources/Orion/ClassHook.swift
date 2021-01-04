@@ -70,6 +70,20 @@ public protocol ClassHookProtocol: class, AnyHook {
     /// or override this.
     init(target: Target)
 
+    /// A function which is run before a `target` is deallocated.
+    ///
+    /// Use this to perform any cleanup before the target is deallocated.
+    ///
+    /// The default implementation is equivalent to simply returning
+    /// `DeinitPolicy.callOrig`.
+    ///
+    /// - Important: You **must not** call `orig.deinitializer()` or
+    /// `supr.deinitializer()` in this method. Instead, return the
+    /// appropriate deinit policy.
+    ///
+    /// - Returns: A `DeinitPolicy` representing the action to perform next.
+    func deinitializer() -> DeinitPolicy
+
 }
 
 /// :nodoc:
@@ -84,6 +98,8 @@ extension ClassHookProtocol {
     public static var subclassMode: SubclassMode { .none }
 
     public static var protocols: [Protocol] { [] }
+
+    public func deinitializer() -> DeinitPolicy { .callOrig }
 
 }
 
@@ -173,6 +189,12 @@ extension ClassHookProtocol {
 ///     }
 /// }
 /// ```
+///
+/// ## Deinitializers
+///
+/// If you find the need to perform custom behavior when a target object is
+/// deallocated, you can declare a `deinitializer` function (**not** `deinit`).
+/// For more information, see `ClassHookProtocol.deinitializer()`.
 ///
 /// # Adding to the Class
 ///

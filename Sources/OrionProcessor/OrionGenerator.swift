@@ -96,7 +96,29 @@ public final class OrionGenerator {
         let origIdent = "orion_\(method.isAddition ? "imp" : "orig")\(index)"
         let selIdent = "orion_sel\(index)"
 
-        if method.isAddition {
+        if method.isDeinitializer {
+            orig = method.isAddition ? nil : """
+            \(method.function.function) {
+                deinitOrigError()
+            }
+            """
+
+            supr = method.isAddition ? nil : """
+            \(method.function.function) {
+                deinitSuprError()
+            }
+            """
+
+            register = """
+            builder.addDeinitializer(to: self, getOrig: { \(origIdent) }, setOrig: { \(origIdent) = $0 })
+            """
+
+            let main = """
+            private static var \(origIdent): @convention(c) (Any, Selector) -> Void = { _, _ in }
+            """
+
+            return (orig, supr, main, register)
+        } else if method.isAddition {
             orig = nil
             supr = nil
             register = """

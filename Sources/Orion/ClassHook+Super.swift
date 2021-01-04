@@ -1,6 +1,6 @@
 import Foundation
 #if SWIFT_PACKAGE
-import OrionC
+@_implementationOnly import OrionC
 #endif
 
 // based on https://github.com/SSheldon/rust-objc/tree/95bce4e0d7fa99efebbd135a47cb7dec54710261/src/message/apple
