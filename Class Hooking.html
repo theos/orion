@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Orion latest (dummy-10) Docs
+          Orion latest (dummy-11) Docs
         </a>
          (100% documented)
       </p>
@@ -166,6 +166,9 @@
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Enums/SubclassMode.html">SubclassMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/DeinitPolicy.html">DeinitPolicy</a>
               </li>
             </ul>
           </li>
@@ -299,25 +302,55 @@ at compile-time, specify a class in its inheritance chain as <code>Target</code>
 at compile-time), and provide the actual target class&rsquo; name by implementing
 the static <code>targetName</code> property.</p>
 <h1 id='hooking-methods' class='heading'>Hooking Methods</h1>
+<h2 id='instance-class-methods' class='heading'>Instance/Class Methods</h2>
 
-<p>To hook a method on the target class, simply declare a method with the same
-name and method signature in your hook class. The contents of your method
-will replace the original method implementation.</p>
+<p>To hook an instance method on the target class, simply declare an instance
+method with the same name and method signature in your hook class. The
+contents of your method will replace the original method implementation.</p>
 
 <p>In order to hook a class method, declare the replacement method as a <code>class</code>
-method. The method must not be <code>final</code> or <code>static</code>. Methods which have a
-visibility of <code>fileprivate</code> or <code>private</code> will be ignored by Orion.</p>
+method.</p>
+
+<p>In either case, the method must not be <code>final</code> or <code>static</code>. Methods which have
+a visibility of <code>fileprivate</code> or <code>private</code> will be ignored by Orion and can
+thus be used as helper methods.</p>
+<h2 id='accessing-target-information' class='heading'>Accessing Target Information</h2>
 
 <p>Within a method hook function, the object upon which the hooked method was
 invoked can be accessed via <code>target</code>. To call the original implementation
 of the method, call the method itself on the <code>orig</code> proxy. Similarly, the
 superclass implementation can be accessed via the <code>supr</code> proxy.</p>
+<h2 id='method-naming' class='heading'>Method Naming</h2>
 
 <p>To figure out the required Swift name for an Objective-C method, you may want
 to follow the way that Objective-C APIs are <a href="https://github.com/apple/swift-evolution/blob/main/proposals/0005-objective-c-name-translation.md">renamed</a>
 when they are imported into Swift, in reverse. If you cannot figure out the
 Swift name for the method, you can also provide the Objective-C selector name
 directly by declaring the function as <code>@objc(selector:name:) func</code>.</p>
+<h2 id='initializers' class='heading'>Initializers</h2>
+
+<p>In order to hook an initializer with Orion, declare an <em>instance</em> method with
+the initializer&rsquo;s name and Objective-C method signature, with a return type of
+<code>Target</code>. For example <code>func initWithFrame(_ frame: CGRect) -&gt; Target</code>. Inside
+the method, your first statement should be a call to an initializer on <code>supr</code>
+or <code>orig</code>, after which you can configure <code>target</code> as you desire before you
+return it. To hook <code>NSObject.init</code>, use backticks to escape the init keyword:
+<code>func `init`() -&gt; Target</code>.</p>
+
+<p>Example of hooking <code>initWithFrame</code>:</p>
+<pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">ViewHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UIView</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">initWithFrame</span><span class="p">(</span><span class="n">_</span> <span class="nv">frame</span><span class="p">:</span> <span class="kt">CGRect</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Target</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">target</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="nf">initWithFrame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="c1">// configure target</span>
+        <span class="k">return</span> <span class="n">target</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='deinitializers' class='heading'>Deinitializers</h2>
+
+<p>If you find the need to perform custom behavior when a target object is
+deallocated, you can declare a <code>deinitializer</code> function (<strong>not</strong> <code>deinit</code>).
+For more information, see <code><a href="Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP13deinitializerAA12DeinitPolicyOyF">ClassHookProtocol.deinitializer()</a></code>.</p>
 <h1 id='adding-to-the-class' class='heading'>Adding to the Class</h1>
 <h2 id='properties' class='heading'>Properties</h2>
 
@@ -363,7 +396,7 @@ above.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/ClassHook.swift#L189">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/d9848bcf7e40d6cdf90f7f0db996ddbc4fa70968/Sources/Orion/ClassHook.swift#L241">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -395,7 +428,7 @@ directly; use <code><a href="Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHoo
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/ClassHook.swift#L30-L73">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/d9848bcf7e40d6cdf90f7f0db996ddbc4fa70968/Sources/Orion/ClassHook.swift#L30-L87">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -475,7 +508,7 @@ policy will only override the respective default.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/Property.swift#L99-L237">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/d9848bcf7e40d6cdf90f7f0db996ddbc4fa70968/Sources/Orion/Property.swift#L99-L237">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -506,7 +539,41 @@ policy will only override the respective default.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/f8c3c0ea242d14330c71f73a382c9904edcf4e2e/Sources/Orion/ClassHook.swift#L4-L26">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/d9848bcf7e40d6cdf90f7f0db996ddbc4fa70968/Sources/Orion/ClassHook.swift#L4-L26">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion12DeinitPolicyO"></a>
+                    <a name="//apple_ref/swift/Enum/DeinitPolicy" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion12DeinitPolicyO">DeinitPolicy</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The action to perform after a <code><a href="Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP13deinitializerAA12DeinitPolicyOyF">ClassHookProtocol.deinitializer()</a></code> is run.</p>
+
+<p>Unless you&rsquo;re managing the target class&rsquo; own resources, you usually want
+to use <code>callOrig</code>.</p>
+
+                        <a href="Enums/DeinitPolicy.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">DeinitPolicy</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/d9848bcf7e40d6cdf90f7f0db996ddbc4fa70968/Sources/Orion/ClassHook+Deinit.swift#L10-L15">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
