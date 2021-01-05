@@ -1,0 +1,49 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+        path: orion
+    - name: Install Theos
+      run: |
+        brew install ldid make xz
+        echo "THEOS=${GITHUB_WORKSPACE}/theos" >> "${GITHUB_ENV}"
+        echo "PATH=/usr/local/opt/make/libexec/gnubin:${PATH}" >> "${GITHUB_ENV}"
+        echo "Installing Theos in ${THEOS}"
+        git clone --recursive https://github.com/theos/theos "${THEOS}"
+        hash -r
+    - name: Build Release
+      run: |
+        cd orion
+        make package FINALPACKAGE=1
+        cd packages
+        zip -yqr9 Orion_${{ github.ref }}.zip *
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        body: ''
+        draft: true
+        prerelease: false
+    - name: Upload Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./packages/Orion_${{ github.ref }}.zip
+        asset_name: Orion_${{ github.ref }}.zip
+        asset_content_type: application/zip
