@@ -32,7 +32,8 @@ jobs:
         cd orion
         make package FINALPACKAGE=1
         cd packages
-        zip -yqr9 Orion_${{ steps.setup.outputs.version }}.zip *
+        zip -yr9 Orion_${{ steps.setup.outputs.version }}.zip *
+        cd ..
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
