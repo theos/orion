@@ -13,20 +13,26 @@ jobs:
       with:
         submodules: true
         path: orion
-    - name: Install Theos
+    - name: Set Up Dependencies
+      id: setup
       run: |
-        gem install xcpretty
-        brew install ldid make
-        git clone --recursive https://github.com/theos/theos
+        brew install ldid make fakeroot
         echo "THEOS=${GITHUB_WORKSPACE}/theos" >> "${GITHUB_ENV}"
         echo "PATH=/usr/local/opt/make/libexec/gnubin:${PATH}" >> "${GITHUB_ENV}"
-        hash -r
+        echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+    - name: Install Theos
+      uses: actions/checkout@v2
+      with:
+        repository: theos/theos
+        ref: 691cbfd92985deaa6ec6d00549353e8f74d2b395
+        path: theos
+        submodules: recursive
     - name: Build Release
       run: |
         cd orion
         make package FINALPACKAGE=1
         cd packages
-        zip -yqr9 Orion_${{ github.ref }}.zip *
+        zip -yqr9 Orion_${{ steps.setup.outputs.version }}.zip *
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -34,7 +40,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
+        release_name: ${{ steps.setup.outputs.version }}
         body: ''
         draft: true
         prerelease: false
@@ -44,6 +50,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./packages/Orion_${{ github.ref }}.zip
-        asset_name: Orion_${{ github.ref }}.zip
+        asset_path: ./packages/Orion_${{ steps.setup.outputs.version }}.zip
+        asset_name: Orion_${{ steps.setup.outputs.version }}.zip
         asset_content_type: application/zip
