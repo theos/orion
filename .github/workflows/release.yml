@@ -15,11 +15,11 @@ jobs:
         path: orion
     - name: Install Theos
       run: |
-        brew install ldid make xz
+        gem install xcpretty
+        brew install ldid make
+        git clone --recursive https://github.com/theos/theos
         echo "THEOS=${GITHUB_WORKSPACE}/theos" >> "${GITHUB_ENV}"
         echo "PATH=/usr/local/opt/make/libexec/gnubin:${PATH}" >> "${GITHUB_ENV}"
-        echo "Installing Theos in ${THEOS}"
-        git clone --recursive https://github.com/theos/theos "${THEOS}"
         hash -r
     - name: Build Release
       run: |
