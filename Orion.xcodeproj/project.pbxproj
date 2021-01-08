@@ -450,6 +450,7 @@
 		56897498252BB9C6006F48E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
 					arm64e,
@@ -495,6 +496,7 @@
 		56897499252BB9C6006F48E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
 					arm64e,
