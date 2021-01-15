@@ -1,5 +1,6 @@
 included:
   - Sources
+  - Tests
 disabled_rules:
   - trailing_comma
   - nesting
@@ -14,7 +15,6 @@ opt_in_rules:
   - closure_spacing
   - empty_count
   - explicit_init
-  - fatal_error_message
   - first_where
   - implicit_return
   - joined_default_parameter
@@ -54,6 +54,12 @@ custom_rules:
       - number
       - attribute.builtin
     message: "Don't add a .0 to the end of floating point literals"
+  fatal_error:
+    name: "Fatal Error"
+    regex: '\bfatalError\b'
+    match_kinds:
+      - identifier
+    message: "Use orionError instead of fatalError"
 force_try: warning
 force_cast: warning
 function_body_length: 80

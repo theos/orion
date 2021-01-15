@@ -49,6 +49,11 @@ custom_categories:
       - Backend
       - DefaultBackend
       - HookDescriptor
+  - name: Error Handling
+    children:
+      - OrionErrorHandler
+      - updateOrionErrorHandler(_:)
+      - orionError(_:file:line:)
   - name: Versions
     children:
       - Versions

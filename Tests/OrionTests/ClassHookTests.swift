@@ -30,6 +30,7 @@ final class ClassHookTests: XCTestCase {
     }
 
     func testBasicNamedClassHooks() {
+        // swiftlint:disable:next force_cast
         let res = BasicClass.classMethodForNamedTest(withArgument: "Orion") as! [String]
         XCTAssertEqual(res, ["Hooked named class method", "hello", "Orion, or is it!"])
     }

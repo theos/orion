@@ -110,14 +110,14 @@ import Foundation
         get {
             withIvar(ivarName) {
                 guard let pointer = $0
-                    else { fatalError("Ivar '\(ivarName)' not found on object \(object)") }
+                    else { orionError("Ivar '\(ivarName)' not found on object \(object)") }
                 return pointer.pointee
             }
         }
         nonmutating set {
             withIvar(ivarName) {
                 guard let pointer = $0
-                    else { fatalError("Ivar '\(ivarName)' not found on object \(object)") }
+                    else { orionError("Ivar '\(ivarName)' not found on object \(object)") }
                 pointer.pointee = newValue
             }
         }

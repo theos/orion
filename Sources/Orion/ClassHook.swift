@@ -92,7 +92,7 @@ extension ClassHookProtocol {
     public static var targetName: String { "" }
 
     public static var _target: Target.Type {
-        fatalError("Could not get target. Has the Orion glue file been compiled?")
+        orionError("Could not get target. Has the Orion glue file been compiled?")
     }
 
     public static var subclassMode: SubclassMode { .none }
@@ -267,10 +267,10 @@ extension ClassHookProtocol {
         let target: Target.Type
         if let subclassName = subclassMode.subclassName(withType: self) {
             guard let pair: AnyClass = objc_allocateClassPair(baseTarget, subclassName, 0)
-                else { fatalError("Could not allocate subclass for \(self)") }
+                else { orionError("Could not allocate subclass for \(self)") }
             objc_registerClassPair(pair)
             guard let _target = pair as? Target.Type
-                else { fatalError("Allocated invalid subclass for \(self)") }
+                else { orionError("Allocated invalid subclass for \(self)") }
             target = _target
         } else {
             target = baseTarget
@@ -278,7 +278,7 @@ extension ClassHookProtocol {
 
         protocols.forEach {
             guard class_addProtocol(target, $0)
-                else { fatalError("Could not add protocol \($0) to \(target)") }
+                else { orionError("Could not add protocol \($0) to \(target)") }
         }
         return target
     }
@@ -306,14 +306,11 @@ extension ClassHookProtocol {
     // won't normally see the glue overrides and so it'll not realise that there is
     // an override point.
 
-    // Note that we have to add a level of indirection to fatalError because otherwise
-    // that code path isn't considered as part of the main control flow.
-
     /// A proxy to access the original instance methods of the hooked class.
     @_transparent
     public var orig: Self {
         guard let unwrapped = (self as? _AnyGlueClassHook)?._orig as? Self
-            else { _indirectFatalError("Could not get orig") }
+            else { orionError("Could not get orig") }
         return unwrapped
     }
 
@@ -321,7 +318,7 @@ extension ClassHookProtocol {
     @_transparent
     public static var orig: Self.Type {
         guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._orig as? Self.Type
-            else { _indirectFatalError("Could not get orig") }
+            else { orionError("Could not get orig") }
         return unwrapped
     }
 
@@ -329,7 +326,7 @@ extension ClassHookProtocol {
     @_transparent
     public var supr: Self {
         guard let unwrapped = (self as? _AnyGlueClassHook)?._supr as? Self
-            else { _indirectFatalError("Could not get supr") }
+            else { orionError("Could not get supr") }
         return unwrapped
     }
 
@@ -337,7 +334,7 @@ extension ClassHookProtocol {
     @_transparent
     public static var supr: Self.Type {
         guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._supr as? Self.Type
-            else { _indirectFatalError("Could not get supr") }
+            else { orionError("Could not get supr") }
         return unwrapped
     }
 
@@ -389,12 +386,12 @@ extension _GlueClassHook {
     public static func addMethod<Code>(_ selector: Selector, _ implementation: Code, isClassMethod: Bool) {
         let methodDescription = { "\(isClassMethod ? "+" : "-")[\(self) \(selector)]" }
         guard let method = (isClassMethod ? class_getClassMethod : class_getInstanceMethod)(self, selector)
-            else { fatalError("Could not find method \(methodDescription())") }
+            else { orionError("Could not find method \(methodDescription())") }
         guard let types = method_getTypeEncoding(method)
-            else { fatalError("Could not get method signature for \(methodDescription())") }
+            else { orionError("Could not get method signature for \(methodDescription())") }
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
         guard class_addMethod(cls, selector, unsafeBitCast(implementation, to: IMP.self), types)
-            else { fatalError("Failed to add method \(methodDescription())") }
+            else { orionError("Failed to add method \(methodDescription())") }
     }
 
     public static func activate() -> [HookDescriptor] {

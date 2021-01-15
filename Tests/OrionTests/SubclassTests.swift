@@ -6,6 +6,8 @@ import OrionTestSupport
     func someNewMethod() -> String
 }
 
+// swiftlint:disable explicit_init
+
 final class SubclassTests: XCTestCase {
 
     func testCustomSubclassNameRespected() {
@@ -48,3 +50,5 @@ final class SubclassTests: XCTestCase {
     }
 
 }
+
+// swiftlint:enable explicit_init

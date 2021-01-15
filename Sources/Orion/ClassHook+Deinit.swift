@@ -38,7 +38,7 @@ extension _ClassHookBuilder {
             let policy: DeinitPolicy = autoreleasepool {
                 let value = target.takeUnretainedValue()
                 guard let castTarget = value as? T.Target else {
-                    fatalError("""
+                    orionError("""
                     Could not convert value of type \(type(of: value)) to expected \
                     type \(classHook.target)
                     """)
@@ -62,10 +62,10 @@ extension _ClassHookBuilder {
 /// :nodoc:
 extension _GlueClassHook {
     public func deinitOrigError(file: StaticString = #file, line: UInt = #line) -> Never {
-        fatalError("Do not call `orig.deinitializer()`.", file: file, line: line)
+        orionError("Do not call `orig.deinitializer()`.", file: file, line: line)
     }
 
     public func deinitSuprError(file: StaticString = #file, line: UInt = #line) -> Never {
-        fatalError("Do not call `supr.deinitializer()`.", file: file, line: line)
+        orionError("Do not call `supr.deinitializer()`.", file: file, line: line)
     }
 }

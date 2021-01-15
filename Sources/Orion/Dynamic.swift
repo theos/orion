@@ -141,21 +141,21 @@ import Foundation
         var cls: AnyClass {
             switch self {
             case .cls(let cls): return cls
-            case .proto: fatalError("Cannot convert protocol to class")
+            case .proto: orionError("Cannot convert protocol to class")
             case .name(let name):
                 guard let cls = NSClassFromString(name)
-                    else { fatalError("Could not find class named \(name)") }
+                    else { orionError("Could not find class named \(name)") }
                 return cls
             }
         }
 
         var proto: Protocol {
             switch self {
-            case .cls: fatalError("Cannot convert class to protocol")
+            case .cls: orionError("Cannot convert class to protocol")
             case .proto(let proto): return proto
             case .name(let name):
                 guard let cls = NSProtocolFromString(name)
-                    else { fatalError("Could not find protocol named \(name)") }
+                    else { orionError("Could not find protocol named \(name)") }
                 return cls
             }
         }
@@ -259,7 +259,7 @@ import Foundation
     /// - Returns: The cast class.
     public func `as`<T: AnyObject>(type: T.Type) -> T.Type {
         guard let typed = `class` as? T.Type
-            else { fatalError("Could not convert class \(`class`) to type \(type)") }
+            else { orionError("Could not convert class \(`class`) to type \(type)") }
         return typed
     }
 
@@ -282,10 +282,10 @@ import Foundation
     public func `as`<I>(interface: I.Type, protocol: Protocol? = nil) -> I {
         // we use init(reflecting:) to get the fully qualified protocol name
         guard let proto = `protocol` ?? NSProtocolFromString(String(reflecting: interface))
-            else { fatalError("\(interface) is not an @objc protocol") }
+            else { orionError("\(interface) is not an @objc protocol") }
         class_addProtocol(`class`, proto)
         guard let typed = `class` as? I
-            else { fatalError("Failed to make \(`class`) conform to \(interface)") }
+            else { orionError("Failed to make \(`class`) conform to \(interface)") }
         return typed
     }
 

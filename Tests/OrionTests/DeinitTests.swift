@@ -11,7 +11,7 @@ private struct Deallocation: Equatable {
         self.cls = cls
     }
 
-    static func ==(lhs: Self, rhs: Self) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.identifier == rhs.identifier
             && ObjectIdentifier(lhs.cls) == ObjectIdentifier(rhs.cls)
     }

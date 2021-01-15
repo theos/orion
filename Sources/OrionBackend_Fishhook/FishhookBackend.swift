@@ -64,14 +64,14 @@ extension Backends.Fishhook {
             let handle: UnsafeMutableRawPointer
             if let image = request.image {
                 guard let _handle = image.withUnsafeFileSystemRepresentation({ dlopen($0, RTLD_NOLOAD | RTLD_NOW) })
-                    else { fatalError("Image not loaded: \(image.path)") }
+                    else { orionError("Image not loaded: \(image.path)") }
                 handle = _handle
             } else {
                 handle = UnsafeMutableRawPointer(bitPattern: -2)! // RTLD_DEFAULT
             }
 
             guard let orig = dlsym(handle, request.symbol) else {
-                fatalError("Could not find function \(function)")
+                orionError("Could not find function \(function)")
             }
 
             rebindings.append(rebinding(
@@ -91,14 +91,14 @@ extension Backends.Fishhook {
 
             completions.append { brokenOrig in
                 guard brokenOrig != nil else {
-                    fatalError("Failed to hook function \(function)")
+                    orionError("Failed to hook function \(function)")
                 }
                 request.completion(orig)
             }
         }
 
         guard orion_rebind_symbols(&rebindings, rebindings.count) == 0
-            else { fatalError("Failed to hook functions") }
+            else { orionError("Failed to hook functions") }
 
         zip(completions, origs).forEach { $0($1) }
     }
@@ -110,7 +110,7 @@ extension Backends.Fishhook {
         hooks.forEach {
             switch $0 {
             case .function(.address, _, _):
-                fatalError("""
+                orionError("""
                 The fishhook backend cannot hook functions at raw addresses. If possible, provide \
                 a symbol name and image instead.
                 """)

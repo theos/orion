@@ -24,11 +24,11 @@ extension Backends.Internal {
         let methodDescription = { "\(class_isMetaClass(cls) ? "+" : "-")[\(cls) \(sel)]" }
 
         guard let origMethod = class_getInstanceMethod(cls, sel) else {
-            fatalError("Could not find method \(methodDescription())")
+            orionError("Could not find method \(methodDescription())")
         }
 
         guard let types = method_getTypeEncoding(origMethod) else {
-            fatalError("Could not get type encoding for method \(methodDescription())")
+            orionError("Could not get type encoding for method \(methodDescription())")
         }
 
         let imp = IMP(replacement)
@@ -49,7 +49,7 @@ extension Backends.Internal {
         hooks.forEach {
             switch $0 {
             case .function(let function, _, _):
-                fatalError(
+                orionError(
                     "Could not hook \(function). The internal backend does not support function hooking"
                 )
             case let .method(cls, sel, replacement, completion):

@@ -72,7 +72,7 @@ extension Backend {
         var orig: UnsafeMutableRawPointer?
         apply(hooks: [.function(function: function, replacement: replacement) { orig = $0 }])
         guard let unwrapped = orig
-            else { fatalError("Hook builder did not call function hook completion") }
+            else { orionError("Hook builder did not call function hook completion") }
         return unwrapped
     }
 
@@ -93,7 +93,7 @@ extension Backend {
         var orig: UnsafeMutableRawPointer?
         apply(hooks: [.method(cls: cls, sel: sel, replacement: replacement) { orig = $0 }])
         guard let unwrapped = orig
-            else { fatalError("Hook builder did not call method hook completion") }
+            else { orionError("Hook builder did not call method hook completion") }
         return unwrapped
     }
 

@@ -114,7 +114,7 @@ extension FunctionHookProtocol {
     @_transparent
     public var orig: Self {
         guard let unwrapped = (self as? _AnyGlueFunctionHook)?._orig as? Self
-            else { _indirectFatalError("Could not get orig") }
+            else { orionError("Could not get orig") }
         return unwrapped
     }
 

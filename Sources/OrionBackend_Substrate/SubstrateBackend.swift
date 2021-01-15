@@ -50,19 +50,19 @@ extension Backends.Substrate {
             switch $0 {
             case let .function(function, replacement, completion):
                 guard let symbol = address(for: function, fetcher: &imageFetcher) else {
-                    fatalError("The function \(function) could not be found")
+                    orionError("The function \(function) could not be found")
                 }
                 var old: UnsafeMutableRawPointer?
                 MSHookFunction(symbol, replacement, &old)
                 guard let unwrapped = old
-                    else { fatalError("Could not hook function: \(function)") }
+                    else { orionError("Could not hook function: \(function)") }
                 completion(unwrapped)
             case let .method(cls, sel, replacement, completion):
                 var old: IMP?
                 MSHookMessageEx(cls, sel, IMP(replacement), &old)
                 guard let unwrapped = old else {
                     let method = "\(class_isMetaClass(cls) ? "+" : "-")[\(cls) \(sel)]"
-                    fatalError("Could not hook method \(method)")
+                    orionError("Could not hook method \(method)")
                 }
                 completion(.init(unwrapped))
             }

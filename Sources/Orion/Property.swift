@@ -102,9 +102,9 @@ final class PropertyKeys {
     /// :nodoc:
     @available(*, unavailable, message: "@Property is only available on ClassHook types")
     public var wrappedValue: T {
-        get { fatalError("@Property is only available on ClassHook types") }
+        get { orionError("@Property is only available on ClassHook types") }
         // swiftlint:disable:next unused_setter_value
-        set { fatalError("@Property is only available on ClassHook types") }
+        set { orionError("@Property is only available on ClassHook types") }
     }
 
     /// An enumeration indicating that the property should use the `assign`
