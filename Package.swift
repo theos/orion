@@ -36,6 +36,7 @@ if env["SPM_THEOS_BUILD"] == "1" {
 
 // https://github.com/muter-mutation-testing/muter/blob/dc53a9cd1792b2ffd3c9a1a0795aae99e8c7334d/Package.swift#L40
 let rpathLinkerSettings: [LinkerSetting]? = {
+    #if os(macOS)
     guard builder == .xcode else { return nil }
 
     let stdout = Pipe()
@@ -52,6 +53,9 @@ let rpathLinkerSettings: [LinkerSetting]? = {
     return [
         .unsafeFlags(["-rpath", rpath])
     ]
+    #else
+    return nil
+    #endif
 }()
 
 var package = Package(
