@@ -510,7 +510,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
 				MARKETING_VERSION = 0.9.0;
-				OTHER_LDFLAGS = "-lsubstrate";
+				OTHER_LDFLAGS = "-weak-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = NO;
@@ -557,7 +557,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
 				MARKETING_VERSION = 0.9.0;
-				OTHER_LDFLAGS = "-lsubstrate";
+				OTHER_LDFLAGS = "-weak-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = NO;

@@ -18,6 +18,10 @@ ifeq ($(_THEOS_FINAL_PACKAGE),$(_THEOS_TRUE))
 	$(ECHO_NOTHING)cp -a $(THEOS_OBJ_DIR)/dSYMs/Orion.framework.dSYM $(DSYM_DIR)$(ECHO_END)
 endif
 	$(ECHO_NOTHING)xcrun tapi stubify $(SDK_DIR)/Orion$(ECHO_END)
+	$(ECHO_NOTHING)if [[ -L $(SDK_DIR)/Orion ]]; then \
+		ln -s Versions/Current/Orion.tbd $(SDK_DIR)/Orion.tbd; \
+		rm $(SDK_DIR)/Versions/Current/Orion; \
+	fi$(ECHO_END)
 	$(ECHO_NOTHING)rm $(SDK_DIR)/Orion $(SDK_DIR)/Modules/Orion.swiftmodule/*.swiftmodule$(ECHO_END)
 	$(ECHO_NOTHING)rm -rf $(THEOS_STAGING_DIR)/Library/Frameworks/Orion.framework/{Headers,Modules}$(ECHO_END)
 

@@ -12,6 +12,11 @@ extension Backends {
     /// if the target system has CydiaSubstrate – or another hooking
     /// framework which vends its API – installed, this backend makes
     /// for a sensible default choice.
+    ///
+    /// - Warning: Do not use this backend if the target system does not
+    /// have a framework which vends the CydiaSubstrate APIs. Doing so
+    /// will result in the process crashing with an "undefined symbols"
+    /// error.
     public struct Substrate: DefaultBackend {
         public init() {}
     }
