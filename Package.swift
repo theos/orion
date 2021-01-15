@@ -103,51 +103,53 @@ var package = Package(
 )
 
 #if canImport(ObjectiveC)
-package.products += [
-    .library(
-        name: "Orion",
-        targets: ["Orion"]
-    ),
-    .library(
-        name: "CydiaSubstrate",
-        targets: ["CydiaSubstrate"]
-    ),
-    .library(
-        name: "OrionBackend_Substrate",
-        targets: ["OrionBackend_Substrate"]
-    )
-]
+if builder != .theos {
+    package.products += [
+        .library(
+            name: "Orion",
+            targets: ["Orion"]
+        ),
+        .library(
+            name: "CydiaSubstrate",
+            targets: ["CydiaSubstrate"]
+        ),
+        .library(
+            name: "OrionBackend_Substrate",
+            targets: ["OrionBackend_Substrate"]
+        )
+    ]
 
-package.targets += [
-    .target(
-        name: "OrionC",
-        dependencies: []
-    ),
-    .target(
-        name: "Orion",
-        dependencies: ["OrionC"]
-    ),
-    .systemLibrary(
-        name: "CydiaSubstrate"
-    ),
-    .target(
-        name: "OrionBackend_Substrate",
-        dependencies: ["CydiaSubstrate", "Orion"]
-    ),
-    .target(
-        name: "Fishhook"
-    ),
-    .target(
-        name: "OrionBackend_Fishhook",
-        dependencies: ["Fishhook", "Orion"]
-    ),
-    .target(
-        name: "OrionTestSupport",
-        dependencies: ["Orion"]
-    ),
-    .testTarget(
-        name: "OrionTests",
-        dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"]
-    ),
-]
+    package.targets += [
+        .target(
+            name: "OrionC",
+            dependencies: []
+        ),
+        .target(
+            name: "Orion",
+            dependencies: ["OrionC"]
+        ),
+        .systemLibrary(
+            name: "CydiaSubstrate"
+        ),
+        .target(
+            name: "OrionBackend_Substrate",
+            dependencies: ["CydiaSubstrate", "Orion"]
+        ),
+        .target(
+            name: "Fishhook"
+        ),
+        .target(
+            name: "OrionBackend_Fishhook",
+            dependencies: ["Fishhook", "Orion"]
+        ),
+        .target(
+            name: "OrionTestSupport",
+            dependencies: ["Orion"]
+        ),
+        .testTarget(
+            name: "OrionTests",
+            dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"]
+        ),
+    ]
+}
 #endif
