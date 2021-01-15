@@ -28,7 +28,7 @@ let builder: Builder
 let env = ProcessInfo.processInfo.environment
 if env["SPM_THEOS_BUILD"] == "1" {
     builder = .theos
-} else if env["XPC_SERVICE_NAME"]?.hasPrefix("com.apple.dt.Xcode.") == true {
+} else if env["XPC_SERVICE_NAME"]?.contains("com.apple.dt.Xcode.") == true {
     builder = .xcode
 } else {
     builder = .spm
