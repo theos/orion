@@ -32,6 +32,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		565F484E25B1ED3400B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
+		565F485725B1F0D000B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
+		565F485925B1F0D000B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
 		567AF4DB25367DE30056182E /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		567AF4DC25367DE30056182E /* CydiaSubstrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CydiaSubstrate.h; sourceTree = "<group>"; };
 		567AF4E125367DF20056182E /* SubstrateBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubstrateBackend.swift; sourceTree = "<group>"; };
@@ -74,6 +77,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		565F484D25B1ED3400B75BA3 /* lib-maccatalyst */ = {
+			isa = PBXGroup;
+			children = (
+				565F484E25B1ED3400B75BA3 /* libsubstrate.tbd */,
+			);
+			path = "lib-maccatalyst";
+			sourceTree = "<group>";
+		};
+		565F485625B1F0D000B75BA3 /* lib-appletvos */ = {
+			isa = PBXGroup;
+			children = (
+				565F485725B1F0D000B75BA3 /* libsubstrate.tbd */,
+			);
+			path = "lib-appletvos";
+			sourceTree = "<group>";
+		};
+		565F485825B1F0D000B75BA3 /* lib-appletvsimulator */ = {
+			isa = PBXGroup;
+			children = (
+				565F485925B1F0D000B75BA3 /* libsubstrate.tbd */,
+			);
+			path = "lib-appletvsimulator";
+			sourceTree = "<group>";
+		};
 		567AF4D625367DA40056182E /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -106,35 +133,38 @@
 		567AF4EA253680EF0056182E /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				567AF4EE253681100056182E /* macosx */,
-				567AF4EC253680FC0056182E /* iphonesimulator */,
-				567AF4EB253680F60056182E /* iphoneos */,
+				567AF4EE253681100056182E /* lib */,
+				565F484D25B1ED3400B75BA3 /* lib-maccatalyst */,
+				567AF4EC253680FC0056182E /* lib-iphonesimulator */,
+				567AF4EB253680F60056182E /* lib-iphoneos */,
+				565F485825B1F0D000B75BA3 /* lib-appletvsimulator */,
+				565F485625B1F0D000B75BA3 /* lib-appletvos */,
 			);
 			path = lib;
 			sourceTree = "<group>";
 		};
-		567AF4EB253680F60056182E /* iphoneos */ = {
+		567AF4EB253680F60056182E /* lib-iphoneos */ = {
 			isa = PBXGroup;
 			children = (
 				567AF4E625367E460056182E /* libsubstrate.tbd */,
 			);
-			path = iphoneos;
+			path = "lib-iphoneos";
 			sourceTree = "<group>";
 		};
-		567AF4EC253680FC0056182E /* iphonesimulator */ = {
+		567AF4EC253680FC0056182E /* lib-iphonesimulator */ = {
 			isa = PBXGroup;
 			children = (
 				567AF4ED253681030056182E /* libsubstrate.tbd */,
 			);
-			path = iphonesimulator;
+			path = "lib-iphonesimulator";
 			sourceTree = "<group>";
 		};
-		567AF4EE253681100056182E /* macosx */ = {
+		567AF4EE253681100056182E /* lib */ = {
 			isa = PBXGroup;
 			children = (
 				567AF4EF253681120056182E /* libsubstrate.tbd */,
 			);
-			path = macosx;
+			path = lib;
 			sourceTree = "<group>";
 		};
 		56897485252BB9C6006F48E9 = {
@@ -239,7 +269,7 @@
 		56897486252BB9C6006F48E9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1210;
+				LastUpgradeCheck = 1230;
 				TargetAttributes = {
 					5689748E252BB9C6006F48E9 = {
 						CreatedOnToolsVersion = 12.0.1;
@@ -476,9 +506,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/$(PLATFORM_NAME)",
+					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/lib$(EFFECTIVE_PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
+				MARKETING_VERSION = 0.9.0;
 				OTHER_LDFLAGS = "-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -487,7 +518,7 @@
 				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/CydiaSubstrate";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3,6";
 				TVOS_DEPLOYMENT_TARGET = 12.2;
 				WATCHOS_DEPLOYMENT_TARGET = 5.2;
 			};
@@ -522,9 +553,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/$(PLATFORM_NAME)",
+					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/lib$(EFFECTIVE_PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
+				MARKETING_VERSION = 0.9.0;
 				OTHER_LDFLAGS = "-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -532,7 +564,7 @@
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx appletvsimulator appletvos watchsimulator watchos";
 				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/Sources/CydiaSubstrate";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3,6";
 				TVOS_DEPLOYMENT_TARGET = 12.2;
 				WATCHOS_DEPLOYMENT_TARGET = 5.2;
 			};

@@ -1,11 +1,11 @@
 ---
-archs:           [ i386, x86_64, arm64, arm64e ]
-platform:        macosx
+archs:           [ arm64, arm64e, x86_64 ]
+platform:        appletvsimulator
 install-name:    /Library/Frameworks/CydiaSubstrate.framework/CydiaSubstrate
 current-version: 0.0.0
 compatibility-version: 0.0.0
 exports:
-  - archs:            [ i386, x86_64, arm64, arm64e ]
+  - archs:            [ arm64, arm64e, x86_64 ]
     symbols:          [ _MSCloseImage, _MSDebug, _MSFindAddress, _MSFindSymbol,
                         _MSGetImageByName, _MSHookClassPair, _MSHookFunction,
                         _MSHookMemory, _MSHookMessageEx, _MSImageAddress,
