@@ -16,6 +16,7 @@ jobs:
     - name: Set Up Dependencies
       id: setup
       run: |
+        sudo xcode-select -s /Applications/Xcode_11.7.app/Contents/Developer
         brew install ldid make fakeroot
         echo "THEOS=${GITHUB_WORKSPACE}/theos" >> "${GITHUB_ENV}"
         echo "PATH=/usr/local/opt/make/libexec/gnubin:${PATH}" >> "${GITHUB_ENV}"
