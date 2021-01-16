@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Versions  Reference</title>
+    <title>Function Hooking  Reference</title>
     <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="css/highlight.css" />
     <meta charset="utf-8">
@@ -82,13 +82,14 @@
   </head>
   <body>
 
+    <a name="//apple_ref/swift/Section/Function Hooking" class="dashAnchor"></a>
 
-    <a title="Versions  Reference"></a>
+    <a title="Function Hooking  Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Orion latest (0.9.0) Docs
+          Orion 0.9.0 Docs
         </a>
          (100% documented)
       </p>
@@ -107,7 +108,7 @@
         </p>
     
         <p class="header-col header-col--secondary">
-          <a class="header-link" href="dash-feed://https%3A%2F%2Forion.theos.dev%2Fdocsets%2FOrion.xml">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Forion.theos.dev%2Fversions%2F0.9.0%2Fdocsets%2FOrion.xml">
             <img class="header-icon" src="img/dash.png"/>
             Install in Dash
           </a>
@@ -117,7 +118,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="index.html">Orion Reference</a>
       <img class="carat" src="img/carat.png" />
-      Versions  Reference
+      Function Hooking  Reference
     </p>
 
     <div class="content-wrapper">
@@ -275,18 +276,135 @@
 
         <section class="section">
           <div class="section-content top-matter">
+            <h1>Function Hooking</h1>
             
-            <h1 id='versions' class='heading'>Versions</h1>
-
-<p>The following is a list of permalinks to all versions of the Orion documentation:</p>
-
-<ul>
-<li><a href="/versions/0.9.0">0.9.0</a></li>
-</ul>
-
           </div>
         </section>
 
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion12FunctionHooka"></a>
+                    <a name="//apple_ref/swift/Alias/FunctionHook" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion12FunctionHooka">FunctionHook</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The base function hook type. All function hooks must subclass this.</p>
+
+<p>In order to make a function hook, create a class which conforms
+to this type. Satisfy the protocol requirement by providing a
+static <code>target</code> property, and declare a function named <code>function</code>
+with the signature of the function that is being hooked.</p>
+
+<p>The original function implementation can be accessed via <code>orig.function</code>.</p>
+<h1 id='example' class='heading'>Example</h1>
+
+<p>The following example hooks the C standard library function <code>atoi</code> such
+that <code>atoi(&quot;1234&quot;)</code> returns <code>4321</code> and all other calls behave normally.</p>
+<pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">AtoiHook</span><span class="p">:</span> <span class="kt">FunctionHook</span> <span class="p">{</span>
+    <span class="kd">static</span> <span class="k">let</span> <span class="nv">target</span> <span class="o">=</span> <span class="kt">Function</span><span class="o">.</span><span class="nf">symbol</span><span class="p">(</span><span class="s">"atoi"</span><span class="p">,</span> <span class="nv">image</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span>
+
+    <span class="kd">func</span> <span class="nf">function</span><span class="p">(</span><span class="n">_</span> <span class="nv">string</span><span class="p">:</span> <span class="kt">UnsafePointer</span><span class="o">&lt;</span><span class="kt">Int8</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Int32</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="kt">String</span><span class="p">(</span><span class="nv">cString</span><span class="p">:</span> <span class="n">string</span><span class="p">)</span> <span class="o">==</span> <span class="s">"1234"</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="mi">4321</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">orig</span><span class="o">.</span><span class="nf">function</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">FunctionHook</span> <span class="o">=</span> <span class="kt">FunctionHookClass</span> <span class="o">&amp;</span> <span class="kt"><a href="Protocols/FunctionHookProtocol.html">FunctionHookProtocol</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/FunctionHook.swift#L95">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion20FunctionHookProtocolP"></a>
+                    <a name="//apple_ref/swift/Protocol/FunctionHookProtocol" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion20FunctionHookProtocolP">FunctionHookProtocol</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The protocol to which function hooks conform. Do not conform to this
+directly; use <code><a href="Function%20Hooking.html#/s:5Orion12FunctionHooka">FunctionHook</a></code>.</p>
+
+                        <a href="Protocols/FunctionHookProtocol.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">FunctionHookProtocol</span> <span class="p">:</span> <span class="kt">AnyObject</span><span class="p">,</span> <span class="kt"><a href="Protocols/AnyHook.html">AnyHook</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/FunctionHook.swift#L43-L53">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion8FunctionO"></a>
+                    <a name="//apple_ref/swift/Enum/Function" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion8FunctionO">Function</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An enumeration describing a function.</p>
+
+                        <a href="Enums/Function.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Function</span> <span class="p">:</span> <span class="kt">CustomStringConvertible</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/FunctionHook.swift#L4-L39">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
       </article>
     </div>
