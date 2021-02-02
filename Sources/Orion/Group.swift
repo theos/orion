@@ -224,34 +224,3 @@ extension AnyHook {
         GroupRegistry.shared.group(ofType: Group.self)
     }
 }
-
-struct iOS14Stuff: HookGroup {
-    let hasNotch: Bool
-}
-struct iOS13Stuff: HookGroup {}
-class CallBarHook: ClassHook<NSString> {
-    typealias Group = iOS14Stuff
-    static let targetName = "SBCallBarView"
-    // ...
-}
-class AppLibraryHook: ClassHook<NSString> {
-    typealias Group = iOS14Stuff
-    static let targetName =
-        group.hasNotch ? "SBModernAppLibraryView" : "SBAppLibraryView"
-    // ...
-}
-class CallScreenHook: ClassHook<NSString> {
-    typealias Group = iOS13Stuff
-    static let targetName = "SBCallScreenView"
-    // ...
-}
-struct MyTweak: Tweak {
-    init() {
-        if #available(iOS 14, *) {
-            let hasNotch = true
-            iOS14Stuff(hasNotch: hasNotch).activate()
-        } else {
-            iOS13Stuff().activate()
-        }
-    }
-}
