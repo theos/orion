@@ -83,3 +83,19 @@ public func orionError(
         orionErrorHandler(message(), file, line)
     }
 }
+
+// TODO: Use this
+
+// usage: someOptional !! "Error message"
+infix operator !!: CastingPrecedence
+
+extension Optional {
+    static func !! (lhs: Self, message: @autoclosure () -> String) -> Wrapped {
+        switch lhs {
+        case .some(let unwrapped):
+            return unwrapped
+        case .none:
+            orionError(message())
+        }
+    }
+}

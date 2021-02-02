@@ -55,7 +55,7 @@ extension _ClassHookBuilder {
             }
         } as @convention(block) (Unmanaged<AnyObject>) -> Void)
         let method = unsafeBitCast(imp, to: Code.self)
-        addHook(Self.deallocSelector, method, isClassMethod: false, completion: setOrig)
+        addHook(Self.deallocSelector, method, isClassMethod: false, saveOrig: setOrig)
     }
 }
 

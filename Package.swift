@@ -116,7 +116,11 @@ if builder != .theos {
         .library(
             name: "OrionBackend_Substrate",
             targets: ["OrionBackend_Substrate"]
-        )
+        ),
+        .executable(
+            name: "OrionPlayground",
+            targets: ["OrionPlayground"]
+        ),
     ]
 
     package.targets += [
@@ -141,6 +145,10 @@ if builder != .theos {
         .target(
             name: "OrionBackend_Fishhook",
             dependencies: ["Fishhook", "Orion"]
+        ),
+        .target(
+            name: "OrionPlayground",
+            dependencies: ["Orion", "OrionTestSupport"]
         ),
         .target(
             name: "OrionTestSupport",

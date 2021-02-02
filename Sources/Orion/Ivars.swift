@@ -1,6 +1,7 @@
 import Foundation
 
-/// A wrapper around an object for accessing ivars on it.
+/// A wrapper around an object for accessing Objective-C instance variables of
+/// type `IvarType` on it.
 ///
 /// This type supports dynamic member lookup, which means that ivars
 /// can be accessed as if they were members of the type. Note that if
@@ -14,6 +15,9 @@ import Foundation
 /// - To access an ivar with a name that clashes with an actual member on this type,
 /// it is possible to use `Ivars.subscript(dynamicMember:)` directly.
 ///
+/// - To access a weak ivar, pass `.weak` as the second argument to the `Ivars` initializer.
+/// The `IvarType` must correspond to an optional of a class (e.g. `Ivars<NSString?>`).
+///
 /// # Example
 ///
 /// ```
@@ -23,17 +27,24 @@ import Foundation
 /// print(object.foo) // 7
 /// ```
 @dynamicMemberLookup public struct Ivars<IvarType> {
-    private let object: AnyObject
+    enum Storage {
+        case strong
+        case weak
+    }
 
-    /// Construct a new instance of `Ivars` for accessing instance
-    /// variables on `object`.
+    let object: AnyObject
+    let storage: Storage
+
+    /// Construct a new instance of `Ivars` for accessing Objective-C
+    /// instance variables on `object`.
     ///
     /// - Parameter object: The object on which ivars are to be accessed.
     public init(_ object: AnyObject) {
         self.object = object
+        self.storage = .strong
     }
 
-    /// Access an instance variable on the object.
+    /// Access an Objective-C instance variable on the object.
     ///
     /// - Parameter name: The name of the instance variable to access.
     ///
@@ -80,8 +91,8 @@ import Foundation
         }
     }
 
-    /// Access an instance variable on the object, failing gracefully if
-    /// the instance variable does not exist.
+    /// Access an Objective-C instance variable on the object, failing gracefully
+    /// if the instance variable does not exist.
     ///
     /// - Parameter ivarName: The name of the instance variable to access.
     ///
@@ -97,7 +108,7 @@ import Foundation
         }
     }
 
-    /// Access an instance variable on the object.
+    /// Access an Objective-C instance variable on the object.
     ///
     /// - Parameter ivarName: The name of the instance variable to access.
     ///

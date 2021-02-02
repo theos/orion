@@ -10,6 +10,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSString *woz;
 @property (nonatomic, readonly) NSString *hooked;
 
+@property (nonatomic, nullable) id strongRef;
+@property (nonatomic, nullable, weak) id weakRef;
+
 @end
 
 NS_ASSUME_NONNULL_END

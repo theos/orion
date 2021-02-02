@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		56080B5C25C1F8BF005803BC /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56080B5B25C1F8BE005803BC /* Group.swift */; };
+		562FA0E325B7003E007A32FE /* Ivars+Weak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562FA0E225B7003E007A32FE /* Ivars+Weak.swift */; };
 		567AF4E325367DF20056182E /* SubstrateBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567AF4E125367DF20056182E /* SubstrateBackend.swift */; };
 		568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749C252BBA15006F48E9 /* ClassHook.swift */; };
 		568974AB252BBA15006F48E9 /* Dynamic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749D252BBA15006F48E9 /* Dynamic.swift */; };
@@ -29,9 +31,12 @@
 		56AFA08D25A3CE6500884E2D /* dealloc.m in Sources */ = {isa = PBXBuildFile; fileRef = 56AFA08C25A3CE6500884E2D /* dealloc.m */; };
 		56AFA08F25A3CE8B00884E2D /* ClassHook+Deinit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */; };
 		56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */; };
+		56D9F14925C4940900EDB315 /* LazyAtomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D9F14825C4940900EDB315 /* LazyAtomic.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		56080B5B25C1F8BE005803BC /* Group.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		562FA0E225B7003E007A32FE /* Ivars+Weak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Ivars+Weak.swift"; sourceTree = "<group>"; };
 		565F484E25B1ED3400B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
 		565F485725B1F0D000B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
 		565F485925B1F0D000B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
@@ -64,6 +69,7 @@
 		56AFA08C25A3CE6500884E2D /* dealloc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dealloc.m; sourceTree = "<group>"; };
 		56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ClassHook+Deinit.swift"; sourceTree = "<group>"; };
 		56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
+		56D9F14825C4940900EDB315 /* LazyAtomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LazyAtomic.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,9 +199,12 @@
 				5689749D252BBA15006F48E9 /* Dynamic.swift */,
 				56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */,
 				5689749E252BBA15006F48E9 /* FunctionHook.swift */,
+				56080B5B25C1F8BE005803BC /* Group.swift */,
 				568974A8252BBA15006F48E9 /* Hook.swift */,
 				5689749F252BBA15006F48E9 /* InternalBackend.swift */,
 				568974A2252BBA15006F48E9 /* Ivars.swift */,
+				562FA0E225B7003E007A32FE /* Ivars+Weak.swift */,
+				56D9F14825C4940900EDB315 /* LazyAtomic.swift */,
 				568974A5252BBA15006F48E9 /* MutexLock.swift */,
 				568974A3252BBA15006F48E9 /* Property.swift */,
 				568974A7252BBA15006F48E9 /* ReadWriteLock.swift */,
@@ -269,7 +278,7 @@
 		56897486252BB9C6006F48E9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1230;
+				LastUpgradeCheck = 1240;
 				TargetAttributes = {
 					5689748E252BB9C6006F48E9 = {
 						CreatedOnToolsVersion = 12.0.1;
@@ -334,15 +343,18 @@
 				568974AE252BBA15006F48E9 /* ClassHook+Super.swift in Sources */,
 				56AFA08D25A3CE6500884E2D /* dealloc.m in Sources */,
 				568974B2252BBA15006F48E9 /* Backend.swift in Sources */,
+				56080B5C25C1F8BF005803BC /* Group.swift in Sources */,
 				56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */,
 				56AFA08F25A3CE8B00884E2D /* ClassHook+Deinit.swift in Sources */,
 				568974B0252BBA15006F48E9 /* Ivars.swift in Sources */,
+				562FA0E325B7003E007A32FE /* Ivars+Weak.swift in Sources */,
 				568974B7252BBA16006F48E9 /* Tweak.swift in Sources */,
 				568974CB252BBA4F006F48E9 /* init.c in Sources */,
 				568974AC252BBA15006F48E9 /* FunctionHook.swift in Sources */,
 				568974AD252BBA15006F48E9 /* InternalBackend.swift in Sources */,
 				568974B6252BBA15006F48E9 /* Hook.swift in Sources */,
 				568974B5252BBA15006F48E9 /* ReadWriteLock.swift in Sources */,
+				56D9F14925C4940900EDB315 /* LazyAtomic.swift in Sources */,
 				568974C4252BBA4F006F48E9 /* super.m in Sources */,
 				568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */,
 				568974B1252BBA15006F48E9 /* Property.swift in Sources */,

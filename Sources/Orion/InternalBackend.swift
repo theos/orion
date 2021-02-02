@@ -45,15 +45,15 @@ extension Backends.Internal {
         return .init(orig)
     }
 
-    public func apply(hooks: [HookDescriptor]) {
-        hooks.forEach {
+    public func apply(descriptors: [HookDescriptor]) {
+        descriptors.forEach {
             switch $0 {
             case .function(let function, _, _):
                 orionError(
                     "Could not hook \(function). The internal backend does not support function hooking"
                 )
-            case let .method(cls, sel, replacement, completion):
-                completion(hookMethod(cls: cls, sel: sel, replacement: replacement))
+            case let .method(cls, sel, replacement, saveOrig):
+                saveOrig(hookMethod(cls: cls, sel: sel, replacement: replacement))
             }
         }
     }

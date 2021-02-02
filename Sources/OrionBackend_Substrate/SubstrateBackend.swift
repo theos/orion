@@ -49,9 +49,9 @@ extension Backends.Substrate {
         }
     }
 
-    public func apply(hooks: [HookDescriptor]) {
+    public func apply(descriptors: [HookDescriptor]) {
         var imageFetcher = ImageFetcher()
-        hooks.forEach {
+        descriptors.forEach {
             switch $0 {
             case let .function(function, replacement, completion):
                 guard let symbol = address(for: function, fetcher: &imageFetcher) else {

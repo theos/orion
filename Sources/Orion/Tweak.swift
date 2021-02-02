@@ -15,15 +15,17 @@ public protocol Tweak {
 
     /// The tweak's initializer and entry point.
     ///
-    /// Use this method to perform any custom initialization behavior.
+    /// Use this method to perform any custom initialization behavior before
+    /// `DefaultGroup` is activated. To perform initialization behavior after
+    /// `DefaultGroup` is activated, implement `tweakDidActivate()` instead.
     ///
     /// - Warning: This method is called at launch time, even before `main`
     /// has been invoked. Do not synchronously perform any time-consuming
     /// tasks here, because they will make the target process launch slowly.
     init()
 
-    /// Called after all of the tweak's hooks have been activated. The
-    /// default implementation does nothing.
+    /// Called after all of the tweak's hooks that are in `DefaultGroup` have
+    /// been activated. The default implementation does nothing.
     func tweakDidActivate()
 
 }
@@ -33,7 +35,7 @@ extension Tweak {
     /// Activates the tweak. Do not call this yourself.
     ///
     /// :nodoc:
-    public func activate<BackendType: Backend>(backend: BackendType, hooks: [_AnyGlueHook.Type]) {
+    public static func activate<BackendType: Backend>(backend: BackendType, hooks: [_AnyGlueHook.Type]) {
         #if SWIFT_PACKAGE
         // this is effectively a no-op but we need it in order to prevent the
         // compiler from stripping out the constructor because it doesn't see
@@ -41,11 +43,11 @@ extension Tweak {
         _orion_init_c()
         #endif
 
-        let hooksToActivate = hooks.filter { $0.hookWillActivate() }
-        backend.apply(hooks: hooksToActivate.flatMap { $0.activate() })
-        hooksToActivate.forEach { $0.hookDidActivate() }
+        let defaultHooks = GroupRegistry.shared.register(hooks, withBackend: backend)
 
-        tweakDidActivate()
+        let tweak = Self()
+        backend.activate(hooks: defaultHooks)
+        tweak.tweakDidActivate()
     }
 
     public func tweakDidActivate() {}
@@ -62,7 +64,7 @@ public protocol TweakWithBackend: Tweak {
     associatedtype BackendType: Backend
 
     /// The custom `Backend`.
-    var backend: BackendType { get }
+    static var backend: BackendType { get }
 
 }
 
@@ -71,7 +73,7 @@ extension TweakWithBackend {
     /// Activates the tweak. Do not call this yourself.
     ///
     /// :nodoc:
-    public func activate(hooks: [_AnyGlueHook.Type]) {
+    public static func activate(hooks: [_AnyGlueHook.Type]) {
         activate(backend: backend, hooks: hooks)
     }
 
@@ -79,7 +81,7 @@ extension TweakWithBackend {
 
 /// The default implementation of `Tweak`.
 ///
-/// This type has no special behavior.
+/// This type simply consists of an empty initializer.
 public struct DefaultTweak: Tweak {
     public init() {}
 }

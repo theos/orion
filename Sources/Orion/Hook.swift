@@ -1,9 +1,12 @@
 import Foundation
 
-/// The base protocol for all hook types. Do not use this directly.
+/// The base existential protocol for all hook types. Do not use this directly.
 ///
-/// - See: `ClassHook` and `FunctionHook`.
-public protocol AnyHook {
+/// - See: `AnyHook`, `ClassHook`, and `FunctionHook`.
+public protocol AnyHookBase {
+    // This protocol should never have any Self/PAT requirements, to allow it to be
+    // usable as an existential. To add a Self/PAT requirement, use `AnyHook`.
+
     // these are named hook[Will|Did]Activate instead of [will|did]Activate because
     // they're special cased in the generator so that in class hooks, we don't end
     // up thinking the user wants to hook methods by those names in the target class.
@@ -25,7 +28,28 @@ public protocol AnyHook {
     static func hookDidActivate()
 }
 
-extension AnyHook {
+/// Additional protocol requirements for hooks, beyond those of `AnyHookBase`.
+/// Do not use this directly.
+///
+/// - See: `AnyHookBase`, `ClassHook`, and `FunctionHook`.
+public protocol AnyHook: AnyHookBase {
+
+    /// The `HookGroup` to which this hook is assigned.
+    ///
+    /// Defaults to `DefaultGroup`.
+    ///
+    /// - See: `HookGroup`
+    associatedtype Group: HookGroup = DefaultGroup
+
+    /// The `HookGroup` associated with this hook type.
+    ///
+    /// Do not attempt to implement this yourself; use the default
+    /// implementation.
+    static var group: Group { get }
+
+}
+
+extension AnyHookBase {
     public static func hookWillActivate() -> Bool { true }
     public static func hookDidActivate() {}
 }
@@ -34,9 +58,18 @@ extension AnyHook {
 /// this directly.
 ///
 /// :nodoc:
-public protocol _AnyGlueHook: AnyHook {
+public protocol _AnyGlueHook: AnyHookBase {
 
     /// Activates the hook. Do not call this directly.
     static func activate() -> [HookDescriptor]
 
+    /// The type-erased `HookGroup` associated with this hook. Do
+    /// not use this yourself.
+    static var groupType: HookGroup.Type { get }
+
+}
+
+/// :nodoc:
+extension _AnyGlueHook where Self: AnyHook {
+    public static var groupType: HookGroup.Type { Group.self }
 }

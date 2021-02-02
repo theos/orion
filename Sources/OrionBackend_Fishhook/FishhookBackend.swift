@@ -4,6 +4,8 @@ import Foundation
 import Orion
 #endif
 
+private let hookingQueue = DispatchQueue(label: "fishhook-hooking-queue")
+
 extension Backends {
 
     /// A backend which uses Fishhook to hook functions.
@@ -40,7 +42,7 @@ extension Backends.Fishhook {
         let symbol: String
         let replacement: UnsafeMutableRawPointer
         let image: URL?
-        let completion: (UnsafeMutableRawPointer) -> Void
+        let saveOrig: (UnsafeMutableRawPointer) -> Void
     }
 
     private func apply(functionHookRequests requests: [Request]) {
@@ -74,6 +76,14 @@ extension Backends.Fishhook {
                 orionError("Could not find function \(function)")
             }
 
+            // we can't call this in the completion handler because if we don't set
+            // it right away, it leaves the hooked function in a partially hooked
+            // state where the orig hasn't been saved yet but the hook has been applied,
+            // and so if the function is used by fishhook itself before the completion is
+            // called, it'll lead to infinite recursion. This can be seen, for example, when
+            // hooking strcmp.
+            request.saveOrig(orig)
+
             rebindings.append(rebinding(
                 // Turns out fishhook doesn't copy this string so we're responsible for keeping
                 // it alive, because the rebindings are stored globally, and are accessed not
@@ -93,7 +103,6 @@ extension Backends.Fishhook {
                 guard brokenOrig != nil else {
                     orionError("Failed to hook function \(function)")
                 }
-                request.completion(orig)
             }
         }
 
@@ -103,33 +112,36 @@ extension Backends.Fishhook {
         zip(completions, origs).forEach { $0($1) }
     }
 
-    public func apply(hooks: [HookDescriptor]) {
+    public func apply(descriptors: [HookDescriptor]) {
         var requests: [Request] = []
-        var forwardedHooks: [HookDescriptor] = []
+        var forwardedDescriptors: [HookDescriptor] = []
 
-        hooks.forEach {
+        descriptors.forEach {
             switch $0 {
             case .function(.address, _, _):
                 orionError("""
                 The fishhook backend cannot hook functions at raw addresses. If possible, provide \
                 a symbol name and image instead.
                 """)
-            case let .function(.symbol(symbol, image: image), replacement, completion):
+            case let .function(.symbol(symbol, image: image), replacement, saveOrig):
                 requests.append(
                     Request(
                         symbol: symbol,
                         replacement: replacement,
                         image: image,
-                        completion: completion
+                        saveOrig: saveOrig
                     )
                 )
             default:
-                forwardedHooks.append($0)
+                forwardedDescriptors.append($0)
             }
         }
 
-        underlyingBackend.apply(hooks: forwardedHooks)
-        apply(functionHookRequests: requests)
+        underlyingBackend.apply(descriptors: forwardedDescriptors)
+
+        hookingQueue.sync {
+            apply(functionHookRequests: requests)
+        }
     }
 
 }

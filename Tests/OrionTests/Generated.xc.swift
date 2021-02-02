@@ -6,7 +6,7 @@ import OrionBackend_Fishhook
 import OrionTestSupport
 
 extension BasicHook {
-    public static let _target: BasicClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook1: BasicHook, _GlueClassHook {
@@ -61,7 +61,7 @@ private class Orion_ClassHook1: BasicHook, _GlueClassHook {
 }
 
 extension ActivationHook {
-    public static let _target: BasicClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook2: ActivationHook, _GlueClassHook {
@@ -88,7 +88,7 @@ private class Orion_ClassHook2: ActivationHook, _GlueClassHook {
 }
 
 extension NotHook {
-    public static let _target: BasicClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook3: NotHook, _GlueClassHook {
@@ -115,7 +115,7 @@ private class Orion_ClassHook3: NotHook, _GlueClassHook {
 }
 
 extension NamedBasicHook {
-    public static let _target: NSObject.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook4: NamedBasicHook, _GlueClassHook {
@@ -156,7 +156,7 @@ private class Orion_ClassHook4: NamedBasicHook, _GlueClassHook {
 }
 
 extension BasicSubclass {
-    public static let _target: BasicClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook5: BasicSubclass, _GlueClassHook {
@@ -217,7 +217,7 @@ private class Orion_ClassHook5: BasicSubclass, _GlueClassHook {
 }
 
 extension NamedBasicSubclass {
-    public static let _target: NSObject.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook6: NamedBasicSubclass, _GlueClassHook {
@@ -258,7 +258,7 @@ private class Orion_ClassHook6: NamedBasicSubclass, _GlueClassHook {
 }
 
 extension AdditionHook {
-    public static let _target: BasicClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook7: AdditionHook, _GlueClassHook {
@@ -283,7 +283,7 @@ private class Orion_ClassHook7: AdditionHook, _GlueClassHook {
 }
 
 extension InheritedHook {
-    public static let _target: InheritedClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook8: InheritedHook, _GlueClassHook {
@@ -310,7 +310,7 @@ private class Orion_ClassHook8: InheritedHook, _GlueClassHook {
 }
 
 extension InitHook {
-    public static let _target: InitClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook9: InitHook, _GlueClassHook {
@@ -351,7 +351,7 @@ private class Orion_ClassHook9: InitHook, _GlueClassHook {
 }
 
 extension SuperHook {
-    public static let _target: MyClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook10: SuperHook, _GlueClassHook {
@@ -392,7 +392,7 @@ private class Orion_ClassHook10: SuperHook, _GlueClassHook {
 }
 
 extension PropertyHookX {
-    public static let _target: PropertyClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook11: PropertyHookX, _GlueClassHook {
@@ -433,7 +433,7 @@ private class Orion_ClassHook11: PropertyHookX, _GlueClassHook {
 }
 
 extension PropertyHookY {
-    public static let _target: PropertyClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook12: PropertyHookY, _GlueClassHook {
@@ -474,7 +474,7 @@ private class Orion_ClassHook12: PropertyHookY, _GlueClassHook {
 }
 
 extension PropertyHook2 {
-    public static let _target: PropertyClass2.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook13: PropertyHook2, _GlueClassHook {
@@ -515,7 +515,7 @@ private class Orion_ClassHook13: PropertyHook2, _GlueClassHook {
 }
 
 extension DeHook {
-    public static let _target: DeClass.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook14: DeHook, _GlueClassHook {
@@ -539,7 +539,7 @@ private class Orion_ClassHook14: DeHook, _GlueClassHook {
 }
 
 extension DeSubHook1 {
-    public static let _target: DeSubclass1.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook15: DeSubHook1, _GlueClassHook {
@@ -555,7 +555,7 @@ private class Orion_ClassHook15: DeSubHook1, _GlueClassHook {
 }
 
 extension DeSubHook2 {
-    public static let _target: DeSubclass2.Type = _initializeTargetType()
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_ClassHook16: DeSubHook2, _GlueClassHook {
@@ -578,6 +578,91 @@ private class Orion_ClassHook16: DeSubHook2, _GlueClassHook {
     }
 }
 
+extension GrHook {
+    public static let _storage = _initializeStorage()
+}
+
+private class Orion_ClassHook17: GrHook, _GlueClassHook {
+    final class OrigType: Orion_ClassHook17 {
+        @objc override func myString() -> String {
+            Self.orion_orig1(target, Self.orion_sel1)
+        }
+    }
+
+    final class SuprType: Orion_ClassHook17 {
+        @objc override func myString() -> String {
+            callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, Self.orion_sel1) }
+        }
+    }
+
+    private static let orion_sel1 = #selector(myString as (Self) -> () -> String)
+    private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
+        Orion_ClassHook17(target: target).myString()
+    }
+
+    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder) {
+        builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+    }
+}
+
+extension GrHook2 {
+    public static let _storage = _initializeStorage()
+}
+
+private class Orion_ClassHook18: GrHook2, _GlueClassHook {
+    final class OrigType: Orion_ClassHook18 {
+        @objc override func mySecondString() -> String {
+            Self.orion_orig1(target, Self.orion_sel1)
+        }
+    }
+
+    final class SuprType: Orion_ClassHook18 {
+        @objc override func mySecondString() -> String {
+            callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, Self.orion_sel1) }
+        }
+    }
+
+    private static let orion_sel1 = #selector(mySecondString as (Self) -> () -> String)
+    private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
+        Orion_ClassHook18(target: target).mySecondString()
+    }
+
+    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder) {
+        builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+    }
+}
+
+extension GrHook3 {
+    public static let _storage = _initializeStorage()
+}
+
+private class Orion_ClassHook19: GrHook3, _GlueClassHook {
+    final class OrigType: Orion_ClassHook19 {
+        @objc override func myThirdString() -> String {
+            Self.orion_orig1(target, Self.orion_sel1)
+        }
+    }
+
+    final class SuprType: Orion_ClassHook19 {
+        @objc override func myThirdString() -> String {
+            callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, Self.orion_sel1) }
+        }
+    }
+
+    private static let orion_sel1 = #selector(myThirdString as (Self) -> () -> String)
+    private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
+        Orion_ClassHook19(target: target).myThirdString()
+    }
+
+    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder) {
+        builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+    }
+}
+
+extension AtoiHook {
+    public static let _storage = _initializeStorage()
+}
+
 private class Orion_FunctionHook1: AtoiHook, _GlueFunctionHook {
     static let orion_shared = Orion_FunctionHook1()
 
@@ -590,6 +675,10 @@ private class Orion_FunctionHook1: AtoiHook, _GlueFunctionHook {
             Self.origFunction(arg1)
         }
     }
+}
+
+extension AtofHook {
+    public static let _storage = _initializeStorage()
 }
 
 private class Orion_FunctionHook2: AtofHook, _GlueFunctionHook {
@@ -606,9 +695,27 @@ private class Orion_FunctionHook2: AtofHook, _GlueFunctionHook {
     }
 }
 
+extension StringCompareHook {
+    public static let _storage = _initializeStorage()
+}
+
+private class Orion_FunctionHook3: StringCompareHook, _GlueFunctionHook {
+    static let orion_shared = Orion_FunctionHook3()
+
+    static var origFunction: @convention(c) (UnsafePointer<Int8>?, UnsafePointer<Int8>?) -> Int32 = { arg1, arg2 in
+        Orion_FunctionHook3.orion_shared.function(_:_:)(arg1, arg2)
+    }
+
+    final class OrigType: Orion_FunctionHook3 {
+        override func function(_ arg1: UnsafePointer<Int8>?, _ arg2: UnsafePointer<Int8>?) -> Int32 {
+            Self.origFunction(arg1, arg2)
+        }
+    }
+}
+
 @_cdecl("orion_init")
 func orion_init() {
-    HooksTweak().activate(
+    HooksTweak.activate(
         hooks: [
             Orion_ClassHook1.self,
             Orion_ClassHook2.self,
@@ -626,8 +733,12 @@ func orion_init() {
             Orion_ClassHook14.self,
             Orion_ClassHook15.self,
             Orion_ClassHook16.self,
+            Orion_ClassHook17.self,
+            Orion_ClassHook18.self,
+            Orion_ClassHook19.self,
             Orion_FunctionHook1.self,
-            Orion_FunctionHook2.self
+            Orion_FunctionHook2.self,
+            Orion_FunctionHook3.self
         ]
     )
 }

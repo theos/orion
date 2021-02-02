@@ -3,8 +3,8 @@ import Foundation
 /// A type describing a single hook.
 public enum HookDescriptor {
 
-    /// The completion handler type. The closure is passed the original implementation.
-    public typealias Completion = (UnsafeMutableRawPointer) -> Void
+    /// A closure used to save the original implementation.
+    public typealias SaveOrig = (UnsafeMutableRawPointer) -> Void
 
     /// A method hook.
     ///
@@ -12,13 +12,19 @@ public enum HookDescriptor {
     /// function which takes `self: AnyObject` and `_cmd: Selector` as its first two arguments.
     /// The remaining argument types should be the argument types of the hooked Objective-C method
     /// in order, and the return type should be the return type of the method.
-    case method(cls: AnyClass, sel: Selector, replacement: UnsafeMutableRawPointer, completion: Completion)
+    ///
+    /// `saveOrig` is a closure which will be passed the original method implementation when the
+    /// hook is applied.
+    case method(cls: AnyClass, sel: Selector, replacement: UnsafeMutableRawPointer, saveOrig: SaveOrig)
 
     /// A function hook.
     ///
     /// `replacement` should be a `@convention(c)` function with the same signature as the function
     /// which is to be hooked.
-    case function(function: Function, replacement: UnsafeMutableRawPointer, completion: Completion)
+    ///
+    /// `saveOrig` is a closure which will be passed the original function implementation when the
+    /// hook is applied.
+    case function(function: Function, replacement: UnsafeMutableRawPointer, saveOrig: SaveOrig)
 
 }
 
@@ -48,9 +54,17 @@ public protocol Backend {
 
     /// Hooks the provided functions and methods.
     ///
-    /// - Parameter hooks: The descriptors for the hooks to be applied.
-    func apply(hooks: [HookDescriptor])
+    /// - Parameter descriptors: The descriptors for the hooks to be applied.
+    func apply(descriptors: [HookDescriptor])
 
+}
+
+extension Backend {
+    func activate(hooks: [_AnyGlueHook.Type]) {
+        let hooksToActivate = hooks.filter { $0.hookWillActivate() }
+        apply(descriptors: hooksToActivate.flatMap { $0.activate() })
+        hooksToActivate.forEach { $0.hookDidActivate() }
+    }
 }
 
 extension Backend {
@@ -70,7 +84,7 @@ extension Backend {
         // NOTE: We can't declare `code` inside the block because `completion` is only
         // guaranteed to have been called once `hook` is complete
         var orig: UnsafeMutableRawPointer?
-        apply(hooks: [.function(function: function, replacement: replacement) { orig = $0 }])
+        apply(descriptors: [.function(function: function, replacement: replacement) { orig = $0 }])
         guard let unwrapped = orig
             else { orionError("Hook builder did not call function hook completion") }
         return unwrapped
@@ -91,7 +105,7 @@ extension Backend {
     /// may be able to optimize batch hooking.
     public func hookMethod(cls: AnyClass, sel: Selector, replacement: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
         var orig: UnsafeMutableRawPointer?
-        apply(hooks: [.method(cls: cls, sel: sel, replacement: replacement) { orig = $0 }])
+        apply(descriptors: [.method(cls: cls, sel: sel, replacement: replacement) { orig = $0 }])
         guard let unwrapped = orig
             else { orionError("Hook builder did not call method hook completion") }
         return unwrapped

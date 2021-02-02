@@ -25,6 +25,27 @@ public enum SubclassMode {
 
 }
 
+/// Internal storage associated with a `ClassHook`. Do not use this yourself.
+///
+/// :nodoc:
+public final class _ClassHookStorage {
+    let hookType: AnyClass
+    @LazyAtomic private(set) var targetType: AnyObject.Type
+    @LazyAtomic private(set) var group: HookGroup
+
+    // additional fields may be added here in the future
+
+    init(
+        hookType: AnyClass,
+        loadTargetType: @escaping () -> AnyObject.Type,
+        loadGroup: @escaping () -> HookGroup
+    ) {
+        self.hookType = hookType
+        _targetType = LazyAtomic(wrappedValue: loadTargetType())
+        _group = LazyAtomic(wrappedValue: loadGroup())
+    }
+}
+
 /// The protocol to which class hooks conform. Do not conform to this
 /// directly; use `ClassHook`.
 public protocol ClassHookProtocol: class, AnyHook {
@@ -36,16 +57,19 @@ public protocol ClassHookProtocol: class, AnyHook {
     /// its inheritance chain.
     associatedtype Target: AnyObject
 
-    /// The storage for the underlying target. Do not implement
-    /// or use this yourself.
+    /// Internal storage associated with the class hook.
+    /// Do not implement or use this yourself.
     ///
     /// :nodoc:
-    static var _target: Target.Type { get }
+    static var _storage: _ClassHookStorage { get }
 
     /// The name of the target class, or the empty string to use `Target.self`.
     ///
     /// This class must be `Target` or a subclass of `Target`. Defaults to
     /// an empty string.
+    ///
+    /// - Warning: Do not attempt to access `target` in the getter for this property,
+    /// as that will lead to infinite recursion.
     static var targetName: String { get }
 
     /// If this is not `.none`, it indicates that this hook creates a subclass.
@@ -55,15 +79,23 @@ public protocol ClassHookProtocol: class, AnyHook {
     ///
     /// This property is implemented by creating a new class pair on top of the
     /// original target, when the property is not `.none`.
+    ///
+    /// - Warning: Do not attempt to access `target` in the getter for this property,
+    /// as that will lead to infinite recursion.
     static var subclassMode: SubclassMode { get }
 
     /// An array of protocols which should be added to the target class.
     ///
     /// The default value is an empty array.
+    ///
+    /// - Warning: Do not attempt to access `target` in the getter for this property,
+    /// as that will lead to infinite recursion.
     static var protocols: [Protocol] { get }
 
     /// The current instance of the hooked class, upon which a hooked method
     /// has been called.
+    ///
+    /// Do not attempt to implement this yourself; use the default implementation.
     var target: Target { get }
 
     /// Initializes the type with the provided target instance. Do not invoke
@@ -91,8 +123,8 @@ extension ClassHookProtocol {
 
     public static var targetName: String { "" }
 
-    public static var _target: Target.Type {
-        orionError("Could not get target. Has the Orion glue file been compiled?")
+    public static var _storage: _ClassHookStorage {
+        orionError("Could not retrieve class hook storage. Has the Orion glue file been compiled?")
     }
 
     public static var subclassMode: SubclassMode { .none }
@@ -240,9 +272,19 @@ extension ClassHookProtocol {
 ///
 public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHookProtocol
 // swiftlint:enable line_length
-// we don't declare _ClassHookProtocol conformance on _ClassHookClass directly since that would
-// result in _ClassHookClass inheriting the default implementations of _ClassHookProtocol and
-// _AnyHook requirements, making it more difficult to override them
+// we don't declare ClassHookProtocol conformance on ClassHookClass directly since that would
+// result in ClassHookClass inheriting the default implementations of ClassHookProtocol and
+// AnyHook requirements, making it more difficult to override them
+
+/// :nodoc:
+extension ClassHookProtocol {
+    public static var group: Group {
+        guard let group = _storage.group as? Group else {
+            orionError("Got unexpected group type from \(self)._storage")
+        }
+        return group
+    }
+}
 
 extension ClassHookProtocol {
 
@@ -250,22 +292,33 @@ extension ClassHookProtocol {
     /// `subclassMode`).
     public static var target: Target.Type {
         // this is in an extension so users can't accidentally override it
-        _target
+        guard let target = _storage.targetType as? Target.Type else {
+            orionError("Got unexpected target type from \(self)._storage")
+        }
+        return target
     }
 
-    /// Initializes the target. Do not call this yourself.
-    ///
-    /// Since this may be expensive, rather than using a computed prop, when
-    /// accessing the static `target` this function is only called once and
-    /// cached by the glue.
+    /// Initializes the hook's internal storage. Do not call this yourself.
     ///
     /// :nodoc:
-    public static func _initializeTargetType() -> Target.Type {
+    public static func _initializeStorage() -> _ClassHookStorage {
+        // this gives us the type of the user's hook rather than
+        // our concrete subclass
+        _ClassHookStorage(
+            hookType: self,
+            loadTargetType: initializeTargetType,
+            loadGroup: loadGroup
+        )
+    }
+
+    // since `target` is referred to in `activate()`, this will deterministically be called
+    // when a class hook is activated.
+    private static func initializeTargetType() -> Target.Type {
         let targetName = self.targetName // only call getter once
         let baseTarget = targetName.isEmpty ? Target.self : Dynamic(targetName).as(type: Target.self)
 
         let target: Target.Type
-        if let subclassName = subclassMode.subclassName(withType: self) {
+        if let subclassName = subclassMode.subclassName(withType: _storage.hookType) {
             guard let pair: AnyClass = objc_allocateClassPair(baseTarget, subclassName, 0)
                 else { orionError("Could not allocate subclass for \(self)") }
             objc_registerClassPair(pair)
@@ -353,12 +406,12 @@ public struct _ClassHookBuilder {
         _ sel: Selector,
         _ replacement: Code,
         isClassMethod: Bool,
-        completion: @escaping (Code) -> Void
+        saveOrig: @escaping (Code) -> Void
     ) {
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
         descriptors.append(
             .method(cls: cls, sel: sel, replacement: unsafeBitCast(replacement, to: UnsafeMutableRawPointer.self)) {
-                completion(unsafeBitCast($0, to: Code.self))
+                saveOrig(unsafeBitCast($0, to: Code.self))
             }
         )
     }

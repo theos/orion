@@ -183,7 +183,7 @@ public final class OrionGenerator {
 
         let hook = """
         extension \(classHook.name) {
-            public static let _target: \(classHook.target).Type = _initializeTargetType()
+            public static let _storage = _initializeStorage()
         }
 
         private class \(className): \(classHook.name), _GlueClassHook {
@@ -207,6 +207,10 @@ public final class OrionGenerator {
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
         let hook = """
+        extension \(functionHook.name) {
+            public static let _storage = _initializeStorage()
+        }
+
         private class \(className): \(functionHook.name), _GlueFunctionHook {
             static let \(shared) = \(className)()
 
@@ -285,7 +289,7 @@ public final class OrionGenerator {
         \(importBackend)\
         @_cdecl("orion_init")
         func orion_init() {
-            \(tweakName)().activate(
+            \(tweakName).activate(
         \(hasCustomBackend ? "" : "        backend: Backends.\(backend.name)(),\n")\
                 hooks: [
                     \(allHooks)

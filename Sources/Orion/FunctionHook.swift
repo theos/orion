@@ -38,6 +38,17 @@ public enum Function: CustomStringConvertible {
     }
 }
 
+/// Internal storage associated with a `FunctionHook`. Do not use this yourself.
+///
+/// :nodoc:
+public final class _FunctionHookStorage {
+    @LazyAtomic private(set) var group: HookGroup
+
+    init(loadGroup: @escaping () -> HookGroup) {
+        _group = LazyAtomic(wrappedValue: loadGroup())
+    }
+}
+
 /// The protocol to which function hooks conform. Do not conform to this
 /// directly; use `FunctionHook`.
 public protocol FunctionHookProtocol: class, AnyHook {
@@ -45,11 +56,41 @@ public protocol FunctionHookProtocol: class, AnyHook {
     /// The function which is to be hooked.
     static var target: Function { get }
 
+    /// Internal storage associated with the function hook.
+    /// Do not implement or use this yourself.
+    ///
+    /// :nodoc:
+    static var _storage: _FunctionHookStorage { get }
+
     /// Initialize the function hook type. Do not invoke or override this;
-    /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for lifecycle
-    /// events.
+    /// use `AnyHookBase.hookWillActivate()` or `AnyHookBase.hookDidActivate()`
+    /// for lifecycle events.
     init()
 
+}
+
+/// :nodoc:
+extension FunctionHookProtocol {
+    public static var _storage: _FunctionHookStorage {
+        orionError("Could not retrieve function hook storage. Has the Orion glue file been compiled?")
+    }
+
+    /// Initializes the hook's internal storage. Do not call this yourself.
+    ///
+    /// :nodoc:
+    public static func _initializeStorage() -> _FunctionHookStorage {
+        _FunctionHookStorage(loadGroup: loadGroup)
+    }
+}
+
+/// :nodoc:
+extension FunctionHookProtocol {
+    public static var group: Group {
+        guard let group = _storage.group as? Group else {
+            orionError("Got unexpected group type from \(self)._storage")
+        }
+        return group
+    }
 }
 
 /// The class which all function hooks inherit from. Do not subclass
@@ -59,8 +100,8 @@ public protocol FunctionHookProtocol: class, AnyHook {
 open class FunctionHookClass {
 
     /// Initialize the function hook type. Do not invoke or override this;
-    /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for lifecycle
-    /// events.
+    /// use `AnyHookBase.hookWillActivate()` or `AnyHookBase.hookDidActivate()`
+    /// for lifecycle events.
     required public init() {}
 
 }
