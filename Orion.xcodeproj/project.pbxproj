@@ -259,8 +259,10 @@
 			buildPhases = (
 				567AF4F32536817C0056182E /* Run SwiftLint If Present */,
 				5689748A252BB9C6006F48E9 /* Headers */,
+				5648210A25C9B7C300339957 /* Build CLI if Needed */,
 				5689748B252BB9C6006F48E9 /* Sources */,
 				5689748C252BB9C6006F48E9 /* Frameworks */,
+				5648211025C9BA6A00339957 /* Copy CLI if Needed */,
 				5689748D252BB9C6006F48E9 /* Resources */,
 			);
 			buildRules = (
@@ -315,6 +317,45 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5648210A25C9B7C300339957 /* Build CLI if Needed */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Sources/OrionProcessor",
+				"$(SRCROOT)/Sources/OrionProcessorCLI",
+				"$(SRCROOT)/Package.swift",
+			);
+			name = "Build CLI if Needed";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "[[ \"${COPY_CLI}\" == \"YES\" ]] || exit 0\n[[ \"${CONFIGURATION}\" == \"Debug\" ]] && conf=\"debug\" || conf=\"release\"\nswift build --package-path \"${SRCROOT}\" -c \"${conf}\"\n";
+		};
+		5648211025C9BA6A00339957 /* Copy CLI if Needed */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy CLI if Needed";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "[[ \"${COPY_CLI}\" == \"YES\" ]] || exit 0\n[[ \"${CONFIGURATION}\" == \"Debug\" ]] && conf=\"debug\" || conf=\"release\"\norion=\"$(swift build --package-path \"${SRCROOT}\" -c \"${conf}\" --show-bin-path)/orion\"\n\ncp \"${orion}\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+		};
 		567AF4F32536817C0056182E /* Run SwiftLint If Present */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -492,6 +533,7 @@
 		56897498252BB9C6006F48E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = macosx;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
@@ -500,6 +542,8 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				COPY_CLI = NO;
+				"COPY_CLI[sdk=macosx*]" = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -539,6 +583,7 @@
 		56897499252BB9C6006F48E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = macosx;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
@@ -547,6 +592,8 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				COPY_CLI = NO;
+				"COPY_CLI[sdk=macosx*]" = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;

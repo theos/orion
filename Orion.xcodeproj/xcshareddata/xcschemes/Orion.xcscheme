@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OrionProcessor"
-               BuildableName = "OrionProcessor"
-               BlueprintName = "OrionProcessor"
-               ReferencedContainer = "container:">
+               BlueprintIdentifier = "5689748E252BB9C6006F48E9"
+               BuildableName = "Orion.framework"
+               BlueprintName = "Orion"
+               ReferencedContainer = "container:Orion.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -50,10 +50,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "OrionProcessor"
-            BuildableName = "OrionProcessor"
-            BlueprintName = "OrionProcessor"
-            ReferencedContainer = "container:">
+            BlueprintIdentifier = "5689748E252BB9C6006F48E9"
+            BuildableName = "Orion.framework"
+            BlueprintName = "Orion"
+            ReferencedContainer = "container:Orion.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
