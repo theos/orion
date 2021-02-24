@@ -533,7 +533,6 @@
 		56897498252BB9C6006F48E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ADDITIONAL_SDKS = macosx;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
@@ -583,7 +582,6 @@
 		56897499252BB9C6006F48E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ADDITIONAL_SDKS = macosx;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
