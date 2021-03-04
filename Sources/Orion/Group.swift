@@ -121,7 +121,7 @@ class GroupRegistry {
     private init() {}
 
     // returns default hooks which should be activated immediately
-    func register(_ hooks: [_AnyGlueHook.Type], withBackend backend: Backend) -> [_AnyGlueHook.Type] {
+    func register(_ hooks: [_GlueAnyHook.Type], withBackend backend: Backend) -> [_GlueAnyHook.Type] {
         var newGroups = Dictionary(grouping: hooks) { $0.groupType.id }
         let defaultHooks = newGroups.removeValue(forKey: DefaultGroup.id)
         if !newGroups.isEmpty {

@@ -84,13 +84,38 @@ public func orionError(
     }
 }
 
+@inlinable func alwaysFalse() -> Bool { false }
+
+/// Disables a spurious warning emitted by the Swift compiler in
+/// hooked methods that call their original implementations.
+///
+/// When the glue file has not been compiled, Swift warns that
+/// calls to `orig.foo()` will always recurse. We, however, know
+/// that the glue file _will_ eventually be compiled and so the
+/// warning is incorrect. This method suppresses that warning.
+///
+/// Since the function is `@_transparent`, Swift includes the
+/// `orionError(...)` path in its control flow analysis of the caller,
+/// which causes Swift to think that there is indeed a non-recursive
+/// path for the function, suppressing the warning. Furthermore, since
+/// `alwaysFalse()` isn't transparent, Swift doesn't go deep enough
+/// while computing the warning to realize that the branch will never
+/// execute, however the optimizer does indeed see this since the code
+/// is still inlined, and therefore the method call is entirely
+/// optimized out.
+@_transparent @inlinable func disableRecursionCheck() {
+    if alwaysFalse() {
+        orionError("should never be executed")
+    }
+}
+
 // TODO: Use this
 
 // usage: someOptional !! "Error message"
 infix operator !!: CastingPrecedence
 
 extension Optional {
-    static func !! (lhs: Self, message: @autoclosure () -> String) -> Wrapped {
+    @inlinable static func !! (lhs: Self, message: @autoclosure () -> String) -> Wrapped {
         switch lhs {
         case .some(let unwrapped):
             return unwrapped

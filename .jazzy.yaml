@@ -33,7 +33,6 @@ custom_categories:
   - name: All Hooks
     children:
       - AnyHook
-      - AnyHookBase
   - name: Groups
     children:
       - HookGroup

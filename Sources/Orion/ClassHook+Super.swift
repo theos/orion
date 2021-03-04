@@ -47,7 +47,7 @@ enum MessageSendSuperType {
 }
 
 /// :nodoc:
-extension _GlueClassHook {
+extension _GlueClassHookTrampoline {
     private static func callSuper<ReturnType, MessageType>(
         _ type: MessageType.Type,
         receiver: Any,

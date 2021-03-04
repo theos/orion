@@ -38,59 +38,27 @@ public enum Function: CustomStringConvertible {
     }
 }
 
-/// Internal storage associated with a `FunctionHook`. Do not use this yourself.
-///
-/// :nodoc:
-public final class _FunctionHookStorage {
-    @LazyAtomic private(set) var group: HookGroup
-
-    init(loadGroup: @escaping () -> HookGroup) {
-        _group = LazyAtomic(wrappedValue: loadGroup())
-    }
-}
-
 /// The protocol to which function hooks conform. Do not conform to this
 /// directly; use `FunctionHook`.
 public protocol FunctionHookProtocol: class, AnyHook {
 
+    /// The glue type associated with this hook. Do not implement or use
+    /// this yourself.
+    ///
+    /// - See: `_GlueAnyHook`
+    ///
+    /// :nodoc:
+    associatedtype _Glue: _GlueFunctionHook = _GlueFunctionHookPlaceholder<Self>
+        where _Glue.HookType == Self
+
     /// The function which is to be hooked.
     static var target: Function { get }
 
-    /// Internal storage associated with the function hook.
-    /// Do not implement or use this yourself.
-    ///
-    /// :nodoc:
-    static var _storage: _FunctionHookStorage { get }
-
     /// Initialize the function hook type. Do not invoke or override this;
-    /// use `AnyHookBase.hookWillActivate()` or `AnyHookBase.hookDidActivate()`
-    /// for lifecycle events.
+    /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for
+    /// lifecycle events.
     init()
 
-}
-
-/// :nodoc:
-extension FunctionHookProtocol {
-    public static var _storage: _FunctionHookStorage {
-        orionError("Could not retrieve function hook storage. Has the Orion glue file been compiled?")
-    }
-
-    /// Initializes the hook's internal storage. Do not call this yourself.
-    ///
-    /// :nodoc:
-    public static func _initializeStorage() -> _FunctionHookStorage {
-        _FunctionHookStorage(loadGroup: loadGroup)
-    }
-}
-
-/// :nodoc:
-extension FunctionHookProtocol {
-    public static var group: Group {
-        guard let group = _storage.group as? Group else {
-            orionError("Got unexpected group type from \(self)._storage")
-        }
-        return group
-    }
 }
 
 /// The class which all function hooks inherit from. Do not subclass
@@ -100,8 +68,8 @@ extension FunctionHookProtocol {
 open class FunctionHookClass {
 
     /// Initialize the function hook type. Do not invoke or override this;
-    /// use `AnyHookBase.hookWillActivate()` or `AnyHookBase.hookDidActivate()`
-    /// for lifecycle events.
+    /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for
+    /// lifecycle events.
     required public init() {}
 
 }
@@ -135,14 +103,6 @@ open class FunctionHookClass {
 /// ```
 public typealias FunctionHook = FunctionHookClass & FunctionHookProtocol
 
-/// An existential for glue function hooks. Do not use this directly.
-///
-/// :nodoc:
-public protocol _AnyGlueFunctionHook {
-    static var _orig: AnyClass { get }
-    var _orig: AnyObject { get }
-}
-
 extension FunctionHookProtocol {
 
     /// A proxy which allows invoking the original function.
@@ -154,32 +114,20 @@ extension FunctionHookProtocol {
     /// information on how this is used.
     @_transparent
     public var orig: Self {
-        guard let unwrapped = (self as? _AnyGlueFunctionHook)?._orig as? Self
+        disableRecursionCheck()
+        guard let unwrapped = _Glue.OrigType() as? Self
             else { orionError("Could not get orig") }
         return unwrapped
     }
 
 }
 
-/// A concrete function hook, implemented in the glue file. Do not use
-/// this directly.
-///
 /// :nodoc:
-public protocol _GlueFunctionHook: _AnyGlueFunctionHook, FunctionHookProtocol, _AnyGlueHook {
-    associatedtype Code
-    static var origFunction: Code { get set }
-
-    associatedtype OrigType: FunctionHookProtocol
-}
-
-/// :nodoc:
-extension _GlueFunctionHook {
-    public static func activate() -> [HookDescriptor] {
-        [.function(function: target, replacement: unsafeBitCast(origFunction, to: UnsafeMutableRawPointer.self)) {
-            origFunction = unsafeBitCast($0, to: Code.self)
-        }]
+extension FunctionHookProtocol {
+    public static var group: Group {
+        guard let group = _Glue.storage.group as? Group else {
+            orionError("Got unexpected group type for \(self)")
+        }
+        return group
     }
-
-    public static var _orig: AnyClass { OrigType.self }
-    public var _orig: AnyObject { OrigType() }
 }

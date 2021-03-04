@@ -12,38 +12,6 @@ public enum SubclassMode {
     /// Create a subclass with the provided name.
     case createSubclassNamed(String)
 
-    fileprivate func subclassName(withType type: AnyClass) -> String? {
-        switch self {
-        case .none:
-            return nil
-        case .createSubclass:
-            return "OrionSubclass.\(NSStringFromClass(type))"
-        case .createSubclassNamed(let name):
-            return name
-        }
-    }
-
-}
-
-/// Internal storage associated with a `ClassHook`. Do not use this yourself.
-///
-/// :nodoc:
-public final class _ClassHookStorage {
-    let hookType: AnyClass
-    @LazyAtomic private(set) var targetType: AnyObject.Type
-    @LazyAtomic private(set) var group: HookGroup
-
-    // additional fields may be added here in the future
-
-    init(
-        hookType: AnyClass,
-        loadTargetType: @escaping () -> AnyObject.Type,
-        loadGroup: @escaping () -> HookGroup
-    ) {
-        self.hookType = hookType
-        _targetType = LazyAtomic(wrappedValue: loadTargetType())
-        _group = LazyAtomic(wrappedValue: loadGroup())
-    }
 }
 
 /// The protocol to which class hooks conform. Do not conform to this
@@ -57,11 +25,14 @@ public protocol ClassHookProtocol: class, AnyHook {
     /// its inheritance chain.
     associatedtype Target: AnyObject
 
-    /// Internal storage associated with the class hook.
-    /// Do not implement or use this yourself.
+    /// The glue type associated with this hook. Do not implement or use
+    /// this yourself.
+    ///
+    /// - See: `_GlueAnyHook`
     ///
     /// :nodoc:
-    static var _storage: _ClassHookStorage { get }
+    associatedtype _Glue: _GlueClassHook = _GlueClassHookPlaceholder<Self>
+        where _Glue.HookType == Self
 
     /// The name of the target class, or the empty string to use `Target.self`.
     ///
@@ -95,11 +66,11 @@ public protocol ClassHookProtocol: class, AnyHook {
     /// The current instance of the hooked class, upon which a hooked method
     /// has been called.
     ///
-    /// Do not attempt to implement this yourself; use the default implementation.
+    /// - Warning: Do not attempt to implement this yourself; use the default
+    /// implementation.
     var target: Target { get }
 
-    /// Initializes the type with the provided target instance. Do not invoke
-    /// or override this.
+    /// Initializes the type with the provided target instance. Do not override this.
     init(target: Target)
 
     /// A function which is run before a `target` is deallocated.
@@ -123,10 +94,6 @@ extension ClassHookProtocol {
 
     public static var targetName: String { "" }
 
-    public static var _storage: _ClassHookStorage {
-        orionError("Could not retrieve class hook storage. Has the Orion glue file been compiled?")
-    }
-
     public static var subclassMode: SubclassMode { .none }
 
     public static var protocols: [Protocol] { [] }
@@ -145,8 +112,7 @@ extension ClassHookProtocol {
     /// has been called.
     public let target: Target
 
-    /// Initializes the type with the provided target instance. Do not invoke
-    /// or override this.
+    /// Initializes the type with the provided target instance. Do not override this.
     public required init(target: Target) { self.target = target }
 
 }
@@ -276,93 +242,16 @@ public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHo
 // result in ClassHookClass inheriting the default implementations of ClassHookProtocol and
 // AnyHook requirements, making it more difficult to override them
 
-/// :nodoc:
-extension ClassHookProtocol {
-    public static var group: Group {
-        guard let group = _storage.group as? Group else {
-            orionError("Got unexpected group type from \(self)._storage")
-        }
-        return group
-    }
-}
-
 extension ClassHookProtocol {
 
-    /// The concrete type of the hooked target (or its subclass depending on
-    /// `subclassMode`).
-    public static var target: Target.Type {
-        // this is in an extension so users can't accidentally override it
-        guard let target = _storage.targetType as? Target.Type else {
-            orionError("Got unexpected target type from \(self)._storage")
-        }
-        return target
-    }
-
-    /// Initializes the hook's internal storage. Do not call this yourself.
-    ///
-    /// :nodoc:
-    public static func _initializeStorage() -> _ClassHookStorage {
-        // this gives us the type of the user's hook rather than
-        // our concrete subclass
-        _ClassHookStorage(
-            hookType: self,
-            loadTargetType: initializeTargetType,
-            loadGroup: loadGroup
-        )
-    }
-
-    // since `target` is referred to in `activate()`, this will deterministically be called
-    // when a class hook is activated.
-    private static func initializeTargetType() -> Target.Type {
-        let targetName = self.targetName // only call getter once
-        let baseTarget = targetName.isEmpty ? Target.self : Dynamic(targetName).as(type: Target.self)
-
-        let target: Target.Type
-        if let subclassName = subclassMode.subclassName(withType: _storage.hookType) {
-            guard let pair: AnyClass = objc_allocateClassPair(baseTarget, subclassName, 0)
-                else { orionError("Could not allocate subclass for \(self)") }
-            objc_registerClassPair(pair)
-            guard let _target = pair as? Target.Type
-                else { orionError("Allocated invalid subclass for \(self)") }
-            target = _target
-        } else {
-            target = baseTarget
-        }
-
-        protocols.forEach {
-            guard class_addProtocol(target, $0)
-                else { orionError("Could not add protocol \($0) to \(target)") }
-        }
-        return target
-    }
-
-}
-
-/// An existential for glue class hooks. Do not use this directly.
-///
-/// :nodoc:
-public protocol _AnyGlueClassHook {
-    static var _orig: AnyClass { get }
-    var _orig: AnyObject { get }
-
-    static var _supr: AnyClass { get }
-    var _supr: AnyObject { get }
-}
-
-extension ClassHookProtocol {
-
-    // @_transparent allows the compiler to incorporate these methods into the
-    // control flow analysis of the caller. This means it sees the possibility
-    // for the fatal errors, thereby not thinking that the function is infinitely
-    // recursive which it would otherwise do (see https://bugs.swift.org/browse/SR-7925)
-    // While that bug has technically been fixed, it still affects us because Swift
-    // won't normally see the glue overrides and so it'll not realise that there is
-    // an override point.
+    // These are `@_transparent` to allow control flow information from
+    // `disableRecursionCheck()` to carry through to callers.
 
     /// A proxy to access the original instance methods of the hooked class.
     @_transparent
     public var orig: Self {
-        guard let unwrapped = (self as? _AnyGlueClassHook)?._orig as? Self
+        disableRecursionCheck()
+        guard let unwrapped = _Glue.OrigType(target: target) as? Self
             else { orionError("Could not get orig") }
         return unwrapped
     }
@@ -370,7 +259,8 @@ extension ClassHookProtocol {
     /// A proxy to access the original class methods of the hooked class.
     @_transparent
     public static var orig: Self.Type {
-        guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._orig as? Self.Type
+        disableRecursionCheck()
+        guard let unwrapped = _Glue.OrigType.self as? Self.Type
             else { orionError("Could not get orig") }
         return unwrapped
     }
@@ -378,7 +268,8 @@ extension ClassHookProtocol {
     /// A proxy to access the hooked class' superclass instance methods.
     @_transparent
     public var supr: Self {
-        guard let unwrapped = (self as? _AnyGlueClassHook)?._supr as? Self
+        disableRecursionCheck()
+        guard let unwrapped = _Glue.SuprType(target: target) as? Self
             else { orionError("Could not get supr") }
         return unwrapped
     }
@@ -386,70 +277,32 @@ extension ClassHookProtocol {
     /// A proxy to access the hooked class' superclass class methods.
     @_transparent
     public static var supr: Self.Type {
-        guard let unwrapped = (self as? _AnyGlueClassHook.Type)?._supr as? Self.Type
+        disableRecursionCheck()
+        guard let unwrapped = _Glue.SuprType.self as? Self.Type
             else { orionError("Could not get supr") }
         return unwrapped
     }
 
 }
 
-/// A helper type used in the glue file for applying class hooks. Do not
-/// use this directly.
-///
-/// :nodoc:
-public struct _ClassHookBuilder {
-    let target: AnyClass
-
-    var descriptors: [HookDescriptor] = []
-
-    public mutating func addHook<Code>(
-        _ sel: Selector,
-        _ replacement: Code,
-        isClassMethod: Bool,
-        saveOrig: @escaping (Code) -> Void
-    ) {
-        let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
-        descriptors.append(
-            .method(cls: cls, sel: sel, replacement: unsafeBitCast(replacement, to: UnsafeMutableRawPointer.self)) {
-                saveOrig(unsafeBitCast($0, to: Code.self))
-            }
-        )
+extension ClassHookProtocol {
+    /// The concrete type of the hooked target (or its subclass depending on
+    /// `subclassMode`).
+    public static var target: Target.Type {
+        // this is in an extension so users can't accidentally override it
+        guard let target = _Glue.storage.targetType as? Target.Type else {
+            orionError("Got unexpected target type for \(self)")
+        }
+        return target
     }
 }
 
-/// A concrete class hook, implemented in the glue file. Do not use
-/// this directly.
-///
 /// :nodoc:
-public protocol _GlueClassHook: _AnyGlueClassHook, ClassHookProtocol, _AnyGlueHook {
-    associatedtype OrigType: ClassHookProtocol where OrigType.Target == Target
-    associatedtype SuprType: ClassHookProtocol where SuprType.Target == Target
-
-    static func activate(withClassHookBuilder builder: inout _ClassHookBuilder)
-}
-
-/// :nodoc:
-extension _GlueClassHook {
-    public static var _orig: AnyClass { OrigType.self }
-    public var _orig: AnyObject { OrigType(target: target) }
-
-    public static var _supr: AnyClass { SuprType.self }
-    public var _supr: AnyObject { SuprType(target: target) }
-
-    public static func addMethod<Code>(_ selector: Selector, _ implementation: Code, isClassMethod: Bool) {
-        let methodDescription = { "\(isClassMethod ? "+" : "-")[\(self) \(selector)]" }
-        guard let method = (isClassMethod ? class_getClassMethod : class_getInstanceMethod)(self, selector)
-            else { orionError("Could not find method \(methodDescription())") }
-        guard let types = method_getTypeEncoding(method)
-            else { orionError("Could not get method signature for \(methodDescription())") }
-        let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
-        guard class_addMethod(cls, selector, unsafeBitCast(implementation, to: IMP.self), types)
-            else { orionError("Failed to add method \(methodDescription())") }
-    }
-
-    public static func activate() -> [HookDescriptor] {
-        var classHookBuilder = _ClassHookBuilder(target: target)
-        activate(withClassHookBuilder: &classHookBuilder)
-        return classHookBuilder.descriptors
+extension ClassHookProtocol {
+    public static var group: Group {
+        guard let group = _Glue.storage.group as? Group else {
+            orionError("Got unexpected group type for \(self)")
+        }
+        return group
     }
 }

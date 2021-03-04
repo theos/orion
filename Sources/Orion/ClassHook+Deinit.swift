@@ -15,7 +15,7 @@ public enum DeinitPolicy {
 }
 
 /// :nodoc:
-extension _ClassHookBuilder {
+extension _GlueClassHookBuilder {
     private static let deallocSelector = NSSelectorFromString("dealloc")
 
     public typealias Deinitializer = @convention(c) (Any, Selector) -> Void
@@ -23,7 +23,7 @@ extension _ClassHookBuilder {
     // for some reason using `@escaping Deinitializer` instead of `Code`
     // works in SPM but not with the binary framework (maybe a swiftinterface
     // bug or library evolution thing?)
-    public mutating func addDeinitializer<T: _GlueClassHook, Code>(
+    public mutating func addDeinitializer<T: ClassHookProtocol, Code>(
         to classHook: T.Type,
         getOrig: @escaping () -> Deinitializer,
         setOrig: @escaping (Code) -> Void
@@ -60,7 +60,7 @@ extension _ClassHookBuilder {
 }
 
 /// :nodoc:
-extension _GlueClassHook {
+extension _GlueClassHookTrampoline {
     public func deinitOrigError(file: StaticString = #file, line: UInt = #line) -> Never {
         orionError("Do not call `orig.deinitializer()`.", file: file, line: line)
     }

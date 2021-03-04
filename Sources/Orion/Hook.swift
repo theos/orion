@@ -1,11 +1,22 @@
 import Foundation
 
-/// The base existential protocol for all hook types. Do not use this directly.
+/// Base protocol requirements for hooks. Do not use this directly.
 ///
-/// - See: `AnyHook`, `ClassHook`, and `FunctionHook`.
-public protocol AnyHookBase {
-    // This protocol should never have any Self/PAT requirements, to allow it to be
-    // usable as an existential. To add a Self/PAT requirement, use `AnyHook`.
+/// - See: `ClassHook`, and `FunctionHook`.
+public protocol AnyHook {
+
+    /// The `HookGroup` to which this hook is assigned.
+    ///
+    /// Defaults to `DefaultGroup`.
+    ///
+    /// - See: `HookGroup`
+    associatedtype Group: HookGroup = DefaultGroup
+
+    /// The `HookGroup` associated with this hook type.
+    ///
+    /// Do not attempt to implement this yourself; use the default
+    /// implementation.
+    static var group: Group { get }
 
     // these are named hook[Will|Did]Activate instead of [will|did]Activate because
     // they're special cased in the generator so that in class hooks, we don't end
@@ -26,50 +37,49 @@ public protocol AnyHookBase {
     ///
     /// The default implementation does nothing.
     static func hookDidActivate()
-}
-
-/// Additional protocol requirements for hooks, beyond those of `AnyHookBase`.
-/// Do not use this directly.
-///
-/// - See: `AnyHookBase`, `ClassHook`, and `FunctionHook`.
-public protocol AnyHook: AnyHookBase {
-
-    /// The `HookGroup` to which this hook is assigned.
-    ///
-    /// Defaults to `DefaultGroup`.
-    ///
-    /// - See: `HookGroup`
-    associatedtype Group: HookGroup = DefaultGroup
-
-    /// The `HookGroup` associated with this hook type.
-    ///
-    /// Do not attempt to implement this yourself; use the default
-    /// implementation.
-    static var group: Group { get }
 
 }
 
-extension AnyHookBase {
+/// :nodoc:
+extension AnyHook {
     public static func hookWillActivate() -> Bool { true }
     public static func hookDidActivate() {}
 }
 
-/// A concrete hook, implemented in the glue file. Do not use
-/// this directly.
+/// A protocol that is implemented in Orion's glue file for each
+/// hook, which performs the actual hooking.
+///
+/// This protocol (and its refinements) serve as the bridge between
+/// the user's code and the glue file. For every hook that the user
+/// declares, the glue file extends it with a `_Glue` associatedtype
+/// that conforms to one of the `_Glue*Hook` types and contains the
+/// actual hook implementation.
+///
+/// The source files still compile in the absence of such an extension
+/// since the `_Glue` associatedtype has a placeholder value, which
+/// allows SourceKit to play nicely with the user's source files even
+/// if the glue file hasn't been compiled yet. On the other hand, if
+/// the glue file _is_ compiled then the compiler prefers the `_Glue`
+/// type provided by the glue file's extensions over the placeholder,
+/// which changes the code's behavior and enables it to actually perform
+/// the desired hooking.
 ///
 /// :nodoc:
-public protocol _AnyGlueHook: AnyHookBase {
+public protocol _GlueAnyHook {
 
     /// Activates the hook. Do not call this directly.
     static func activate() -> [HookDescriptor]
+
+    /// Trampoline for `AnyHook.hookWillActivate()`. Do not call
+    /// this directly.
+    static func hookWillActivate() -> Bool
+
+    /// Trampoline for `AnyHook.hookDidActivate()`. Do not call
+    /// this directly.
+    static func hookDidActivate()
 
     /// The type-erased `HookGroup` associated with this hook. Do
     /// not use this yourself.
     static var groupType: HookGroup.Type { get }
 
-}
-
-/// :nodoc:
-extension _AnyGlueHook where Self: AnyHook {
-    public static var groupType: HookGroup.Type { Group.self }
 }

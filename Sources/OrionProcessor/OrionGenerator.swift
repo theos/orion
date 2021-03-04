@@ -110,7 +110,7 @@ public final class OrionGenerator {
             """
 
             register = """
-            builder.addDeinitializer(to: self, getOrig: { \(origIdent) }, setOrig: { \(origIdent) = $0 })
+            builder.addDeinitializer(to: \(className).self, getOrig: { \(origIdent) }, setOrig: { \(origIdent) = $0 })
             """
 
             let main = """
@@ -132,13 +132,13 @@ public final class OrionGenerator {
 
             orig = """
             \(funcOverride) {
-                Self.\(origIdent)(target, Self.\(selIdent)\(commaArgs))
+                _Glue.\(origIdent)(target, _Glue.\(selIdent)\(commaArgs))
             }
             """
 
             supr = """
             \(funcOverride) {
-                callSuper((@convention(c) \(method.superClosure)).self) { $0($1, Self.\(selIdent)\(commaArgs)) }
+                callSuper((@convention(c) \(method.superClosure)).self) { $0($1, _Glue.\(selIdent)\(commaArgs)) }
             }
             """
 
@@ -149,9 +149,9 @@ public final class OrionGenerator {
 
         // say there's a method foo() and another named foo(bar:). #selector(foo) will result in an error
         // because it could refer to either. Adding the signature disambiguates.
-        let selSig = "\(method.isClassMethod ? "" : "(Self) -> ")\(method.function.closure)"
+        let selSig = "\(method.isClassMethod ? "" : "(\(className)) -> ")\(method.function.closure)"
         let main = """
-        private static let \(selIdent) = #selector(\(method.function.identifier) as \(selSig))
+        private static let \(selIdent) = #selector(\(className).\(method.function.identifier) as \(selSig))
         private static var \(origIdent): @convention(c) \(method.methodClosure) = { target, _cmd\(commaArgs) in
             \(className)\(method.isClassMethod ? "" : "(target: target)").\(method.function.identifier)(\(argsList))
         }
@@ -171,61 +171,59 @@ public final class OrionGenerator {
             return "\n\(joined)\n\(outdent)"
         }
 
-        let className = "Orion_ClassHook\(idx)"
-
         let (origs, suprs, mains, registers) = classHook.methods.enumerated()
-            .map { generateConcreteMethodData(from: $1, className: className, index: $0 + 1) }
+            .map { generateConcreteMethodData(from: $1, className: classHook.name, index: $0 + 1) }
             .unzip()
 
-        let indentedOrigs = indentAndJoin(origs.compactMap { $0 }, by: 2)
-        let indentedSuprs = indentAndJoin(suprs.compactMap { $0 }, by: 2)
-        let indentedMains = indentAndJoin(mains, by: 1)
+        let indentedOrigs = indentAndJoin(origs.compactMap { $0 }, by: 3)
+        let indentedSuprs = indentAndJoin(suprs.compactMap { $0 }, by: 3)
+        let indentedMains = indentAndJoin(mains, by: 2)
 
         let hook = """
         extension \(classHook.name) {
-            public static let _storage = _initializeStorage()
-        }
+            enum _Glue: _GlueClassHook {
+                typealias HookType = \(classHook.name)
 
-        private class \(className): \(classHook.name), _GlueClassHook {
-            final class OrigType: \(className) {\(indentedOrigs)}
+                final class OrigType: \(classHook.name), _GlueClassHookTrampoline {\(indentedOrigs)}
 
-            final class SuprType: \(className) {\(indentedSuprs)}
+                final class SuprType: \(classHook.name), _GlueClassHookTrampoline {\(indentedSuprs)}
+
+                static let storage = initializeStorage()
         \(indentedMains)
-            static func activate(withClassHookBuilder builder: inout _ClassHookBuilder) {
-                \(registers.joined(separator: "\n        "))
+                static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
+                    \(registers.joined(separator: "\n            "))
+                }
             }
         }
         """
 
-        return (hook, className)
+        return (hook, "\(classHook.name)._Glue")
     }
 
     private func generateConcreteFunctionHook(from functionHook: OrionData.FunctionHook, idx: Int) -> (hook: String, name: String) {
-        let className = "Orion_FunctionHook\(idx)"
-        let shared = "orion_shared"
         let args = arguments(for: functionHook.function)
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
         let hook = """
         extension \(functionHook.name) {
-            public static let _storage = _initializeStorage()
-        }
+            enum _Glue: _GlueFunctionHook {
+                typealias HookType = \(functionHook.name)
 
-        private class \(className): \(functionHook.name), _GlueFunctionHook {
-            static let \(shared) = \(className)()
-
-            static var origFunction: @convention(c) \(functionHook.function.closure) = { \(argsIn)
-                \(className).\(shared).\(functionHook.function.identifier)(\(argsList))
-            }
-
-            final class OrigType: \(className) {
-                \(functionHook.function.function) {
-                    Self.origFunction(\(argsList))
+                final class OrigType: \(functionHook.name), _GlueFunctionHookTrampoline {
+                    \(functionHook.function.function) {
+                        _Glue.origFunction(\(argsList))
+                    }
                 }
+
+                static var origFunction: @convention(c) \(functionHook.function.closure) = { \(argsIn)
+                    \(functionHook.name)().\(functionHook.function.identifier)(\(argsList))
+                }
+
+                static let storage = initializeStorage()
             }
         }
         """
-        return (hook, className)
+        return (hook, "\(functionHook.name)._Glue")
     }
 
     private func join(_ items: [String], separation: String = "\n\n") -> String {

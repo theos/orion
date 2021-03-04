@@ -35,7 +35,7 @@ extension Tweak {
     /// Activates the tweak. Do not call this yourself.
     ///
     /// :nodoc:
-    public static func activate<BackendType: Backend>(backend: BackendType, hooks: [_AnyGlueHook.Type]) {
+    public static func activate<BackendType: Backend>(backend: BackendType, hooks: [_GlueAnyHook.Type]) {
         #if SWIFT_PACKAGE
         // this is effectively a no-op but we need it in order to prevent the
         // compiler from stripping out the constructor because it doesn't see
@@ -73,7 +73,7 @@ extension TweakWithBackend {
     /// Activates the tweak. Do not call this yourself.
     ///
     /// :nodoc:
-    public static func activate(hooks: [_AnyGlueHook.Type]) {
+    public static func activate(hooks: [_GlueAnyHook.Type]) {
         activate(backend: backend, hooks: hooks)
     }
 

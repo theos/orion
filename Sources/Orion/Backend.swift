@@ -60,7 +60,7 @@ public protocol Backend {
 }
 
 extension Backend {
-    func activate(hooks: [_AnyGlueHook.Type]) {
+    func activate(hooks: [_GlueAnyHook.Type]) {
         let hooksToActivate = hooks.filter { $0.hookWillActivate() }
         apply(descriptors: hooksToActivate.flatMap { $0.activate() })
         hooksToActivate.forEach { $0.hookDidActivate() }
