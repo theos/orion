@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Orion latest (0.9.0) Docs
+          Orion latest (0.9.1) Docs
         </a>
          (100% documented)
       </p>
@@ -195,6 +195,17 @@
             </ul>
           </li>
           <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Groups.html">Groups</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Groups.html#/s:5Orion12DefaultGroupV">DefaultGroup</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
             <a class="nav-group-name-link" href="../Tweaks.html">Tweaks</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
@@ -213,6 +224,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/Ivars.html">Ivars</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Ivars/WeakStorage.html">– WeakStorage</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/Dynamic.html">Dynamic</a>
@@ -285,7 +299,8 @@
 
                 </div>
               </div>
-            <p>A wrapper around an object for accessing ivars on it.</p>
+            <p>A wrapper around an object for accessing Objective-C instance variables of
+type <code>IvarType</code> on it.</p>
 
 <p>This type supports dynamic member lookup, which means that ivars
 can be accessed as if they were members of the type. Note that if
@@ -297,6 +312,8 @@ will result in a crash.</p>
 <li><p>To fail gracefully if the ivar does not exist, use <code><a href="../Structs/Ivars.html#/s:5Orion5IvarsV15safelyAccessingxSgSS_tcip">Ivars.subscript(safelyAccessing:)</a></code>.</p></li>
 <li><p>To access an ivar with a name that clashes with an actual member on this type,
 it is possible to use <code><a href="../Structs/Ivars.html#/s:5Orion5IvarsV13dynamicMemberxSS_tcip">Ivars.subscript(dynamicMember:)</a></code> directly.</p></li>
+<li><p>To access a weak ivar, pass <code>.weak</code> as the second argument to the <code>Ivars</code> initializer.
+The <code>IvarType</code> must correspond to an optional of a class (e.g. <code>Ivars&lt;NSString?&gt;</code>).</p></li>
 </ul>
 <h1 id='example' class='heading'>Example</h1>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">object</span> <span class="o">=</span> <span class="kt">MyObject</span><span class="p">(</span><span class="nv">foo</span><span class="p">:</span> <span class="mi">5</span><span class="p">)</span>
@@ -306,7 +323,7 @@ it is possible to use <code><a href="../Structs/Ivars.html#/s:5Orion5IvarsV13dyn
 </code></pre>
 
               <div class="slightly-smaller">
-                <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Ivars.swift#L25-L125">Show on GitHub</a>
+                <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars.swift#L29-L136">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -328,8 +345,8 @@ it is possible to use <code><a href="../Structs/Ivars.html#/s:5Orion5IvarsV13dyn
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Construct a new instance of <code>Ivars</code> for accessing instance
-variables on <code>object</code>.</p>
+                        <p>Construct a new instance of <code>Ivars</code> for accessing Objective-C
+instance variables on <code>object</code>.</p>
 
                       </div>
                       <div class="declaration">
@@ -360,7 +377,7 @@ variables on <code>object</code>.</p>
                         </table>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Ivars.swift#L32-L34">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars.swift#L42-L45">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -378,7 +395,7 @@ variables on <code>object</code>.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Access an instance variable on the object.</p>
+                        <p>Access an Objective-C instance variable on the object.</p>
 
 <p>It is safe to assume that <code>body</code> will be called on all execution paths.</p>
 <div class="aside aside-warning">
@@ -450,7 +467,7 @@ ivar, within which it may be read or written to.</p>
                         <p>The value returned from <code>body</code>.</p>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Ivars.swift#L52-L81">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars.swift#L63-L92">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -468,8 +485,8 @@ ivar, within which it may be read or written to.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Access an instance variable on the object, failing gracefully if
-the instance variable does not exist.</p>
+                        <p>Access an Objective-C instance variable on the object, failing gracefully
+if the instance variable does not exist.</p>
 <div class="aside aside-note">
     <p class="aside-title">Note</p>
     <p>If the setter is passed a value of <code>nil</code>, it will do nothing.</p>
@@ -510,7 +527,7 @@ the instance variable does not exist.</p>
 no ivar with the given name.</p>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Ivars.swift#L92-L98">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars.swift#L103-L109">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -528,7 +545,7 @@ no ivar with the given name.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Access an instance variable on the object.</p>
+                        <p>Access an Objective-C instance variable on the object.</p>
 <div class="aside aside-precondition">
     <p class="aside-title">Precondition</p>
     <p>The ivar <code>ivarName</code> <strong>must</strong> be present on the object.
@@ -568,7 +585,120 @@ will result in a crash.</p>
                         </table>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Ivars.swift#L109-L124">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars.swift#L120-L135">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60IvarType%60%3A%20%60OptionalProtocol%60%2C%20%60IvarType.Wrapped%60%3A%20%60AnyObject%60"></a>
+                <a name="//apple_ref/swift/Section/Available where `IvarType`: `OptionalProtocol`, `IvarType.Wrapped`: `AnyObject`" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60IvarType%60%3A%20%60OptionalProtocol%60%2C%20%60IvarType.Wrapped%60%3A%20%60AnyObject%60"></a>
+                  <h3 class="section-name"><p>Available where <code>IvarType</code>: <code>OptionalProtocol</code>, <code>IvarType.Wrapped</code>: <code>AnyObject</code></p>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion5IvarsVA2A16OptionalProtocolRz7WrappedRmzClE11WeakStorageO"></a>
+                    <a name="//apple_ref/swift/Enum/WeakStorage" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion5IvarsVA2A16OptionalProtocolRz7WrappedRmzClE11WeakStorageO">WeakStorage</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An enumeration indicating that the instance variable in question
+uses <code>weak</code> semantics.</p>
+
+                        <a href="../Structs/Ivars/WeakStorage.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">WeakStorage</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars+Weak.swift#L27-L34">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion5IvarsVA2A16OptionalProtocolRz7WrappedRmzClEyACyxGyXl_Ac2aDRzAFRLClE11WeakStorageOyx_Gtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion5IvarsVA2A16OptionalProtocolRz7WrappedRmzClEyACyxGyXl_Ac2aDRzAFRLClE11WeakStorageOyx_Gtcfc">init(_:<wbr>_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Construct a new instance of <code>Ivars</code> for accessing weak Objective-C
+instance variables on <code>object</code>.</p>
+
+<p>This initializer requires that <code>IvarType</code> be an optional object type.</p>
+
+<p>For example, to access a weak string ivar <code>_foo</code> on <code>obj</code>, you could use
+<code>Ivars&lt;NSString?&gt;(obj, .weak)._foo</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="n">_</span> <span class="nv">object</span><span class="p">:</span> <span class="kt">AnyObject</span><span class="p">,</span> <span class="n">_</span> <span class="nv">storage</span><span class="p">:</span> <span class="kt"><a href="../Structs/Ivars/WeakStorage.html">WeakStorage</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>object</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The object on which ivars are to be accessed.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>storage</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Set this to <code><a href="../Structs/Ivars/WeakStorage.html#/s:5Orion5IvarsVA2A16OptionalProtocolRz7WrappedRmzClE11WeakStorageO4weakyAHyx_GAJmAaDRzAFRLClF">WeakStorage.weak</a></code>. Indicates that the
+instance variable is weak.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars+Weak.swift#L48-L51">Show on GitHub</a>
                       </div>
                     </section>
                   </div>

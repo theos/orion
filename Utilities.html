@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Orion latest (0.9.0) Docs
+          Orion latest (0.9.1) Docs
         </a>
          (100% documented)
       </p>
@@ -195,6 +195,17 @@
             </ul>
           </li>
           <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Groups.html">Groups</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/HookGroup.html">HookGroup</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Groups.html#/s:5Orion12DefaultGroupV">DefaultGroup</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
             <a class="nav-group-name-link" href="Tweaks.html">Tweaks</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
@@ -213,6 +224,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/Ivars.html">Ivars</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Ivars/WeakStorage.html">– WeakStorage</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Structs/Dynamic.html">Dynamic</a>
@@ -298,7 +312,8 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>A wrapper around an object for accessing ivars on it.</p>
+                        <p>A wrapper around an object for accessing Objective-C instance variables of
+type <code>IvarType</code> on it.</p>
 
 <p>This type supports dynamic member lookup, which means that ivars
 can be accessed as if they were members of the type. Note that if
@@ -310,6 +325,8 @@ will result in a crash.</p>
 <li><p>To fail gracefully if the ivar does not exist, use <code><a href="Structs/Ivars.html#/s:5Orion5IvarsV15safelyAccessingxSgSS_tcip">Ivars.subscript(safelyAccessing:)</a></code>.</p></li>
 <li><p>To access an ivar with a name that clashes with an actual member on this type,
 it is possible to use <code><a href="Structs/Ivars.html#/s:5Orion5IvarsV13dynamicMemberxSS_tcip">Ivars.subscript(dynamicMember:)</a></code> directly.</p></li>
+<li><p>To access a weak ivar, pass <code>.weak</code> as the second argument to the <code>Ivars</code> initializer.
+The <code>IvarType</code> must correspond to an optional of a class (e.g. <code>Ivars&lt;NSString?&gt;</code>).</p></li>
 </ul>
 <h1 id='example' class='heading'>Example</h1>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">object</span> <span class="o">=</span> <span class="kt">MyObject</span><span class="p">(</span><span class="nv">foo</span><span class="p">:</span> <span class="mi">5</span><span class="p">)</span>
@@ -330,7 +347,7 @@ it is possible to use <code><a href="Structs/Ivars.html#/s:5Orion5IvarsV13dynami
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Ivars.swift#L25-L125">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Ivars.swift#L29-L136">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -465,7 +482,7 @@ simply <code>MyClass</code>.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Dynamic.swift#L134-L310">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Dynamic.swift#L134-L310">Show on GitHub</a>
                       </div>
                     </section>
                   </div>

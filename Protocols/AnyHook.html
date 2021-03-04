@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Orion latest (0.9.0) Docs
+          Orion latest (0.9.1) Docs
         </a>
          (100% documented)
       </p>
@@ -195,6 +195,17 @@
             </ul>
           </li>
           <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Groups.html">Groups</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Groups.html#/s:5Orion12DefaultGroupV">DefaultGroup</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
             <a class="nav-group-name-link" href="../Tweaks.html">Tweaks</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
@@ -213,6 +224,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/Ivars.html">Ivars</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Ivars/WeakStorage.html">– WeakStorage</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/Dynamic.html">Dynamic</a>
@@ -284,15 +298,15 @@
 
                 </div>
               </div>
-            <p>The base protocol for all hook types. Do not use this directly.</p>
+            <p>Base protocol requirements for hooks. Do not use this directly.</p>
 <div class="aside aside-see">
     <p class="aside-title">See</p>
-    <code><a href="../Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHook</a></code> and <code><a href="../Function%20Hooking.html#/s:5Orion12FunctionHooka">FunctionHook</a></code>.
+    <code><a href="../Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHook</a></code>, and <code><a href="../Function%20Hooking.html#/s:5Orion12FunctionHooka">FunctionHook</a></code>.
 
 </div>
 
               <div class="slightly-smaller">
-                <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Hook.swift#L6-L26">Show on GitHub</a>
+                <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Hook.swift#L6-L41">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -304,13 +318,80 @@
                 <li class="item">
                   <div>
                     <code>
+                    <a name="/s:5Orion7AnyHookP5GroupQa"></a>
+                    <a name="//apple_ref/swift/Alias/Group" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion7AnyHookP5GroupQa">Group</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The <code><a href="../Protocols/HookGroup.html">HookGroup</a></code> to which this hook is assigned.</p>
+
+<p>Defaults to <code><a href="../Groups.html#/s:5Orion12DefaultGroupV">DefaultGroup</a></code>.</p>
+<div class="aside aside-see">
+    <p class="aside-title">See</p>
+    <code><a href="../Protocols/HookGroup.html">HookGroup</a></code>
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">associatedtype</span> <span class="kt">Group</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/HookGroup.html">HookGroup</a></span> <span class="o">=</span> <span class="kt"><a href="../Groups.html#/s:5Orion12DefaultGroupV">DefaultGroup</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Hook.swift#L13">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion7AnyHookP5group5GroupQzvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/group" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion7AnyHookP5group5GroupQzvpZ">group</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The <code><a href="../Protocols/HookGroup.html">HookGroup</a></code> associated with this hook type.</p>
+
+<p>Do not attempt to implement this yourself; use the default
+implementation.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">static</span> <span class="k">var</span> <span class="nv">group</span><span class="p">:</span> <span class="kt"><a href="../Protocols/AnyHook.html#/s:5Orion7AnyHookP5GroupQa">Group</a></span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Hook.swift#L19">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
                     <a name="/s:5Orion7AnyHookP16hookWillActivateSbyFZ"></a>
                     <a name="//apple_ref/swift/Method/hookWillActivate()" class="dashAnchor"></a>
                     <a class="token" href="#/s:5Orion7AnyHookP16hookWillActivateSbyFZ">hookWillActivate()</a>
                     </code>
-                      <span class="declaration-note">
-                        Default implementation
-                      </span>
                   </div>
                   <div class="height-container">
                     <div class="pointer-container"></div>
@@ -319,10 +400,6 @@
                       <div class="abstract">
                         <p>Called before the hook is activated.</p>
 
-                      </div>
-                      <h4>Default Implementation</h4>
-                      <div class="default_impl abstract">
-                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -338,7 +415,7 @@
 implementation simply returns <code>true</code>.</p>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Hook.swift#L20">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Hook.swift#L34">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -350,9 +427,6 @@ implementation simply returns <code>true</code>.</p>
                     <a name="//apple_ref/swift/Method/hookDidActivate()" class="dashAnchor"></a>
                     <a class="token" href="#/s:5Orion7AnyHookP15hookDidActivateyyFZ">hookDidActivate()</a>
                     </code>
-                      <span class="declaration-note">
-                        Default implementation
-                      </span>
                   </div>
                   <div class="height-container">
                     <div class="pointer-container"></div>
@@ -364,10 +438,6 @@ implementation simply returns <code>true</code>.</p>
 <p>The default implementation does nothing.</p>
 
                       </div>
-                      <h4>Default Implementation</h4>
-                      <div class="default_impl abstract">
-                        
-                      </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
@@ -377,7 +447,7 @@ implementation simply returns <code>true</code>.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/Hook.swift#L25">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Hook.swift#L39">Show on GitHub</a>
                       </div>
                     </section>
                   </div>

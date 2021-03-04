@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Orion latest (0.9.0) Docs
+          Orion latest (0.9.1) Docs
         </a>
          (100% documented)
       </p>
@@ -195,6 +195,17 @@
             </ul>
           </li>
           <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Groups.html">Groups</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Groups.html#/s:5Orion12DefaultGroupV">DefaultGroup</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
             <a class="nav-group-name-link" href="../Tweaks.html">Tweaks</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
@@ -213,6 +224,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/Ivars.html">Ivars</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Ivars/WeakStorage.html">– WeakStorage</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Structs/Dynamic.html">Dynamic</a>
@@ -288,7 +302,7 @@
 directly; use <code><a href="../Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHook</a></code>.</p>
 
               <div class="slightly-smaller">
-                <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L30-L87">Show on GitHub</a>
+                <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L19-L90">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -326,7 +340,7 @@ its inheritance chain.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L37">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L26">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -348,6 +362,12 @@ its inheritance chain.</p>
 
 <p>This class must be <code><a href="../Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP6TargetQa">Target</a></code> or a subclass of <code><a href="../Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP6TargetQa">Target</a></code>. Defaults to
 an empty string.</p>
+<div class="aside aside-warning">
+    <p class="aside-title">Warning</p>
+    Do not attempt to access <code><a href="../Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP6target6TargetQzvp">target</a></code> in the getter for this property,
+as that will lead to infinite recursion.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -359,7 +379,7 @@ an empty string.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L49">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L44">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -384,6 +404,12 @@ default value is <code>.none</code>.</p>
 
 <p>This property is implemented by creating a new class pair on top of the
 original target, when the property is not <code>.none</code>.</p>
+<div class="aside aside-warning">
+    <p class="aside-title">Warning</p>
+    Do not attempt to access <code><a href="../Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP6target6TargetQzvp">target</a></code> in the getter for this property,
+as that will lead to infinite recursion.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -395,7 +421,7 @@ original target, when the property is not <code>.none</code>.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L58">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L56">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -416,6 +442,12 @@ original target, when the property is not <code>.none</code>.</p>
                         <p>An array of protocols which should be added to the target class.</p>
 
 <p>The default value is an empty array.</p>
+<div class="aside aside-warning">
+    <p class="aside-title">Warning</p>
+    Do not attempt to access <code><a href="../Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP6target6TargetQzvp">target</a></code> in the getter for this property,
+as that will lead to infinite recursion.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -427,7 +459,7 @@ original target, when the property is not <code>.none</code>.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L63">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L64">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -447,6 +479,12 @@ original target, when the property is not <code>.none</code>.</p>
                       <div class="abstract">
                         <p>The current instance of the hooked class, upon which a hooked method
 has been called.</p>
+<div class="aside aside-warning">
+    <p class="aside-title">Warning</p>
+    Do not attempt to implement this yourself; use the default
+implementation.
+
+</div>
 
                       </div>
                       <div class="declaration">
@@ -458,7 +496,7 @@ has been called.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L67">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L71">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -476,8 +514,7 @@ has been called.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Initializes the type with the provided target instance. Do not invoke
-or override this.</p>
+                        <p>Initializes the type with the provided target instance. Do not override this.</p>
 
                       </div>
                       <div class="declaration">
@@ -489,7 +526,7 @@ or override this.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L71">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L74">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -535,7 +572,139 @@ appropriate deinit policy.</p>
                         <p>A <code><a href="../Enums/DeinitPolicy.html">DeinitPolicy</a></code> representing the action to perform next.</p>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L85">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L88">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion17ClassHookProtocolPAAE4origxvp"></a>
+                    <a name="//apple_ref/swift/Property/orig" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4origxvp">orig</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A proxy to access the original instance methods of the hooked class.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">orig</span><span class="p">:</span> <span class="k">Self</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L252-L257">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion17ClassHookProtocolPAAE4origxmvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/orig" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4origxmvpZ">orig</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A proxy to access the original class methods of the hooked class.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">orig</span><span class="p">:</span> <span class="k">Self</span><span class="o">.</span><span class="k">Type</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L261-L266">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion17ClassHookProtocolPAAE4suprxvp"></a>
+                    <a name="//apple_ref/swift/Property/supr" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4suprxvp">supr</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A proxy to access the hooked class&rsquo; superclass instance methods.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">supr</span><span class="p">:</span> <span class="k">Self</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L270-L275">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:5Orion17ClassHookProtocolPAAE4suprxmvpZ"></a>
+                    <a name="//apple_ref/swift/Variable/supr" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4suprxmvpZ">supr</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A proxy to access the hooked class&rsquo; superclass class methods.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">supr</span><span class="p">:</span> <span class="k">Self</span><span class="o">.</span><span class="k">Type</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L279-L284">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -569,139 +738,7 @@ appropriate deinit policy.</p>
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L251-L254">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:5Orion17ClassHookProtocolPAAE4origxvp"></a>
-                    <a name="//apple_ref/swift/Property/orig" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4origxvp">orig</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A proxy to access the original instance methods of the hooked class.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">orig</span><span class="p">:</span> <span class="k">Self</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L311-L315">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:5Orion17ClassHookProtocolPAAE4origxmvpZ"></a>
-                    <a name="//apple_ref/swift/Variable/orig" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4origxmvpZ">orig</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A proxy to access the original class methods of the hooked class.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">orig</span><span class="p">:</span> <span class="k">Self</span><span class="o">.</span><span class="k">Type</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L319-L323">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:5Orion17ClassHookProtocolPAAE4suprxvp"></a>
-                    <a name="//apple_ref/swift/Property/supr" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4suprxvp">supr</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A proxy to access the hooked class&rsquo; superclass instance methods.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">supr</span><span class="p">:</span> <span class="k">Self</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L327-L331">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:5Orion17ClassHookProtocolPAAE4suprxmvpZ"></a>
-                    <a name="//apple_ref/swift/Variable/supr" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion17ClassHookProtocolPAAE4suprxmvpZ">supr</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A proxy to access the hooked class&rsquo; superclass class methods.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">supr</span><span class="p">:</span> <span class="k">Self</span><span class="o">.</span><span class="k">Type</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/06cb86f32e73e48241afa29df0861f55991cca61/Sources/Orion/ClassHook.swift#L335-L339">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/ClassHook.swift#L291-L297">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
