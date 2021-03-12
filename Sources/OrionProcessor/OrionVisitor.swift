@@ -201,17 +201,16 @@ class OrionVisitor: SyntaxVisitor {
         return Syntax(type)
     }
 
-    private func makeDirectives(for function: FunctionDeclSyntax) -> [OrionData.Directive] {
-        guard let trivia = function.leadingTrivia else { return [] }
-        return trivia.compactMap { piece in
+    private func makeDirectives(
+        for trivia: Trivia,
+        location: @autoclosure () -> SourceLocation
+    ) -> [OrionData.Directive] {
+        trivia.compactMap { piece in
             switch piece {
             case .lineComment(let text):
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard trimmed.hasPrefix("//") else {
-                    diagnosticEngine.diagnose(
-                        .commentParseIssue(),
-                        location: function.startLocation(converter: converter)
-                    )
+                    diagnosticEngine.diagnose(.commentParseIssue(), location: location())
                     return nil
                 }
                 let text = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -219,10 +218,7 @@ class OrionVisitor: SyntaxVisitor {
             case .blockComment(let text):
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard trimmed.hasPrefix("/*") else {
-                    diagnosticEngine.diagnose(
-                        .commentParseIssue(),
-                        location: function.startLocation(converter: converter)
-                    )
+                    diagnosticEngine.diagnose(.commentParseIssue(), location: location())
                     return nil
                 }
                 let text = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -231,6 +227,11 @@ class OrionVisitor: SyntaxVisitor {
                 return nil
             }
         }
+    }
+
+    private func makeDirectives(for function: FunctionDeclSyntax) -> [OrionData.Directive] {
+        guard let trivia = function.leadingTrivia else { return [] }
+        return makeDirectives(for: trivia, location: function.startLocation(converter: converter))
     }
 
     private func orionFunction(for function: FunctionDeclSyntax) -> OrionData.Function {
