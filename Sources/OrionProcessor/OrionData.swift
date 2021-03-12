@@ -2,12 +2,29 @@ import Foundation
 import SwiftSyntax
 
 public struct OrionData {
+    struct Directive {
+        static let prefix = "orion:"
+
+        let name: String
+        let arguments: [String]
+
+        init?(text: String) {
+            guard text.hasPrefix(Self.prefix) else { return nil }
+            let dropped = text.dropFirst(Self.prefix.count)
+            let parts = dropped.split(separator: " ")
+            guard let name = parts.first else { return nil }
+            self.name = String(name)
+            self.arguments = parts.dropFirst().map(String.init)
+        }
+    }
+
     struct Function {
         var numberOfArguments: Int
         // with args replaced with arg1, arg2, etc
         var function: Syntax // func foo(bar arg1: Blah) -> Blah
         var identifier: Syntax // foo(bar:)
         var closure: Syntax // (Blah) -> Blah
+        var directives: [Directive]
     }
 
     struct ClassHook {

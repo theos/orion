@@ -33,6 +33,9 @@ private extension Diagnostic.Message {
     static func classDeinit() -> Diagnostic.Message {
         .init(.error, "A deinitializer cannot be a class method")
     }
+    static func commentParseIssue() -> Diagnostic.Message {
+        .init(.warning, "Could not parse comment(s)")
+    }
 }
 
 // it do be like that for compiler stuff
@@ -198,12 +201,45 @@ class OrionVisitor: SyntaxVisitor {
         return Syntax(type)
     }
 
+    private func makeDirectives(for function: FunctionDeclSyntax) -> [OrionData.Directive] {
+        guard let trivia = function.leadingTrivia else { return [] }
+        return trivia.compactMap { piece in
+            switch piece {
+            case .lineComment(let text):
+                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard trimmed.hasPrefix("//") else {
+                    diagnosticEngine.diagnose(
+                        .commentParseIssue(),
+                        location: function.startLocation(converter: converter)
+                    )
+                    return nil
+                }
+                let text = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
+                return OrionData.Directive(text: text)
+            case .blockComment(let text):
+                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard trimmed.hasPrefix("/*") else {
+                    diagnosticEngine.diagnose(
+                        .commentParseIssue(),
+                        location: function.startLocation(converter: converter)
+                    )
+                    return nil
+                }
+                let text = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
+                return OrionData.Directive(text: text)
+            default:
+                return nil
+            }
+        }
+    }
+
     private func orionFunction(for function: FunctionDeclSyntax) -> OrionData.Function {
         OrionData.Function(
             numberOfArguments: function.signature.input.parameterList.count,
             function: makeFunction(for: function),
             identifier: makeIdentifier(for: function),
-            closure: makeClosure(for: function, kind: .function)
+            closure: makeClosure(for: function, kind: .function),
+            directives: makeDirectives(for: function)
         )
     }
 
