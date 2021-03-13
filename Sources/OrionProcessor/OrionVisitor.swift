@@ -161,21 +161,24 @@ class OrionVisitor: SyntaxVisitor {
 
     private enum FunctionKind {
         case function
-        case method(firstType: String)
+        case method(firstType: String, returnsUnmanaged: Bool)
     }
 
     private func makeClosure(for function: FunctionDeclSyntax, kind: FunctionKind) -> Syntax {
         let params = function.signature.input.parameterList
 
         let prefixTypes: [TypeSyntax]
+        let returnsUnmanaged: Bool
         switch kind {
         case .function:
             prefixTypes = []
-        case .method(let firstType):
+            returnsUnmanaged = false
+        case .method(let firstType, let _returnsUnmanaged):
             prefixTypes = [
                 SyntaxFactory.makeTypeIdentifier(firstType),
                 SyntaxFactory.makeTypeIdentifier("Selector")
             ]
+            returnsUnmanaged = _returnsUnmanaged
         }
         // TODO: Fix force unwrapping
         let types = prefixTypes + params.map { $0.type! }
@@ -188,7 +191,24 @@ class OrionVisitor: SyntaxVisitor {
             )
         }
         let arguments = SyntaxFactory.makeTupleTypeElementList(argumentsArray)
-        let returnType = function.signature.output?.returnType.withoutTrivia() ?? SyntaxFactory.makeTypeIdentifier("Void")
+        let rawReturnType =
+            function.signature.output?.returnType.withoutTrivia() ??
+            SyntaxFactory.makeTypeIdentifier("Void")
+        let returnType: TypeSyntax
+        if returnsUnmanaged {
+            returnType = Syntax(SyntaxFactory.makeSimpleTypeIdentifier(
+                name: SyntaxFactory.makeIdentifier("Unmanaged"),
+                genericArgumentClause: SyntaxFactory.makeGenericArgumentClause(
+                    leftAngleBracket: SyntaxFactory.makeLeftAngleToken(),
+                    arguments: SyntaxFactory.makeGenericArgumentList([
+                        SyntaxFactory.makeGenericArgument(argumentType: rawReturnType, trailingComma: nil)
+                    ]),
+                    rightAngleBracket: SyntaxFactory.makeRightAngleToken()
+                )
+            )).as(TypeSyntax.self)!
+        } else {
+            returnType = rawReturnType
+        }
 
         let type = SyntaxFactory.makeFunctionType(
             leftParen: SyntaxFactory.makeLeftParenToken(),
@@ -217,11 +237,11 @@ class OrionVisitor: SyntaxVisitor {
                 return OrionData.Directive(text: text)
             case .blockComment(let text):
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard trimmed.hasPrefix("/*") else {
+                guard trimmed.hasPrefix("/*") && trimmed.hasSuffix("*/") else {
                     diagnosticEngine.diagnose(.commentParseIssue(), location: location())
                     return nil
                 }
-                let text = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
+                let text = trimmed.dropFirst(2).dropLast(2).trimmingCharacters(in: .whitespacesAndNewlines)
                 return OrionData.Directive(text: text)
             default:
                 return nil
@@ -258,8 +278,16 @@ class OrionVisitor: SyntaxVisitor {
         function.modifiers?.first { ModifierKind($0) == .class }
     }
 
-    private func functionHasObjc(_ function: FunctionDeclSyntax) -> Bool {
-        function.attributes?.contains { $0.as(AttributeSyntax.self)?.attributeName.text == "objc" } == true
+    private func functionObjCAttribute(_ function: FunctionDeclSyntax) -> OrionData.ClassHook.Method.ObjCAttribute? {
+        guard let att = function.attributes?.lazy
+                .compactMap({ $0.as(AttributeSyntax.self) })
+                .first(where: { $0.attributeName.text == "objc" })
+            else { return nil }
+        if let arg = att.argument?.as(ObjCSelectorSyntax.self) {
+            return .named(arg)
+        } else {
+            return .simple
+        }
     }
 
     private func functionIsDeinitializer(_ function: FunctionDeclSyntax) -> Bool {
@@ -316,11 +344,25 @@ class OrionVisitor: SyntaxVisitor {
                 return OrionData.ClassHook.Method(
                     isAddition: functionIsAddition(function),
                     isClassMethod: isClass,
-                    hasObjcAttribute: functionHasObjc(function),
+                    objcAttribute: functionObjCAttribute(function),
                     isDeinitializer: isDeinit,
                     function: orionFunction(for: function),
-                    methodClosure: makeClosure(for: function, kind: .method(firstType: isClass ? "AnyClass" : "Target")),
-                    superClosure: makeClosure(for: function, kind: .method(firstType: "UnsafeRawPointer"))
+                    methodClosure: makeClosure(
+                        for: function,
+                        kind: .method(firstType: isClass ? "AnyClass" : "Target", returnsUnmanaged: false)
+                    ),
+                    methodClosureUnmanaged: makeClosure(
+                        for: function,
+                        kind: .method(firstType: isClass ? "AnyClass" : "Target", returnsUnmanaged: true)
+                    ),
+                    superClosure: makeClosure(
+                        for: function,
+                        kind: .method(firstType: "UnsafeRawPointer", returnsUnmanaged: false)
+                    ),
+                    superClosureUnmanaged: makeClosure(
+                        for: function,
+                        kind: .method(firstType: "UnsafeRawPointer", returnsUnmanaged: true)
+                    )
                 )
             }
         data.classHooks.append(OrionData.ClassHook(

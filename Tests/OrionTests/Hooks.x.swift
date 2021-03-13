@@ -295,3 +295,17 @@ class StringCompareHook: FunctionHook {
         }
     }
 }
+
+class CPHook: ClassHook<MyCopyClass> {
+    func copy() -> Target {
+        let cp = Target()
+        Ivars(cp)._x = target.x + 10
+        return cp
+    }
+
+    func mutableCopy() -> Target {
+        let cp = orig.mutableCopy()
+        Ivars(cp)._x += 100
+        return cp
+    }
+}

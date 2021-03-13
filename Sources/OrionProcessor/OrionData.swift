@@ -25,17 +25,72 @@ public struct OrionData {
         var identifier: Syntax // foo(bar:)
         var closure: Syntax // (Blah) -> Blah
         var directives: [Directive]
+
+        var firstPart: String {
+            let text = identifier.as(IdentifierExprSyntax.self)!.identifier.text
+            if text.hasPrefix("`") && text.hasSuffix("`") {
+                return String(text.dropFirst().dropLast())
+            }
+            return text
+        }
     }
 
     struct ClassHook {
         struct Method {
+            enum ObjCAttribute {
+                case simple // @objc
+                case named(ObjCSelectorSyntax) // @objc(name)
+            }
+
             var isAddition: Bool // implies the method should be added, not swizzled
             var isClassMethod: Bool
-            var hasObjcAttribute: Bool
+            var objcAttribute: ObjCAttribute?
             var isDeinitializer: Bool
             var function: Function
             var methodClosure: Syntax // (<Target|AnyClass>, Selector, Blah) -> Blah
+            var methodClosureUnmanaged: Syntax // (<Target|AnyClass>, Selector, Blah) -> Unmanaged<Blah>
             var superClosure: Syntax // (UnsafeRawPointer, Selector, Blah) -> Blah
+            var superClosureUnmanaged: Syntax // (UnsafeRawPointer, Selector, Blah) -> Unmanaged<Blah>
+
+            var returnsRetained: Bool {
+                // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
+                // explains when a method should return a retained value based on the selector. Swift computes
+                // method selectors here:
+                // https://github.com/apple/swift/blob/06a8902758ca22acc27a28b6cdb68dca3b11203e/lib/AST/Decl.cpp#L6952
+                // tl;dr since we're just concerned with the prefix we merely need to check the first part of
+                // the method identifier (Swift could add a With/And but that's not relevant to any of our
+                // prefixes, and additional selector parts have a colon before them.)
+
+                // TODO: allow user to override this property with a comment, similar to
+                // NS_RETURNS_[NOT_]RETAINED
+
+                if let directive = function.directives.last(where: { $0.name == "arc" }),
+                   let arg = directive.arguments.first {
+                    if arg == "retained" {
+                        return true
+                    } else if arg == "not_retained" {
+                        return false
+                    }
+                }
+
+                let firstPart: Substring
+                if case let .named(name) = objcAttribute, let first = name.first?.name {
+                    // respect explicit selector overrides
+                    firstPart = first.text[...]
+                } else {
+                    let text = function.identifier.as(IdentifierExprSyntax.self)!.identifier.text
+                    if text.hasPrefix("`") && text.hasSuffix("`") {
+                        firstPart = text.dropFirst().dropLast()
+                    } else {
+                        firstPart = text[...]
+                    }
+                }
+
+                return firstPart.hasPrefix("alloc")
+                    || firstPart.hasPrefix("new")
+                    || firstPart.hasPrefix("copy")
+                    || firstPart.hasPrefix("mutableCopy")
+            }
         }
 
         var name: String

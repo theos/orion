@@ -25,15 +25,21 @@ extension BasicHook {
 
         final class SuprType: BasicHook, _GlueClassHookTrampoline {
             @objc override func someTestMethod() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc override func someTestMethod(withArgument arg1: Int32) -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int32) -> String).self) { $0($1, _Glue.orion_sel2, arg1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int32) -> String).self) {
+                    $0($1, _Glue.orion_sel2, arg1)
+                }
             }
 
             @objc class override func someTestMethod2(withArgument arg1: Int32) -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int32) -> String).self) { $0($1, _Glue.orion_sel3, arg1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int32) -> String).self) {
+                    $0($1, _Glue.orion_sel3, arg1)
+                }
             }
         }
 
@@ -41,17 +47,17 @@ extension BasicHook {
 
         private static let orion_sel1 = #selector(BasicHook.someTestMethod as (BasicHook) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            BasicHook(target: target).someTestMethod()
+            (BasicHook(target: target).someTestMethod())
         }
 
         private static let orion_sel2 = #selector(BasicHook.someTestMethod(withArgument:) as (BasicHook) -> (Int32) -> String)
         private static var orion_orig2: @convention(c) (Target, Selector, Int32) -> String = { target, _cmd, arg1 in
-            BasicHook(target: target).someTestMethod(withArgument:)(arg1)
+            (BasicHook(target: target).someTestMethod(withArgument:)(arg1))
         }
 
         private static let orion_sel3 = #selector(BasicHook.someTestMethod2(withArgument:) as (Int32) -> String)
         private static var orion_orig3: @convention(c) (AnyClass, Selector, Int32) -> String = { target, _cmd, arg1 in
-            BasicHook.someTestMethod2(withArgument:)(arg1)
+            (BasicHook.someTestMethod2(withArgument:)(arg1))
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -74,7 +80,9 @@ extension ActivationHook {
 
         final class SuprType: ActivationHook, _GlueClassHookTrampoline {
             @objc override func someDidActivateMethod() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
         }
 
@@ -82,7 +90,7 @@ extension ActivationHook {
 
         private static let orion_sel1 = #selector(ActivationHook.someDidActivateMethod as (ActivationHook) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            ActivationHook(target: target).someDidActivateMethod()
+            (ActivationHook(target: target).someDidActivateMethod())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -103,7 +111,9 @@ extension NotHook {
 
         final class SuprType: NotHook, _GlueClassHookTrampoline {
             @objc override func someUnhookedMethod() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
         }
 
@@ -111,7 +121,7 @@ extension NotHook {
 
         private static let orion_sel1 = #selector(NotHook.someUnhookedMethod as (NotHook) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            NotHook(target: target).someUnhookedMethod()
+            (NotHook(target: target).someUnhookedMethod())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -136,11 +146,15 @@ extension NamedBasicHook {
 
         final class SuprType: NamedBasicHook, _GlueClassHookTrampoline {
             @objc override func methodForNamedTest() -> Bool {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Bool).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Bool).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc class override func classMethodForNamedTest(withArgument arg1: String) -> [String] {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector, String) -> [String]).self) { $0($1, _Glue.orion_sel2, arg1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector, String) -> [String]).self) {
+                    $0($1, _Glue.orion_sel2, arg1)
+                }
             }
         }
 
@@ -148,12 +162,12 @@ extension NamedBasicHook {
 
         private static let orion_sel1 = #selector(NamedBasicHook.methodForNamedTest as (NamedBasicHook) -> () -> Bool)
         private static var orion_orig1: @convention(c) (Target, Selector) -> Bool = { target, _cmd in
-            NamedBasicHook(target: target).methodForNamedTest()
+            (NamedBasicHook(target: target).methodForNamedTest())
         }
 
         private static let orion_sel2 = #selector(NamedBasicHook.classMethodForNamedTest(withArgument:) as (String) -> [String])
         private static var orion_orig2: @convention(c) (AnyClass, Selector, String) -> [String] = { target, _cmd, arg1 in
-            NamedBasicHook.classMethodForNamedTest(withArgument:)(arg1)
+            (NamedBasicHook.classMethodForNamedTest(withArgument:)(arg1))
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -183,15 +197,21 @@ extension BasicSubclass {
 
         final class SuprType: BasicSubclass, _GlueClassHookTrampoline {
             @objc override func someTestMethod() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc override func subclassableTestMethod() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel3) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel3)
+                }
             }
 
             @objc class override func subclassableTestMethod1() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel4) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel4)
+                }
             }
         }
 
@@ -199,22 +219,22 @@ extension BasicSubclass {
 
         private static let orion_sel1 = #selector(BasicSubclass.someTestMethod as (BasicSubclass) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            BasicSubclass(target: target).someTestMethod()
+            (BasicSubclass(target: target).someTestMethod())
         }
 
         private static let orion_sel2 = #selector(BasicSubclass.someNewMethod as (BasicSubclass) -> () -> String)
         private static var orion_imp2: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            BasicSubclass(target: target).someNewMethod()
+            (BasicSubclass(target: target).someNewMethod())
         }
 
         private static let orion_sel3 = #selector(BasicSubclass.subclassableTestMethod as (BasicSubclass) -> () -> String)
         private static var orion_orig3: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            BasicSubclass(target: target).subclassableTestMethod()
+            (BasicSubclass(target: target).subclassableTestMethod())
         }
 
         private static let orion_sel4 = #selector(BasicSubclass.subclassableTestMethod1 as () -> String)
         private static var orion_orig4: @convention(c) (AnyClass, Selector) -> String = { target, _cmd in
-            BasicSubclass.subclassableTestMethod1()
+            (BasicSubclass.subclassableTestMethod1())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -242,11 +262,15 @@ extension NamedBasicSubclass {
 
         final class SuprType: NamedBasicSubclass, _GlueClassHookTrampoline {
             @objc override func subclassableNamedTestMethod() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc class override func subclassableNamedTestMethod1() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel2) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel2)
+                }
             }
         }
 
@@ -254,12 +278,12 @@ extension NamedBasicSubclass {
 
         private static let orion_sel1 = #selector(NamedBasicSubclass.subclassableNamedTestMethod as (NamedBasicSubclass) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            NamedBasicSubclass(target: target).subclassableNamedTestMethod()
+            (NamedBasicSubclass(target: target).subclassableNamedTestMethod())
         }
 
         private static let orion_sel2 = #selector(NamedBasicSubclass.subclassableNamedTestMethod1 as () -> String)
         private static var orion_orig2: @convention(c) (AnyClass, Selector) -> String = { target, _cmd in
-            NamedBasicSubclass.subclassableNamedTestMethod1()
+            (NamedBasicSubclass.subclassableNamedTestMethod1())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -281,12 +305,12 @@ extension AdditionHook {
 
         private static let orion_sel1 = #selector(AdditionHook.someTestProtocolMethod as (AdditionHook) -> () -> String)
         private static var orion_imp1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            AdditionHook(target: target).someTestProtocolMethod()
+            (AdditionHook(target: target).someTestProtocolMethod())
         }
 
         private static let orion_sel2 = #selector(AdditionHook.someTestProtocolClassMethod as () -> String)
         private static var orion_imp2: @convention(c) (AnyClass, Selector) -> String = { target, _cmd in
-            AdditionHook.someTestProtocolClassMethod()
+            (AdditionHook.someTestProtocolClassMethod())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -308,7 +332,9 @@ extension InheritedHook {
 
         final class SuprType: InheritedHook, _GlueClassHookTrampoline {
             @objc class override func someTestMethod3() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
         }
 
@@ -316,7 +342,7 @@ extension InheritedHook {
 
         private static let orion_sel1 = #selector(InheritedHook.someTestMethod3 as () -> String)
         private static var orion_orig1: @convention(c) (AnyClass, Selector) -> String = { target, _cmd in
-            InheritedHook.someTestMethod3()
+            (InheritedHook.someTestMethod3())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -341,11 +367,15 @@ extension InitHook {
 
         final class SuprType: InitHook, _GlueClassHookTrampoline {
             @objc override func `init`() -> Target {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Target).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Target).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc override func `init`(withX arg1: Int32) -> Target {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int32) -> Target).self) { $0($1, _Glue.orion_sel2, arg1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int32) -> Target).self) {
+                    $0($1, _Glue.orion_sel2, arg1)
+                }
             }
         }
 
@@ -353,12 +383,12 @@ extension InitHook {
 
         private static let orion_sel1 = #selector(InitHook.`init` as (InitHook) -> () -> Target)
         private static var orion_orig1: @convention(c) (Target, Selector) -> Target = { target, _cmd in
-            InitHook(target: target).`init`()
+            (InitHook(target: target).`init`())
         }
 
         private static let orion_sel2 = #selector(InitHook.`init`(withX:) as (InitHook) -> (Int32) -> Target)
         private static var orion_orig2: @convention(c) (Target, Selector, Int32) -> Target = { target, _cmd, arg1 in
-            InitHook(target: target).`init`(withX:)(arg1)
+            (InitHook(target: target).`init`(withX:)(arg1))
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -384,11 +414,15 @@ extension SuperHook {
 
         final class SuprType: SuperHook, _GlueClassHookTrampoline {
             @objc override func description() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc override func hooked() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel2) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel2)
+                }
             }
         }
 
@@ -396,12 +430,12 @@ extension SuperHook {
 
         private static let orion_sel1 = #selector(SuperHook.description as (SuperHook) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            SuperHook(target: target).description()
+            (SuperHook(target: target).description())
         }
 
         private static let orion_sel2 = #selector(SuperHook.hooked as (SuperHook) -> () -> String)
         private static var orion_orig2: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            SuperHook(target: target).hooked()
+            (SuperHook(target: target).hooked())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -427,11 +461,15 @@ extension PropertyHookX {
 
         final class SuprType: PropertyHookX, _GlueClassHookTrampoline {
             @objc override func getXValue() -> Int {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc override func setXValue(_ arg1: Int)  {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int) -> Void).self) { $0($1, _Glue.orion_sel2, arg1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int) -> Void).self) {
+                    $0($1, _Glue.orion_sel2, arg1)
+                }
             }
         }
 
@@ -439,12 +477,12 @@ extension PropertyHookX {
 
         private static let orion_sel1 = #selector(PropertyHookX.getXValue as (PropertyHookX) -> () -> Int)
         private static var orion_orig1: @convention(c) (Target, Selector) -> Int = { target, _cmd in
-            PropertyHookX(target: target).getXValue()
+            (PropertyHookX(target: target).getXValue())
         }
 
         private static let orion_sel2 = #selector(PropertyHookX.setXValue(_:) as (PropertyHookX) -> (Int) -> Void)
         private static var orion_orig2: @convention(c) (Target, Selector, Int) -> Void = { target, _cmd, arg1 in
-            PropertyHookX(target: target).setXValue(_:)(arg1)
+            (PropertyHookX(target: target).setXValue(_:)(arg1))
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -470,11 +508,15 @@ extension PropertyHookY {
 
         final class SuprType: PropertyHookY, _GlueClassHookTrampoline {
             @objc override func getYValue() -> Int {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc override func setYValue(_ arg1: Int)  {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int) -> Void).self) { $0($1, _Glue.orion_sel2, arg1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int) -> Void).self) {
+                    $0($1, _Glue.orion_sel2, arg1)
+                }
             }
         }
 
@@ -482,12 +524,12 @@ extension PropertyHookY {
 
         private static let orion_sel1 = #selector(PropertyHookY.getYValue as (PropertyHookY) -> () -> Int)
         private static var orion_orig1: @convention(c) (Target, Selector) -> Int = { target, _cmd in
-            PropertyHookY(target: target).getYValue()
+            (PropertyHookY(target: target).getYValue())
         }
 
         private static let orion_sel2 = #selector(PropertyHookY.setYValue(_:) as (PropertyHookY) -> (Int) -> Void)
         private static var orion_orig2: @convention(c) (Target, Selector, Int) -> Void = { target, _cmd, arg1 in
-            PropertyHookY(target: target).setYValue(_:)(arg1)
+            (PropertyHookY(target: target).setYValue(_:)(arg1))
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -513,11 +555,15 @@ extension PropertyHook2 {
 
         final class SuprType: PropertyHook2, _GlueClassHookTrampoline {
             @objc override func getXValue() -> Int {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Int).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
 
             @objc override func setXValue(_ arg1: Int)  {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int) -> Void).self) { $0($1, _Glue.orion_sel2, arg1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector, Int) -> Void).self) {
+                    $0($1, _Glue.orion_sel2, arg1)
+                }
             }
         }
 
@@ -525,12 +571,12 @@ extension PropertyHook2 {
 
         private static let orion_sel1 = #selector(PropertyHook2.getXValue as (PropertyHook2) -> () -> Int)
         private static var orion_orig1: @convention(c) (Target, Selector) -> Int = { target, _cmd in
-            PropertyHook2(target: target).getXValue()
+            (PropertyHook2(target: target).getXValue())
         }
 
         private static let orion_sel2 = #selector(PropertyHook2.setXValue(_:) as (PropertyHook2) -> (Int) -> Void)
         private static var orion_orig2: @convention(c) (Target, Selector, Int) -> Void = { target, _cmd, arg1 in
-            PropertyHook2(target: target).setXValue(_:)(arg1)
+            (PropertyHook2(target: target).setXValue(_:)(arg1))
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -622,7 +668,9 @@ extension GrHook {
 
         final class SuprType: GrHook, _GlueClassHookTrampoline {
             @objc override func myString() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
         }
 
@@ -630,7 +678,7 @@ extension GrHook {
 
         private static let orion_sel1 = #selector(GrHook.myString as (GrHook) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            GrHook(target: target).myString()
+            (GrHook(target: target).myString())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -651,7 +699,9 @@ extension GrHook2 {
 
         final class SuprType: GrHook2, _GlueClassHookTrampoline {
             @objc override func mySecondString() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
         }
 
@@ -659,7 +709,7 @@ extension GrHook2 {
 
         private static let orion_sel1 = #selector(GrHook2.mySecondString as (GrHook2) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            GrHook2(target: target).mySecondString()
+            (GrHook2(target: target).mySecondString())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
@@ -680,7 +730,9 @@ extension GrHook3 {
 
         final class SuprType: GrHook3, _GlueClassHookTrampoline {
             @objc override func myThirdString() -> String {
-                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) { $0($1, _Glue.orion_sel1) }
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> String).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
             }
         }
 
@@ -688,11 +740,58 @@ extension GrHook3 {
 
         private static let orion_sel1 = #selector(GrHook3.myThirdString as (GrHook3) -> () -> String)
         private static var orion_orig1: @convention(c) (Target, Selector) -> String = { target, _cmd in
-            GrHook3(target: target).myThirdString()
+            (GrHook3(target: target).myThirdString())
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
             builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+        }
+    }
+}
+
+extension CPHook {
+    enum _Glue: _GlueClassHook {
+        typealias HookType = CPHook
+
+        final class OrigType: CPHook, _GlueClassHookTrampoline {
+            @objc override func copy() -> Target {
+                _Glue.orion_orig1(target, _Glue.orion_sel1).takeRetainedValue()
+            }
+
+            @objc override func mutableCopy() -> Target {
+                _Glue.orion_orig2(target, _Glue.orion_sel2).takeRetainedValue()
+            }
+        }
+
+        final class SuprType: CPHook, _GlueClassHookTrampoline {
+            @objc override func copy() -> Target {
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Unmanaged<Target>).self) {
+                    $0($1, _Glue.orion_sel1).takeRetainedValue()
+                }
+            }
+
+            @objc override func mutableCopy() -> Target {
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Unmanaged<Target>).self) {
+                    $0($1, _Glue.orion_sel2).takeRetainedValue()
+                }
+            }
+        }
+
+        static let storage = initializeStorage()
+
+        private static let orion_sel1 = #selector(CPHook.copy as (CPHook) -> () -> Target)
+        private static var orion_orig1: @convention(c) (Target, Selector) -> Unmanaged<Target> = { target, _cmd in
+            Unmanaged.passRetained(CPHook(target: target).copy())
+        }
+
+        private static let orion_sel2 = #selector(CPHook.mutableCopy as (CPHook) -> () -> Target)
+        private static var orion_orig2: @convention(c) (Target, Selector) -> Unmanaged<Target> = { target, _cmd in
+            Unmanaged.passRetained(CPHook(target: target).mutableCopy())
+        }
+    
+        static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
+            builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+            builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
         }
     }
 }
@@ -774,6 +873,7 @@ func orion_init() {
             GrHook._Glue.self,
             GrHook2._Glue.self,
             GrHook3._Glue.self,
+            CPHook._Glue.self,
             AtoiHook._Glue.self,
             AtofHook._Glue.self,
             StringCompareHook._Glue.self

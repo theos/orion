@@ -65,6 +65,47 @@ final class ClassHookTests: XCTestCase {
         XCTAssertEqual(cls.x, 6)
     }
 
+    func testPlusOneOverRelease() throws {
+        weak var cp: MyCopyClass?
+        try autoreleasepool {
+            let obj = MyCopyClass()
+            let copy = try XCTUnwrap(obj.copy() as? MyCopyClass)
+            XCTAssertEqual(copy.x, 15, "-copy may not have been swizzled")
+            // the extra retain will result in the weak reference
+            // being non-nil unless there's an overrelease
+            cp = Unmanaged.passUnretained(copy).retain().takeUnretainedValue()
+        }
+        XCTAssertNotNil(cp, "-copy resulted in an extra release")
+        if let nonNilCP = cp {
+            // balance the extra retain
+            _ = Unmanaged.passRetained(nonNilCP)
+        }
+    }
+
+    func testPlusOneNoLeak() throws {
+        weak var weakCP: MyCopyClass?
+        try autoreleasepool {
+            let cp = try XCTUnwrap(MyCopyClass().copy() as? MyCopyClass)
+            weakCP = cp
+        }
+        XCTAssertNil(weakCP, "copy (no orig) resulted in an extra retain")
+    }
+
+    func testPlusOneOrigNoCrash() throws {
+        let obj = MyCopyClass()
+        let cp = try XCTUnwrap(autoreleasepool(invoking: obj.mutableCopy) as? MyCopyClass)
+        XCTAssertEqual(cp.x, 199, "-mutableCopy may not have been swizzled")
+    }
+
+    func testPlusOneOrigNoLeak() throws {
+        weak var weakCP: MyCopyClass?
+        try autoreleasepool {
+            let cp = try XCTUnwrap(MyCopyClass().mutableCopy() as? MyCopyClass)
+            weakCP = cp
+        }
+        XCTAssertNil(weakCP, "mutableCopy (with orig) resulted in an extraneous retain")
+    }
+
     func testSuper() {
         let cls = MyClass()
         let desc = cls.description

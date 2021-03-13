@@ -96,6 +96,11 @@ public final class OrionGenerator {
         let origIdent = "orion_\(method.isAddition ? "imp" : "orig")\(index)"
         let selIdent = "orion_sel\(index)"
 
+        let returnsRetained = method.returnsRetained
+        let takeRetained = returnsRetained ? ".takeRetainedValue()" : ""
+        let passRetained = returnsRetained ? "Unmanaged.passRetained" : ""
+        let methodClosure = returnsRetained ? method.methodClosureUnmanaged : method.methodClosure
+
         if method.isDeinitializer {
             orig = method.isAddition ? nil : """
             \(method.function.function) {
@@ -128,17 +133,20 @@ public final class OrionGenerator {
             // While we don't need to add @objc due to the class being @objcMembers (and the #selector
             // failing if the function can't be represented in objc), this results in better diagnostics
             // than merely having an error on the #selector line
-            let funcOverride = "\(method.hasObjcAttribute ? "" : "@objc ")\(method.function.function)"
+            let funcOverride = "\(method.objcAttribute == nil ? "@objc " : "")\(method.function.function)"
 
             orig = """
             \(funcOverride) {
-                _Glue.\(origIdent)(target, _Glue.\(selIdent)\(commaArgs))
+                _Glue.\(origIdent)(target, _Glue.\(selIdent)\(commaArgs))\(takeRetained)
             }
             """
 
+            let superClosure = returnsRetained ? method.superClosureUnmanaged : method.superClosure
             supr = """
             \(funcOverride) {
-                callSuper((@convention(c) \(method.superClosure)).self) { $0($1, _Glue.\(selIdent)\(commaArgs)) }
+                callSuper((@convention(c) \(superClosure)).self) {
+                    $0($1, _Glue.\(selIdent)\(commaArgs))\(takeRetained)
+                }
             }
             """
 
@@ -152,8 +160,8 @@ public final class OrionGenerator {
         let selSig = "\(method.isClassMethod ? "" : "(\(className)) -> ")\(method.function.closure)"
         let main = """
         private static let \(selIdent) = #selector(\(className).\(method.function.identifier) as \(selSig))
-        private static var \(origIdent): @convention(c) \(method.methodClosure) = { target, _cmd\(commaArgs) in
-            \(className)\(method.isClassMethod ? "" : "(target: target)").\(method.function.identifier)(\(argsList))
+        private static var \(origIdent): @convention(c) \(methodClosure) = { target, _cmd\(commaArgs) in
+            \(passRetained)(\(className)\(method.isClassMethod ? "" : "(target: target)").\(method.function.identifier)(\(argsList)))
         }
         """
 
