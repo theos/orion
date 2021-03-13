@@ -1,6 +1,10 @@
 import Foundation
 import SwiftSyntax
 
+// it do be like that for compiler stuff
+// swiftlint:disable:next superfluous_disable_command
+// swiftlint:disable type_body_length file_length
+
 private extension Diagnostic.Message {
     static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
         .init(.error, "A \(declKind) cannot be private, fileprivate, or final")
@@ -38,8 +42,6 @@ private extension Diagnostic.Message {
     }
 }
 
-// it do be like that for compiler stuff
-// swiftlint:disable:next type_body_length
 class OrionVisitor: SyntaxVisitor {
     private enum DeclarationKind: CustomStringConvertible {
         case classHook(target: Syntax)

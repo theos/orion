@@ -1,6 +1,9 @@
 import Foundation
 import SwiftSyntax
 
+// swiftlint:disable:next superfluous_disable_command
+// swiftlint:disable type_body_length file_length
+
 private extension Sequence {
     // y u no variadic generics, swift :/
 
