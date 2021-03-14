@@ -10,6 +10,38 @@ include $(THEOS_MAKE_PATH)/xcodeproj.mk
 SDK_DIR = $(THEOS_PACKAGE_DIR)/Orion.framework
 DSYM_DIR = $(SDK_DIR).dSYM
 
+SUBPKG_0_ID = 12
+SUBPKG_0_NAME = iOS 12-13
+SUBPKG_0_FW = firmware (>= 12.2), firmware (<< 14.0)
+
+SUBPKG_1_ID = 14
+SUBPKG_1_NAME = iOS 14
+SUBPKG_1_FW = firmware (>= 14.0), firmware (<< 15.0)
+
+IS_OSS_SWIFT := $(shell $(TARGET_SWIFTC) --version | grep -q swiftlang || echo 1)
+ifeq ($(SUBPKG),)
+ifneq ($(IS_OSS_SWIFT),)
+SUBPKG := 0
+else
+APPLE_SWIFT_VERSION := $(shell $(TARGET_SWIFTC) --version | cut -d' ' -f4)
+ifeq ($(shell $(THEOS_BIN_PATH)/vercmp.pl $(APPLE_SWIFT_VERSION) ge 5.3),1)
+SUBPKG := 1
+else
+SUBPKG := 0
+endif
+endif
+endif
+
+override THEOS_PACKAGE_NAME := dev.theos.orion$(SUBPKG_$(SUBPKG)_ID)
+
+before-package::
+	$(ECHO_NOTHING)sed -i '' \
+		-e 's/\$${SUBPKG_ID}/$(SUBPKG_$(SUBPKG)_ID)/g' \
+		-e 's/\$${SUBPKG_NAME}/$(SUBPKG_$(SUBPKG)_NAME)/g' \
+		-e 's/\$${SUBPKG_FW}/$(SUBPKG_$(SUBPKG)_FW)/g' \
+		-e 's/\$${PKG_VERSION}/$(_THEOS_INTERNAL_PACKAGE_VERSION)/g' \
+		$(_THEOS_ESCAPED_STAGING_DIR)/DEBIAN/control$(ECHO_END)
+
 internal-stage::
 	$(ECHO_NOTHING)mkdir -p $(THEOS_PACKAGE_DIR)$(ECHO_END)
 	$(ECHO_NOTHING)rm -rf $(SDK_DIR) $(DSYM_DIR)$(ECHO_END)

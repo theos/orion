@@ -1,9 +1,10 @@
-Package: dev.theos.orion
-Name: Orion
-Depends: firmware (>= 12.2), mobilesubstrate (>= 0.9.5000)
+Package: dev.theos.orion${SUBPKG_ID}
+Name: Orion (${SUBPKG_NAME})
+Depends: ${SUBPKG_FW}, mobilesubstrate (>= 0.9.5000)
 Version: 0.9.1
+Provides: dev.theos.orion (= ${PKG_VERSION})
 Architecture: iphoneos-arm
-Description: The Orion library for Swift tweak support
+Description: Runtime for tweaks built using Orion and Swift
 Maintainer: Theos Team <theos@kabiroberai.com>
 Author: Theos Team <theos@kabiroberai.com>
 Section: System
