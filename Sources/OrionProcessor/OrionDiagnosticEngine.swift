@@ -35,4 +35,12 @@ public class OrionDiagnosticEngine {
     public func addConsumer(_ consumer: OrionDiagnosticConsumer) {
         engine.addConsumer(consumer.consumer)
     }
+
+    public func diagnoseUnusedDirectives() {
+        OrionDirectiveParser.shared.unusedDirectiveBases().forEach {
+            engine.diagnose(.init(.warning, "Unused directive"), location: $0.location)
+            // so that future calls don't complain about the same directives
+            $0.setUsed()
+        }
+    }
 }

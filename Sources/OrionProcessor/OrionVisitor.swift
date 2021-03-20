@@ -19,6 +19,16 @@ private extension Diagnostic.Message {
             """
         )
     }
+    static func finalClassMethodDecl() -> Diagnostic.Message {
+        .init(
+            .error,
+            """
+            A method hook/addition cannot be declared with the modifier final. If you intended \
+            to mark this method as an addition, add the directive `// orion:new` above the \
+            declaration instead.
+            """
+        )
+    }
     static func multipleDecls() -> Diagnostic.Message {
         .init(.error, "A type can only be a single type of hook or tweak")
     }
@@ -38,7 +48,7 @@ private extension Diagnostic.Message {
         .init(.error, "A deinitializer cannot be a class method")
     }
     static func commentParseIssue() -> Diagnostic.Message {
-        .init(.warning, "Could not parse comment(s)")
+        .init(.warning, "Could not parse comment for directives")
     }
 }
 
@@ -113,6 +123,65 @@ class OrionVisitor: SyntaxVisitor {
 
     private(set) var data = OrionData()
     private(set) var didFail = false
+
+    private func makeDirectives(
+        for trivia: Trivia,
+        position: AbsolutePosition
+    ) -> [OrionDirective] {
+        var currPos = position
+        return trivia.compactMap { piece in
+            defer { currPos += piece.sourceLength }
+            let location = converter.location(for: currPos)
+            let directive: String
+            switch piece {
+            case .lineComment(let text):
+                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard trimmed.hasPrefix("//") else {
+                    diagnosticEngine.diagnose(.commentParseIssue(), location: location)
+                    return nil
+                }
+                directive = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
+            case .blockComment(let text):
+                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard trimmed.hasPrefix("/*") && trimmed.hasSuffix("*/") else {
+                    diagnosticEngine.diagnose(.commentParseIssue(), location: location)
+                    return nil
+                }
+                directive = trimmed.dropFirst(2).dropLast(2).trimmingCharacters(in: .whitespacesAndNewlines)
+            default:
+                return nil
+            }
+            do {
+                return try OrionDirectiveParser.shared.directive(from: directive, at: location)
+            } catch let err as OrionDirectiveDiagnostic {
+                diagnosticEngine.diagnose(err.diagnosticMessage, location: location)
+                return nil
+            } catch {
+                diagnosticEngine.diagnose(Diagnostic.Message(.error, "\(error)"), location: location)
+                return nil
+            }
+        }
+    }
+
+    // any comments between the last token *before* syntax, and the first token *of* syntax
+    // are considered here
+    private func makeDirectives(for syntax: Syntax) -> [OrionDirective] {
+        let leading: [OrionDirective]
+        if let trivia = syntax.leadingTrivia {
+            leading = makeDirectives(for: trivia, position: syntax.position)
+        } else {
+            leading = []
+        }
+
+        let prevTrailing: [OrionDirective]
+        if let prev = syntax.previousToken, let trivia = prev.trailingTrivia {
+            prevTrailing = makeDirectives(for: trivia, position: prev.endPositionBeforeTrailingTrivia)
+        } else {
+            prevTrailing = []
+        }
+
+        return prevTrailing + leading
+    }
 
     private func makeFunction(for function: FunctionDeclSyntax) -> Syntax {
         let elements = function.signature.input.parameterList.enumerated().map { idx, element -> FunctionParameterSyntax in
@@ -223,46 +292,13 @@ class OrionVisitor: SyntaxVisitor {
         return Syntax(type)
     }
 
-    private func makeDirectives(
-        for trivia: Trivia,
-        location: @autoclosure () -> SourceLocation
-    ) -> [OrionData.Directive] {
-        trivia.compactMap { piece in
-            switch piece {
-            case .lineComment(let text):
-                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard trimmed.hasPrefix("//") else {
-                    diagnosticEngine.diagnose(.commentParseIssue(), location: location())
-                    return nil
-                }
-                let text = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
-                return OrionData.Directive(text: text)
-            case .blockComment(let text):
-                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard trimmed.hasPrefix("/*") && trimmed.hasSuffix("*/") else {
-                    diagnosticEngine.diagnose(.commentParseIssue(), location: location())
-                    return nil
-                }
-                let text = trimmed.dropFirst(2).dropLast(2).trimmingCharacters(in: .whitespacesAndNewlines)
-                return OrionData.Directive(text: text)
-            default:
-                return nil
-            }
-        }
-    }
-
-    private func makeDirectives(for function: FunctionDeclSyntax) -> [OrionData.Directive] {
-        guard let trivia = function.leadingTrivia else { return [] }
-        return makeDirectives(for: trivia, location: function.startLocation(converter: converter))
-    }
-
     private func orionFunction(for function: FunctionDeclSyntax) -> OrionData.Function {
         OrionData.Function(
             numberOfArguments: function.signature.input.parameterList.count,
             function: makeFunction(for: function),
             identifier: makeIdentifier(for: function),
             closure: makeClosure(for: function, kind: .function),
-            directives: makeDirectives(for: function)
+            directives: makeDirectives(for: Syntax(function))
         )
     }
 
@@ -327,6 +363,14 @@ class OrionVisitor: SyntaxVisitor {
                     didFail = true
                     return false
                 }
+                if decl.modifiers?.contains(where: { ModifierKind($0) == .final }) == true {
+                    diagnosticEngine.diagnose(
+                        .finalClassMethodDecl(),
+                        location: decl.startLocation(converter: converter)
+                    )
+                    didFail = true
+                    return false
+                }
                 return true
             }
             .compactMap { function -> OrionData.ClassHook.Method? in
@@ -344,7 +388,6 @@ class OrionVisitor: SyntaxVisitor {
                     return nil
                 }
                 return OrionData.ClassHook.Method(
-                    isAddition: functionIsAddition(function),
                     isClassMethod: isClass,
                     objcAttribute: functionObjCAttribute(function),
                     isDeinitializer: isDeinit,
@@ -473,7 +516,27 @@ class OrionVisitor: SyntaxVisitor {
         }
     }
 
+    override func visit(_ node: SourceFileSyntax) -> SyntaxVisitorContinueKind {
+        let directives = makeDirectives(for: Syntax(node))
+        if directives.first is OrionDirectives.Disable {
+            // we just need to mark these first few directives as used
+            // so that they don't emit warnings. Everything else will
+            // be skipped anyway.
+            directives.forEach { $0.setUsed() }
+            return .skipChildren
+        } else {
+            data.globalDirectives += directives
+            return .visitChildren
+        }
+    }
+
     override func visitPost(_ node: ImportDeclSyntax) {
         data.imports.append(node.withoutTrivia())
+    }
+
+    override func visitPost(_ node: TokenSyntax) {
+        // so that all directives can be registered for "unused directive"
+        // warnings.
+        _ = makeDirectives(for: Syntax(node))
     }
 }

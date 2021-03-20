@@ -2,29 +2,13 @@ import Foundation
 import SwiftSyntax
 
 public struct OrionData {
-    struct Directive {
-        static let prefix = "orion:"
-
-        let name: String
-        let arguments: [String]
-
-        init?(text: String) {
-            guard text.hasPrefix(Self.prefix) else { return nil }
-            let dropped = text.dropFirst(Self.prefix.count)
-            let parts = dropped.split(separator: " ")
-            guard let name = parts.first else { return nil }
-            self.name = String(name)
-            self.arguments = parts.dropFirst().map(String.init)
-        }
-    }
-
     struct Function {
         var numberOfArguments: Int
         // with args replaced with arg1, arg2, etc
         var function: Syntax // func foo(bar arg1: Blah) -> Blah
         var identifier: Syntax // foo(bar:)
         var closure: Syntax // (Blah) -> Blah
-        var directives: [Directive]
+        var directives: [OrionDirective]
 
         var firstPart: String {
             let text = identifier.as(IdentifierExprSyntax.self)!.identifier.text
@@ -42,7 +26,6 @@ public struct OrionData {
                 case named(ObjCSelectorSyntax) // @objc(name)
             }
 
-            var isAddition: Bool // implies the method should be added, not swizzled
             var isClassMethod: Bool
             var objcAttribute: ObjCAttribute?
             var isDeinitializer: Bool
@@ -51,6 +34,15 @@ public struct OrionData {
             var methodClosureUnmanaged: Syntax // (<Target|AnyClass>, Selector, Blah) -> Unmanaged<Blah>
             var superClosure: Syntax // (UnsafeRawPointer, Selector, Blah) -> Blah
             var superClosureUnmanaged: Syntax // (UnsafeRawPointer, Selector, Blah) -> Unmanaged<Blah>
+
+            var isAddition: Bool {
+                if let directive = function.directives.compactMap({ $0 as? OrionDirectives.New }).last {
+                    directive.setUsed()
+                    return true
+                } else {
+                    return false
+                }
+            }
 
             var returnsRetained: Bool {
                 // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
@@ -61,16 +53,9 @@ public struct OrionData {
                 // the method identifier (Swift could add a With/And but that's not relevant to any of our
                 // prefixes, and additional selector parts have a colon before them.)
 
-                // TODO: allow user to override this property with a comment, similar to
-                // NS_RETURNS_[NOT_]RETAINED
-
-                if let directive = function.directives.last(where: { $0.name == "arc" }),
-                   let arg = directive.arguments.first {
-                    if arg == "retained" {
-                        return true
-                    } else if arg == "not_retained" {
-                        return false
-                    }
+                if let directive = function.directives.compactMap({ $0 as? OrionDirectives.ARC }).last {
+                    directive.setUsed()
+                    return directive.mode == .retained
                 }
 
                 let firstPart: Substring
@@ -118,6 +103,7 @@ public struct OrionData {
     var functionHooks: [FunctionHook] = []
     var tweaks: [Tweak] = []
     var imports: [ImportDeclSyntax] = []
+    var globalDirectives: [OrionDirective] = []
 }
 
 extension OrionData {

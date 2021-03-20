@@ -616,16 +616,24 @@ extension DeSubHook1 {
     enum _Glue: _GlueClassHook {
         typealias HookType = DeSubHook1
 
-        final class OrigType: DeSubHook1, _GlueClassHookTrampoline {}
+        final class OrigType: DeSubHook1, _GlueClassHookTrampoline {
+            override func deinitializer() -> DeinitPolicy {
+                deinitOrigError()
+            }
+        }
 
-        final class SuprType: DeSubHook1, _GlueClassHookTrampoline {}
+        final class SuprType: DeSubHook1, _GlueClassHookTrampoline {
+            override func deinitializer() -> DeinitPolicy {
+                deinitSuprError()
+            }
+        }
 
         static let storage = initializeStorage()
 
-        private static var orion_imp1: @convention(c) (Any, Selector) -> Void = { _, _ in }
+        private static var orion_orig1: @convention(c) (Any, Selector) -> Void = { _, _ in }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
-            builder.addDeinitializer(to: DeSubHook1.self, getOrig: { orion_imp1 }, setOrig: { orion_imp1 = $0 })
+            builder.addDeinitializer(to: DeSubHook1.self, getOrig: { orion_orig1 }, setOrig: { orion_orig1 = $0 })
         }
     }
 }

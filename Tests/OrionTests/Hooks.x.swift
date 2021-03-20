@@ -115,7 +115,7 @@ class BasicSubclass: ClassHook<BasicClass> {
         "Subclassed test method"
     }
 
-    final func someNewMethod() -> String {
+    /* orion:new */ func someNewMethod() -> String {
         "New method"
     }
 
@@ -142,11 +142,13 @@ class NamedBasicSubclass: ClassHook<NSObject> {
 }
 
 class AdditionHook: ClassHook<BasicClass> {
-    final func someTestProtocolMethod() -> String {
+    // orion:new
+    func someTestProtocolMethod() -> String {
         "New method"
     }
 
-    final class func someTestProtocolClassMethod() -> String {
+    // orion:new
+    class func someTestProtocolClassMethod() -> String {
         "New class method"
     }
 }
@@ -220,9 +222,7 @@ class DeHook: ClassHook<DeClass> {
 }
 
 class DeSubHook1: ClassHook<DeSubclass1> {
-    // final just to ensure that we can adapt when a deinitializer is `final`
-    // (even though it makes no effective difference)
-    final func deinitializer() -> DeinitPolicy {
+    func deinitializer() -> DeinitPolicy {
         Self.target.watcher?.classWillDeallocate(withIdentifier: target.identifier, cls: DeSubHook1.self)
         return .callOrig
     }

@@ -96,22 +96,27 @@ public final class OrionGenerator {
         let args = arguments(for: method.function)
         let argsList = args.joined(separator: ", ")
         let commaArgs = args.isEmpty ? "" : ", \(argsList)"
-        let origIdent = "orion_\(method.isAddition ? "imp" : "orig")\(index)"
+
+        // order of operands matters here; we don't want to evaluate isAddition
+        // if it's a deinitializer, so that Orion can notify the user if they
+        // have a pointless `// orion:new`
+        let isAddition = !method.isDeinitializer && method.isAddition
+        let origIdent = "orion_\(isAddition ? "imp" : "orig")\(index)"
         let selIdent = "orion_sel\(index)"
 
-        let returnsRetained = method.returnsRetained
+        let returnsRetained = !method.isDeinitializer && method.returnsRetained
         let takeRetained = returnsRetained ? ".takeRetainedValue()" : ""
         let passRetained = returnsRetained ? "Unmanaged.passRetained" : ""
         let methodClosure = returnsRetained ? method.methodClosureUnmanaged : method.methodClosure
 
         if method.isDeinitializer {
-            orig = method.isAddition ? nil : """
+            orig = """
             \(method.function.function) {
                 deinitOrigError()
             }
             """
 
-            supr = method.isAddition ? nil : """
+            supr = """
             \(method.function.function) {
                 deinitSuprError()
             }
@@ -126,7 +131,7 @@ public final class OrionGenerator {
             """
 
             return (orig, supr, main, register)
-        } else if method.isAddition {
+        } else if isAddition {
             orig = nil
             supr = nil
             register = """
@@ -241,7 +246,17 @@ public final class OrionGenerator {
         "\(items.joined(separator: separation))\(items.isEmpty ? "" : "\n\n")"
     }
 
-    public func generate(backend: Backend = .internal, extraBackendModules: Set<String> = []) throws -> String {
+    public func generate(
+        backend: Backend = .internal,
+        extraBackendModules: Set<String> = [],
+        diagnoseUnusedDirectives: Bool = true
+    ) throws -> String {
+        defer {
+            if diagnoseUnusedDirectives {
+                diagnosticEngine.diagnoseUnusedDirectives()
+            }
+        }
+
         let (classes, classHookNames) = data.classHooks.enumerated()
             .map { generateConcreteClassHook(from: $1, idx: $0 + 1) }
             .unzip()
