@@ -99,20 +99,29 @@ public struct OrionData {
         var converter: SourceLocationConverter
     }
 
-    var classHooks: [ClassHook] = []
-    var functionHooks: [FunctionHook] = []
-    var tweaks: [Tweak] = []
-    var imports: [ImportDeclSyntax] = []
-    var globalDirectives: [OrionDirective] = []
-}
+    // we don't provide `[]` as a default value here because that
+    // would make it easy to forget to handle the property in
+    // init(merging:)
+    var classHooks: [ClassHook]
+    var functionHooks: [FunctionHook]
+    var tweaks: [Tweak]
+    var imports: [ImportDeclSyntax]
+    var globalDirectives: [OrionDirective]
 
-extension OrionData {
+    public init() {
+        classHooks = []
+        functionHooks = []
+        tweaks = []
+        imports = []
+        globalDirectives = []
+    }
 
     public init(merging data: [OrionData]) {
         classHooks = data.flatMap { $0.classHooks }
         functionHooks = data.flatMap { $0.functionHooks }
         tweaks = data.flatMap { $0.tweaks }
         imports = data.flatMap { $0.imports }
+        globalDirectives = data.flatMap { $0.globalDirectives }
     }
 
 }

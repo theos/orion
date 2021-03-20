@@ -525,6 +525,9 @@ class OrionVisitor: SyntaxVisitor {
             directives.forEach { $0.setUsed() }
             return .skipChildren
         } else {
+            // note that since OrionData types are merged before being passed
+            // to the generator, this means global directives are truly *global*
+            // and not per-file
             data.globalDirectives += directives
             return .visitChildren
         }
