@@ -86,10 +86,12 @@ public struct OrionData {
                     }
                 }
 
-                return firstPart.hasPrefix("alloc")
-                    || firstPart.hasPrefix("new")
-                    || firstPart.hasPrefix("copy")
-                    || firstPart.hasPrefix("mutableCopy")
+                let root = firstPart.drop /* while: */ { $0 == "_" }
+
+                return root.hasPrefix("alloc")
+                    || root.hasPrefix("new")
+                    || root.hasPrefix("copy")
+                    || root.hasPrefix("mutableCopy")
             }
         }
 
