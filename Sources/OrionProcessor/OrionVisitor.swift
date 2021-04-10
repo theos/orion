@@ -540,7 +540,7 @@ class OrionVisitor: SyntaxVisitor {
 
     override func visit(_ node: SourceFileSyntax) -> SyntaxVisitorContinueKind {
         let directives = makeDirectives(for: Syntax(node))
-        if directives.first is OrionDirectives.Disable {
+        if directives.contains(where: { $0 is OrionDirectives.Disable }) {
             // we just need to mark these first few directives as used
             // so that they don't emit warnings. Everything else will
             // be skipped anyway.
