@@ -18,7 +18,6 @@
 		568974B0252BBA15006F48E9 /* Ivars.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A2252BBA15006F48E9 /* Ivars.swift */; };
 		568974B1252BBA15006F48E9 /* Property.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A3252BBA15006F48E9 /* Property.swift */; };
 		568974B2252BBA15006F48E9 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A4252BBA15006F48E9 /* Backend.swift */; };
-		568974B3252BBA15006F48E9 /* MutexLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A5252BBA15006F48E9 /* MutexLock.swift */; };
 		568974B5252BBA15006F48E9 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A7252BBA15006F48E9 /* ReadWriteLock.swift */; };
 		568974B6252BBA15006F48E9 /* Hook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A8252BBA15006F48E9 /* Hook.swift */; };
 		568974B7252BBA16006F48E9 /* Tweak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A9252BBA15006F48E9 /* Tweak.swift */; };
@@ -57,7 +56,6 @@
 		568974A2252BBA15006F48E9 /* Ivars.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ivars.swift; sourceTree = "<group>"; };
 		568974A3252BBA15006F48E9 /* Property.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Property.swift; sourceTree = "<group>"; };
 		568974A4252BBA15006F48E9 /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
-		568974A5252BBA15006F48E9 /* MutexLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutexLock.swift; sourceTree = "<group>"; };
 		568974A7252BBA15006F48E9 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
 		568974A8252BBA15006F48E9 /* Hook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hook.swift; sourceTree = "<group>"; };
 		568974A9252BBA15006F48E9 /* Tweak.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tweak.swift; sourceTree = "<group>"; };
@@ -211,7 +209,6 @@
 				568974A2252BBA15006F48E9 /* Ivars.swift */,
 				562FA0E225B7003E007A32FE /* Ivars+Weak.swift */,
 				56D9F14825C4940900EDB315 /* LazyAtomic.swift */,
-				568974A5252BBA15006F48E9 /* MutexLock.swift */,
 				568974A3252BBA15006F48E9 /* Property.swift */,
 				568974A7252BBA15006F48E9 /* ReadWriteLock.swift */,
 				568974A9252BBA15006F48E9 /* Tweak.swift */,
@@ -407,7 +404,6 @@
 				56D50FAE25F11DEE00AE26FA /* ClassHook+Glue.swift in Sources */,
 				568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */,
 				568974B1252BBA15006F48E9 /* Property.swift in Sources */,
-				568974B3252BBA15006F48E9 /* MutexLock.swift in Sources */,
 				568974AB252BBA15006F48E9 /* Dynamic.swift in Sources */,
 				567AF4E325367DF20056182E /* SubstrateBackend.swift in Sources */,
 			);
