@@ -65,6 +65,7 @@
 		568974C3252BBA4F006F48E9 /* init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
 		568974CD252BBA7F006F48E9 /* Orion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orion.h; sourceTree = "<group>"; };
 		568974D8252BBFF4006F48E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		56AF44C42621D8380041FBF6 /* Orion-Target-iphoneos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Orion-Target-iphoneos.h"; sourceTree = "<group>"; };
 		56AFA08A25A3CE5F00884E2D /* dealloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dealloc.h; sourceTree = "<group>"; };
 		56AFA08C25A3CE6500884E2D /* dealloc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dealloc.m; sourceTree = "<group>"; };
 		56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ClassHook+Deinit.swift"; sourceTree = "<group>"; };
@@ -72,6 +73,8 @@
 		56D50FB025F11DF500AE26FA /* FunctionHook+Glue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FunctionHook+Glue.swift"; sourceTree = "<group>"; };
 		56D5B37E258F6F9D00F3DB6E /* ErrorHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandling.swift; sourceTree = "<group>"; };
 		56D9F14825C4940900EDB315 /* LazyAtomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LazyAtomic.swift; sourceTree = "<group>"; };
+		56EEA36C2621DB0600411C46 /* Orion-Target.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Orion-Target.h"; sourceTree = "<group>"; };
+		56EEA36E2621DB9F00411C46 /* Orion-Target-iphonesimulator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Orion-Target-iphonesimulator.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,6 +182,7 @@
 			isa = PBXGroup;
 			children = (
 				567AF4D625367DA40056182E /* Sources */,
+				56AF44C12621D6CD0041FBF6 /* Orion */,
 				56897490252BB9C6006F48E9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -212,8 +216,6 @@
 				568974A3252BBA15006F48E9 /* Property.swift */,
 				568974A7252BBA15006F48E9 /* ReadWriteLock.swift */,
 				568974A9252BBA15006F48E9 /* Tweak.swift */,
-				568974D8252BBFF4006F48E9 /* Info.plist */,
-				568974CD252BBA7F006F48E9 /* Orion.h */,
 			);
 			path = Orion;
 			sourceTree = "<group>";
@@ -239,6 +241,18 @@
 			path = include;
 			sourceTree = "<group>";
 		};
+		56AF44C12621D6CD0041FBF6 /* Orion */ = {
+			isa = PBXGroup;
+			children = (
+				568974D8252BBFF4006F48E9 /* Info.plist */,
+				568974CD252BBA7F006F48E9 /* Orion.h */,
+				56EEA36E2621DB9F00411C46 /* Orion-Target-iphonesimulator.h */,
+				56AF44C42621D8380041FBF6 /* Orion-Target-iphoneos.h */,
+				56EEA36C2621DB0600411C46 /* Orion-Target.h */,
+			);
+			path = Orion;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -262,6 +276,7 @@
 			buildPhases = (
 				567AF4F32536817C0056182E /* Run SwiftLint If Present */,
 				5689748A252BB9C6006F48E9 /* Headers */,
+				56EEA3612621D90200411C46 /* Copy Target Header */,
 				5648210A25C9B7C300339957 /* Build CLI if Needed */,
 				5689748B252BB9C6006F48E9 /* Sources */,
 				5689748C252BB9C6006F48E9 /* Frameworks */,
@@ -376,6 +391,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if type swiftlint &>/dev/null; then\n    swiftlint lint --config .swiftlint.yml\nfi\n";
+		};
+		56EEA3612621D90200411C46 /* Copy Target Header */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Orion/Orion-Target$(EFFECTIVE_PLATFORM_NAME).h",
+			);
+			name = "Copy Target Header";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp \"${SCRIPT_INPUT_FILE_0}\" \"${BUILT_PRODUCTS_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}/Orion-Target.h\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -555,7 +589,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				INFOPLIST_FILE = Sources/Orion/Info.plist;
+				INFOPLIST_FILE = Orion/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -604,7 +638,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				INFOPLIST_FILE = Sources/Orion/Info.plist;
+				INFOPLIST_FILE = Orion/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
