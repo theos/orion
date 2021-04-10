@@ -176,7 +176,10 @@ public final class OrionGenerator {
         return (orig, supr, main, register)
     }
 
-    private func generateConcreteClassHook(from classHook: OrionData.ClassHook, idx: Int) -> (hook: String, name: String) {
+    private func generateConcreteClassHook(
+        from classHook: OrionData.ClassHook,
+        idx: Int
+    ) -> (hook: String, glue: (name: String, availability: String?)) {
         func indentAndJoin(_ elements: [String], by level: Int) -> String {
             guard !elements.isEmpty else { return "" }
             let indent = String(repeating: "    ", count: level)
@@ -196,7 +199,7 @@ public final class OrionGenerator {
         let indentedMains = indentAndJoin(mains, by: 2)
 
         let hook = """
-        extension \(classHook.name) {
+        \(classHook.availability.map { "@available(\($0))" } ?? "")extension \(classHook.name) {
             enum _Glue: _GlueClassHook {
                 typealias HookType = \(classHook.name)
 
@@ -213,15 +216,18 @@ public final class OrionGenerator {
         }
         """
 
-        return (hook, "\(classHook.name)._Glue")
+        return (hook, ("\(classHook.name)._Glue", classHook.availability.map { "\($0)" }))
     }
 
-    private func generateConcreteFunctionHook(from functionHook: OrionData.FunctionHook, idx: Int) -> (hook: String, name: String) {
+    private func generateConcreteFunctionHook(
+        from functionHook: OrionData.FunctionHook,
+        idx: Int
+    ) -> (hook: String, glue: (name: String, availability: String?)) {
         let args = arguments(for: functionHook.function)
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
         let hook = """
-        extension \(functionHook.name) {
+        \(functionHook.availability.map { "@available(\($0))" } ?? "")extension \(functionHook.name) {
             enum _Glue: _GlueFunctionHook {
                 typealias HookType = \(functionHook.name)
 
@@ -239,7 +245,7 @@ public final class OrionGenerator {
             }
         }
         """
-        return (hook, "\(functionHook.name)._Glue")
+        return (hook, ("\(functionHook.name)._Glue", functionHook.availability.map { "\($0)" }))
     }
 
     private func join(_ items: [String], separation: String = "\n\n") -> String {
@@ -257,16 +263,26 @@ public final class OrionGenerator {
             }
         }
 
-        let (classes, classHookNames) = data.classHooks.enumerated()
+        let (classes, classHookGlues) = data.classHooks.enumerated()
             .map { generateConcreteClassHook(from: $1, idx: $0 + 1) }
             .unzip()
-        let (functions, functionHookNames) = data.functionHooks.enumerated()
+        let (functions, functionHookGlues) = data.functionHooks.enumerated()
             .map { generateConcreteFunctionHook(from: $1, idx: $0 + 1) }
             .unzip()
 
         let separator = ",\n            "
-        let allHookNames = classHookNames + functionHookNames
-        let allHooks = allHookNames.map { "\($0).self" }.joined(separator: separator)
+        let allHookGlues = classHookGlues + functionHookGlues
+        let gluesByAvailability: [String?: [String]] = [String?: [(String, String?)]](grouping: allHookGlues) { $0.1 }
+            .mapValues { $0.map { "\($0.0).self" } }
+        let allHooks = gluesByAvailability.map { availability, glues in
+            """
+                if \(availability.map { "#available(\($0))" } ?? "true") {
+                    hooks += [
+                        \(glues.joined(separator: separator))
+                    ]
+                }
+            """
+        }.joined(separator: "\n")
 
         let tweakName: String
         let hasCustomBackend: Bool
@@ -313,11 +329,11 @@ public final class OrionGenerator {
         \(importBackend)\
         @_cdecl("orion_init")
         func orion_init() {
+            var hooks: [_GlueAnyHook.Type] = []
+        \(allHooks)
             \(tweakName).activate(
         \(hasCustomBackend ? "" : "        backend: Backends.\(backend.name)(),\n")\
-                hooks: [
-                    \(allHooks)
-                ]
+                hooks: hooks
             )
         }\n
         """

@@ -83,12 +83,18 @@ public struct OrionData {
         var name: String
         var target: Syntax
         var methods: [Method]
+        // the ... in @available(...). If there are multiple, only
+        // the first one is used; this is technically imperfect but
+        // to handle multiple @available's we'd have to understand
+        // them semantically to determine their intersection
+        var availability: AvailabilitySpecListSyntax?
         var converter: SourceLocationConverter
     }
 
     struct FunctionHook {
         var name: String
         var function: Function
+        var availability: AvailabilitySpecListSyntax?
         var converter: SourceLocationConverter
     }
 

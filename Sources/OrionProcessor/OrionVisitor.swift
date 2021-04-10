@@ -345,6 +345,13 @@ class OrionVisitor: SyntaxVisitor {
         function.identifier.text == "deinitializer"
     }
 
+    private func availability(for node: ClassDeclSyntax) -> AvailabilitySpecListSyntax? {
+        (node.attributes?.lazy
+            .compactMap { AttributeSyntax($0) }
+            .first { $0.attributeName.text == "available" }?
+            .argument).flatMap(AvailabilitySpecListSyntax.init)
+    }
+
     private func handle(classHook node: ClassDeclSyntax, target: Syntax) {
         let methods = node.members.members
             .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
@@ -427,6 +434,7 @@ class OrionVisitor: SyntaxVisitor {
             name: node.identifier.text,
             target: target,
             methods: methods,
+            availability: availability(for: node),
             converter: converter
         ))
     }
@@ -458,6 +466,7 @@ class OrionVisitor: SyntaxVisitor {
         data.functionHooks.append(OrionData.FunctionHook(
             name: node.identifier.text,
             function: orionFunction(for: function),
+            availability: availability(for: node),
             converter: converter
         ))
     }

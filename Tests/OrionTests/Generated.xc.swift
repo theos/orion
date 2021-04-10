@@ -860,8 +860,9 @@ extension StringCompareHook {
 
 @_cdecl("orion_init")
 func orion_init() {
-    HooksTweak.activate(
-        hooks: [
+    var hooks: [_GlueAnyHook.Type] = []
+    if true {
+        hooks += [
             BasicHook._Glue.self,
             ActivationHook._Glue.self,
             NotHook._Glue.self,
@@ -886,5 +887,8 @@ func orion_init() {
             AtofHook._Glue.self,
             StringCompareHook._Glue.self
         ]
+    }
+    HooksTweak.activate(
+        hooks: hooks
     )
 }
