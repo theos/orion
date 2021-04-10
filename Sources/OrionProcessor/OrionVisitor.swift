@@ -347,9 +347,9 @@ class OrionVisitor: SyntaxVisitor {
 
     private func availability(for node: ClassDeclSyntax) -> AvailabilitySpecListSyntax? {
         (node.attributes?.lazy
-            .compactMap { AttributeSyntax($0) }
+            .compactMap { $0.as(AttributeSyntax.self) }
             .first { $0.attributeName.text == "available" }?
-            .argument).flatMap(AvailabilitySpecListSyntax.init)
+            .argument).flatMap { $0.as(AvailabilitySpecListSyntax.self) }
     }
 
     private func handle(classHook node: ClassDeclSyntax, target: Syntax) {

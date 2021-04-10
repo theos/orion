@@ -199,7 +199,7 @@ public final class OrionGenerator {
         let indentedMains = indentAndJoin(mains, by: 2)
 
         let hook = """
-        \(classHook.availability.map { "@available(\($0))" } ?? "")extension \(classHook.name) {
+        \(classHook.availability.map { "@available(\($0)) " } ?? "")extension \(classHook.name) {
             enum _Glue: _GlueClassHook {
                 typealias HookType = \(classHook.name)
 
@@ -227,7 +227,7 @@ public final class OrionGenerator {
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
         let hook = """
-        \(functionHook.availability.map { "@available(\($0))" } ?? "")extension \(functionHook.name) {
+        \(functionHook.availability.map { "@available(\($0)) " } ?? "")extension \(functionHook.name) {
             enum _Glue: _GlueFunctionHook {
                 typealias HookType = \(functionHook.name)
 
@@ -282,7 +282,7 @@ public final class OrionGenerator {
                     ]
                 }
             """
-        }.joined(separator: "\n")
+        }.sorted().joined(separator: "\n")
 
         let tweakName: String
         let hasCustomBackend: Bool
