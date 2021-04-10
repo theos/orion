@@ -161,7 +161,7 @@ Setting up com.kabiroberai.mytweak (0.0.1-1+debug) ...
 
 Finally, open up the VLC app on your device. You should see that all (or most) text labels have become uppercase with 👏 emojis instead of spaces.
 
-<img src="/assets/vlc-tweak.png" alt="Tweaked VLC for iOS app" style="width: 100%">
+<img src="https://orion.theos.dev/assets/vlc-tweak.png" alt="Tweaked VLC for iOS app" style="width: 100%">
 
 ## Bonus Challenge
 

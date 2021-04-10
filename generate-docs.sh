@@ -21,6 +21,7 @@ else
 	echo "Usage: $0 [cached|<<git hash> <version>>]" >&2
 	exit 1
 fi
+common_args=(--head "$(cat head.html)" --separate-global-declarations --sourcekitten-sourcefile docs.json)
 
 rm -rf "${outdir}/docs" "${outdir}/docs-perm"
 
@@ -43,16 +44,15 @@ else
 	printf '%s' "${combined_docs}" > docs.json
 fi
 
-jazzy "${latest_args[@]}" --head "$(cat head.html)" --sourcekitten-sourcefile docs.json -o "${outdir}/docs"
-cp -a 'Site Assets' "${outdir}/docs/assets"
+jazzy "${latest_args[@]}" "${common_args[@]}" -o "${outdir}/docs"
+cp -a assets "${outdir}/docs/assets"
 
 if [[ $# = 2 ]]; then
-	jazzy "${perma_args[@]}" --head "$(cat head.html)" --sourcekitten-sourcefile docs.json -o "${outdir}/docs-perm"
-	cp -a 'Site Assets' "${outdir}/docs-perm/assets"
+	jazzy "${perma_args[@]}" "${common_args[@]}" -o "${outdir}/docs-perm"
 fi
 
 if [[ $# = 1 && $1 = "watch" ]]; then
 	php -S 0.0.0.0:8080 -t docs &
-	fswatch -o README.md -o Guides -o head.html -o .jazzy.yaml -o 'Site Assets' \
+	fswatch -o README.md -o Guides -o head.html -o .jazzy.yaml -o assets \
 		| xargs -n1 -I{} "$0" cached
 fi
