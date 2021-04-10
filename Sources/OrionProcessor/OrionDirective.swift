@@ -151,11 +151,11 @@ enum OrionDirectives {
 
     struct ARC: OrionDirective {
         enum Mode: String {
-            case retained
-            case notRetained = "not_retained"
+            case retained = "true"
+            case notRetained = "false"
         }
 
-        static let matchRule: OrionDirectiveMatchRule = .exact("arc")
+        static let matchRule: OrionDirectiveMatchRule = .exact("returns_retained")
 
         let base: OrionDirectiveBase
         let mode: Mode

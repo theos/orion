@@ -155,8 +155,8 @@ extension ClassHookProtocol {
 /// Methods which have an Objective-C selector that begins with `alloc`, `new`,
 /// `copy`, or `mutableCopy`, follow the appropriate Objective-C conventions
 /// described [here](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html).
-/// In the rare case that you need to manually override this behavior, add
-/// `// orion:arc retained` or `// orion:arc not_retained` above your method
+/// In the rare case that you need to manually override this behavior,
+/// add `// orion:returns_retained true` (or `false`) above your method
 /// declaration. These directives behave like `NS_RETURNS_RETAINED` and
 /// `NS_RETURNS_NOT_RETAINED` respectively.
 ///

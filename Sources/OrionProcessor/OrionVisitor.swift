@@ -126,7 +126,8 @@ class OrionVisitor: SyntaxVisitor {
 
     private func makeDirectives(
         for trivia: Trivia,
-        position: AbsolutePosition
+        position: AbsolutePosition,
+        warnOnFailure: Bool = false
     ) -> [OrionDirective] {
         var currPos = position
         return trivia.compactMap { piece in
@@ -154,10 +155,14 @@ class OrionVisitor: SyntaxVisitor {
             do {
                 return try OrionDirectiveParser.shared.directive(from: directive, at: location)
             } catch let err as OrionDirectiveDiagnostic {
-                diagnosticEngine.diagnose(err.diagnosticMessage, location: location)
+                if warnOnFailure {
+                    diagnosticEngine.diagnose(err.diagnosticMessage, location: location)
+                }
                 return nil
             } catch {
-                diagnosticEngine.diagnose(Diagnostic.Message(.error, "\(error)"), location: location)
+                if warnOnFailure {
+                    diagnosticEngine.diagnose(Diagnostic.Message(.error, "\(error)"), location: location)
+                }
                 return nil
             }
         }
@@ -165,17 +170,25 @@ class OrionVisitor: SyntaxVisitor {
 
     // any comments between the last token *before* syntax, and the first token *of* syntax
     // are considered here
-    private func makeDirectives(for syntax: Syntax) -> [OrionDirective] {
+    private func makeDirectives(for syntax: Syntax, warnOnFailure: Bool = false) -> [OrionDirective] {
         let leading: [OrionDirective]
         if let trivia = syntax.leadingTrivia {
-            leading = makeDirectives(for: trivia, position: syntax.position)
+            leading = makeDirectives(
+                for: trivia,
+                position: syntax.position,
+                warnOnFailure: warnOnFailure
+            )
         } else {
             leading = []
         }
 
         let prevTrailing: [OrionDirective]
         if let prev = syntax.previousToken, let trivia = prev.trailingTrivia {
-            prevTrailing = makeDirectives(for: trivia, position: prev.endPositionBeforeTrailingTrivia)
+            prevTrailing = makeDirectives(
+                for: trivia,
+                position: prev.endPositionBeforeTrailingTrivia,
+                warnOnFailure: warnOnFailure
+            )
         } else {
             prevTrailing = []
         }
@@ -538,8 +551,8 @@ class OrionVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: TokenSyntax) {
-        // so that all directives can be registered for "unused directive"
-        // warnings.
-        _ = makeDirectives(for: Syntax(node))
+        // validates syntax of all directives and registers them
+        // for "unused directive" warnings as well
+        _ = makeDirectives(for: Syntax(node), warnOnFailure: true)
     }
 }
