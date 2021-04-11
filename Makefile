@@ -18,14 +18,15 @@ SUBPKG_1_ID = 14
 SUBPKG_1_NAME = iOS 14
 SUBPKG_1_FW = firmware (>= 14.0), firmware (<< 15.0)
 
-$(info Swift version $(shell swiftc --version))
+LOCAL_SWIFTC := $(TARGET_SWIFTC)
+$(info Swift version $(shell $(LOCAL_SWIFTC) --version))
 
-IS_OSS_SWIFT := $(shell swiftc --version | grep -q swiftlang || echo 1)
+IS_OSS_SWIFT := $(shell $(LOCAL_SWIFTC) --version | grep -q swiftlang || echo 1)
 ifeq ($(SUBPKG),)
 ifneq ($(IS_OSS_SWIFT),)
 SUBPKG := 0
 else
-APPLE_SWIFT_VERSION := $(shell swiftc --version | cut -d' ' -f4)
+APPLE_SWIFT_VERSION := $(shell $(LOCAL_SWIFTC) --version | cut -d' ' -f4)
 ifeq ($(shell $(THEOS_BIN_PATH)/vercmp.pl $(APPLE_SWIFT_VERSION) ge 5.3),1)
 SUBPKG := 1
 else
