@@ -46,6 +46,9 @@ public class OrionDiagnosticEngine {
     private var consumers: [DiagnosticConsumer] = []
     public init() {}
 
+    // it might be possible to make this not require synchronization by using
+    // atomics, but there's no easy way to do that in Swift yet short of importing
+    // the Swift Atomics package, which would add yet another dependency
     private var _needsLineColumn = false
     private var needsLineColumn: Bool {
         consumerQueue.sync { _needsLineColumn }

@@ -144,12 +144,12 @@ final class OrionDirectiveParser {
 
 enum OrionDirectives {
     static let all: [OrionDirective.Type] = [
-        ARC.self,
+        ReturnsRetained.self,
         New.self,
         Disable.self
     ]
 
-    struct ARC: OrionDirective {
+    struct ReturnsRetained: OrionDirective {
         enum Mode: String {
             case retained = "true"
             case notRetained = "false"
@@ -162,11 +162,11 @@ enum OrionDirectives {
         init(base: OrionDirectiveBase) throws {
             self.base = base
             guard base.arguments.count == 1 else {
-                throw OrionDirectiveDiagnostic("arc directive expected one argument, got \(base.arguments.count)")
+                throw OrionDirectiveDiagnostic("returns_retained directive expected one argument, got \(base.arguments.count)")
             }
             let rawMode = base.arguments[0]
             guard let mode = Mode(rawValue: rawMode) else {
-                throw OrionDirectiveDiagnostic("Invalid ARC directive mode '\(rawMode)'")
+                throw OrionDirectiveDiagnostic("Invalid returns_retained directive mode '\(rawMode)'")
             }
             self.mode = mode
         }

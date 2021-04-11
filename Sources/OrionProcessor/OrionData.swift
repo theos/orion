@@ -53,7 +53,7 @@ public struct OrionData {
                 // the method identifier (Swift could add a With/And but that's not relevant to any of our
                 // prefixes, and additional selector parts have a colon before them.)
 
-                if let directive = function.directives.compactMap({ $0 as? OrionDirectives.ARC }).last {
+                if let directive = function.directives.compactMap({ $0 as? OrionDirectives.ReturnsRetained }).last {
                     directive.setUsed()
                     return directive.mode == .retained
                 }
