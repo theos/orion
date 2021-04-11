@@ -5,10 +5,12 @@
 // orion:disable
 // swiftlint:disable all
 
+@testable import Orion
 import Foundation
 import Orion
 import OrionBackend_Fishhook
 import OrionTestSupport
+import XCTest
 
 extension BasicHook {
     enum _Glue: _GlueClassHook {

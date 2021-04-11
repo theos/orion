@@ -35,8 +35,8 @@ public enum HookDescriptor {
 ///
 /// If you are creating a custom `Backend` implementation which is intended
 /// for distribution, declare it as a nested type in an extension on the
-/// `Backends` enumeration. The backend's name is then the type name minus
-/// the `Backends.` prefix.
+/// `Backends` enumeration. The backend's name (which is understood by the
+/// Orion CLI) is then the type name minus the `Backends.` prefix.
 ///
 /// If a custom backend name is specified via the Orion CLI, Orion will
 /// automatically attempt to import a module named `OrionBackend_<backend name>`
@@ -48,8 +48,6 @@ public enum HookDescriptor {
 /// For example, a backend with the type `Backends.Foo.Bar<Int>` will be referred
 /// to by the name `Foo.Bar<Int>`, and Orion will attempt to auto-import a module
 /// named `OrionBackend_Foo`.
-///
-/// For more information on backends, consult the Orion CLI documentation.
 public protocol Backend {
 
     /// Hooks the provided functions and methods.

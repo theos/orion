@@ -28,19 +28,62 @@ public enum OrionDiagnosticConsumer {
     }
 }
 
+// thread-safe abstraction around DiagnosticEngine
 public class OrionDiagnosticEngine {
-    let engine = DiagnosticEngine()
-    public init() {}
-
-    public func addConsumer(_ consumer: OrionDiagnosticConsumer) {
-        engine.addConsumer(consumer.consumer)
+    private class MUXConsumer: DiagnosticConsumer {
+        // this type pipes messages from many `DiagnosticEngine`s
+        // to one OrionDiagnosticEngine
+        let engine: OrionDiagnosticEngine
+        init(engine: OrionDiagnosticEngine) {
+            self.engine = engine
+        }
+        var needsLineColumn: Bool { engine.needsLineColumn }
+        func handle(_ diagnostic: Diagnostic) { engine.handle(diagnostic) }
+        func finalize() {}
     }
 
-    public func diagnoseUnusedDirectives() {
-        OrionDirectiveParser.shared.unusedDirectiveBases().forEach {
-            engine.diagnose(.init(.warning, "Unused directive"), location: $0.location)
-            // so that future calls don't complain about the same directives
-            $0.setUsed()
+    private let consumerQueue = DispatchQueue(label: "consumer-queue")
+    private var consumers: [DiagnosticConsumer] = []
+    public init() {}
+
+    private var _needsLineColumn = false
+    private var needsLineColumn: Bool {
+        consumerQueue.sync { _needsLineColumn }
+    }
+
+    public func addConsumer(_ consumer: OrionDiagnosticConsumer) {
+        let newConsumer = consumer.consumer
+        consumerQueue.sync {
+            consumers.append(newConsumer)
+            if newConsumer.needsLineColumn {
+                // it doesn't really matter what the old value was
+                _needsLineColumn = true
+            }
+        }
+    }
+
+    private func handle(_ diagnostic: Diagnostic) {
+        consumerQueue.sync {
+            consumers.forEach { $0.handle(diagnostic) }
+        }
+    }
+
+    func createEngine() -> DiagnosticEngine {
+        let engine = DiagnosticEngine()
+        engine.addConsumer(MUXConsumer(engine: self))
+        return engine
+    }
+
+    deinit {
+        let diagnostics = OrionDirectiveParser.shared.unusedDirectiveBases().map { dir -> Diagnostic in
+            dir.setUsed() // so that future calls don't complain about the same directives
+            return Diagnostic(message: .init(.warning, "Unused directive"), location: dir.location, actions: nil)
+        }
+        consumerQueue.sync {
+            diagnostics.forEach { d in
+                consumers.forEach { $0.handle(d) }
+            }
+            consumers.forEach { $0.finalize() }
         }
     }
 }

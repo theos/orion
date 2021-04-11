@@ -7,9 +7,8 @@ let engine = OrionDiagnosticEngine()
 engine.addConsumer(.printing)
 
 let orionTests = URL(fileURLWithPath: #file).deletingLastPathComponent().appendingPathComponent("../../Tests/OrionTests")
-let contents = try String(contentsOf: orionTests.appendingPathComponent("Hooks.x.swift"))
 
-let data = try OrionParser(contents: contents, diagnosticEngine: engine).parse()
+let data = try OrionBatchParser(inputs: [orionTests], diagnosticEngine: engine).parse()
 let generator = OrionGenerator(data: data, diagnosticEngine: engine)
 let glue = try generator.generate()
 

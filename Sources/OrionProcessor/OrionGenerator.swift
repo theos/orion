@@ -61,8 +61,9 @@ public final class OrionGenerator {
 
         public init?(name: String) {
             self.name = name
-            guard let beforeGenerics = name.split(separator: "<").first,
-                  let beforeDot = beforeGenerics.split(separator: ".").first
+            guard let beforeGenerics = name.split(separator: "<", omittingEmptySubsequences: false).first,
+                  let beforeDot = beforeGenerics.split(separator: ".", omittingEmptySubsequences: false).first,
+                  !beforeDot.isEmpty
             else { return nil }
             self.implicitModule = "OrionBackend_\(beforeDot)"
         }
@@ -70,14 +71,12 @@ public final class OrionGenerator {
         public static let `internal`: Self = .init(nameWithoutModule: "Internal")
     }
 
-    public let diagnosticEngine: OrionDiagnosticEngine
+    private let engine: DiagnosticEngine
     public let data: OrionData
-
-    private var engine: DiagnosticEngine { diagnosticEngine.engine }
 
     public init(data: OrionData, diagnosticEngine: OrionDiagnosticEngine = .init()) {
         self.data = data
-        self.diagnosticEngine = diagnosticEngine
+        self.engine = diagnosticEngine.createEngine()
     }
 
     private func arguments(for function: OrionData.Function) -> [String] {
@@ -254,15 +253,8 @@ public final class OrionGenerator {
 
     public func generate(
         backend: Backend = .internal,
-        extraBackendModules: Set<String> = [],
-        diagnoseUnusedDirectives: Bool = true
+        extraBackendModules: Set<String> = []
     ) throws -> String {
-        defer {
-            if diagnoseUnusedDirectives {
-                diagnosticEngine.diagnoseUnusedDirectives()
-            }
-        }
-
         let (classes, classHookGlues) = data.classHooks.enumerated()
             .map { generateConcreteClassHook(from: $1, idx: $0 + 1) }
             .unzip()

@@ -24,23 +24,23 @@ public final class OrionParser {
         }
     }
 
-    public let diagnosticEngine: OrionDiagnosticEngine
+    public let engine: DiagnosticEngine
     private let source: Source
 
     public init(file: URL, diagnosticEngine: OrionDiagnosticEngine = .init()) {
         source = .file(file)
-        self.diagnosticEngine = diagnosticEngine
+        self.engine = diagnosticEngine.createEngine()
     }
 
     public init(contents: String, diagnosticEngine: OrionDiagnosticEngine = .init()) {
         source = .contents(contents)
-        self.diagnosticEngine = diagnosticEngine
+        self.engine = diagnosticEngine.createEngine()
     }
 
     public func parse() throws -> OrionData {
-        let syntax = try source.parseSyntax(diagnosticEngine: diagnosticEngine.engine)
+        let syntax = try source.parseSyntax(diagnosticEngine: engine)
         let converter = SourceLocationConverter(file: source.filename, tree: syntax)
-        let visitor = OrionVisitor(diagnosticEngine: diagnosticEngine.engine, sourceLocationConverter: converter)
+        let visitor = OrionVisitor(diagnosticEngine: engine, sourceLocationConverter: converter)
         visitor.walk(syntax)
         guard !visitor.didFail else {
             throw OrionFailure()

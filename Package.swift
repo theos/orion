@@ -78,6 +78,7 @@ var package = Package(
     dependencies: [
 //        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
         .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", .exact(swiftSyntaxVersion)),
+        .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
     ],
     targets: [
         .target(
@@ -86,7 +87,10 @@ var package = Package(
         ),
         .target(
             name: "OrionProcessorCLI",
-            dependencies: ["OrionProcessor"],
+            dependencies: [
+                "OrionProcessor",
+                .product(name: "ArgumentParser", package: "swift-argument-parser")
+            ],
             linkerSettings: rpathLinkerSettings
         ),
         .target(
