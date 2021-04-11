@@ -2,6 +2,18 @@ import XCTest
 import Orion
 import OrionTestSupport
 
+class AdditionHook: ClassHook<BasicClass> {
+    // orion:new
+    func someTestProtocolMethod() -> String {
+        "New method"
+    }
+
+    // orion:new
+    class func someTestProtocolClassMethod() -> String {
+        "New class method"
+    }
+}
+
 @objc protocol TestProtocol {
     @objc optional func someTestProtocolMethod() -> String
 }

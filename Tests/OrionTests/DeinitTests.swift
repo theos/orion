@@ -2,6 +2,27 @@ import XCTest
 import Orion
 import OrionTestSupport
 
+class DeHook: ClassHook<DeClass> {
+    func deinitializer() -> DeinitPolicy {
+        Self.target.watcher?.classWillDeallocate(withIdentifier: target.identifier, cls: DeHook.self)
+        return .callOrig
+    }
+}
+
+class DeSubHook1: ClassHook<DeSubclass1> {
+    func deinitializer() -> DeinitPolicy {
+        Self.target.watcher?.classWillDeallocate(withIdentifier: target.identifier, cls: DeSubHook1.self)
+        return .callOrig
+    }
+}
+
+class DeSubHook2: ClassHook<DeSubclass2> {
+    func deinitializer() -> DeinitPolicy {
+        Self.target.watcher?.classWillDeallocate(withIdentifier: target.identifier, cls: DeSubHook2.self)
+        return .callSupr
+    }
+}
+
 private struct Deallocation: Equatable {
     let identifier: String
     let cls: AnyClass

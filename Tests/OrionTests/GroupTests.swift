@@ -2,6 +2,67 @@ import XCTest
 import Orion
 import OrionTestSupport
 
+struct MyGroup: HookGroup {
+    let className: String
+    let param: Int
+}
+
+class GrHook: ClassHook<NSObject> {
+    typealias Group = MyGroup
+
+    static let targetName = group.className
+
+    func myString() -> String {
+        "New group string with param: \(Self.group.param)"
+    }
+}
+
+class GrHook2: ClassHook<NSObject> {
+    typealias Group = MyGroup
+
+    static let targetName = group.className
+
+    func mySecondString() -> String {
+        "New second group string with param: \(Self.group.param)"
+    }
+}
+
+struct MySecondGroup: HookGroup {
+    let secondClassName: String
+    let secondParam: Double
+}
+
+class GrHook3: ClassHook<NSObject> {
+    typealias Group = MySecondGroup
+
+    static let targetName = group.secondClassName
+
+    func myThirdString() -> String {
+        "New third group string with param: \(Self.group.secondParam)"
+    }
+}
+
+struct StringCompareGroup: HookGroup {
+    let stringToOverride: String
+}
+
+class StringCompareHook: FunctionHook {
+    typealias Group = StringCompareGroup
+
+    static let target = Function.symbol("strcmp", image: nil)
+
+    func function(_ s1: UnsafePointer<Int8>?, _ s2: UnsafePointer<Int8>?) -> Int32 {
+        if let s1 = s1,
+           let s2 = s2,
+           String(cString: s1) == Self.group.stringToOverride ||
+            String(cString: s2) == Self.group.stringToOverride {
+            return 42
+        } else {
+            return orig.function(s1, s2)
+        }
+    }
+}
+
 final class GroupTests: XCTestCase {
 
     func testClassHookGroups() {

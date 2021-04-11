@@ -2,6 +2,33 @@ import XCTest
 @testable import Orion
 import OrionTestSupport
 
+class PropertyHookX: ClassHook<PropertyClass> {
+    @Property(.nonatomic) var x = 1
+
+    func getXValue() -> Int { x }
+    func setXValue(_ x: Int) { self.x = x }
+}
+
+class PropertyHookY: ClassHook<PropertyClass> {
+    @Property(.nonatomic) var x = 1
+
+    func getYValue() -> Int { x }
+
+    func setYValue(_ x: Int) {
+        self.x = x
+    }
+}
+
+class PropertyHook2: ClassHook<PropertyClass2> {
+    @Property(.nonatomic) var x = 1
+
+    func getXValue() -> Int { x }
+
+    func setXValue(_ x: Int) {
+        self.x = x
+    }
+}
+
 private struct Foo {
     struct Bar {
         let val: Int

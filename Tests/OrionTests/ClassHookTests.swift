@@ -1,9 +1,124 @@
 import XCTest
 import Orion
 import OrionTestSupport
+import OrionBackend_Fishhook
 
 // NOTE: We don't need the linux testing stuff here because the
 // runtime can only be built on platforms with Objective-C
+
+struct HooksTweak: TweakWithBackend {
+    static let backend = Backends.Fishhook<Backends.Internal>()
+
+    init() {
+        print("Entry!")
+    }
+
+    func tweakDidActivate() {
+        print("Activated!")
+    }
+}
+
+class BasicHook: ClassHook<BasicClass> {
+    func someTestMethod() -> String {
+        "Hooked test method"
+    }
+
+    func someTestMethod(withArgument argument: Int32) -> String {
+        "Hooked: \(orig.someTestMethod(withArgument: argument + 1))"
+    }
+
+    class func someTestMethod2(withArgument argument: Int32) -> String {
+        "Hooked class method: \(orig.someTestMethod2(withArgument: argument + 1))"
+    }
+}
+
+class ActivationHook: ClassHook<BasicClass> {
+    static var activationSteps = ["not activated"]
+
+    static func hookWillActivate() -> Bool {
+        activationSteps.append("will activate called")
+        return true
+    }
+
+    static func hookDidActivate() {
+        activationSteps.append("did activate called")
+    }
+
+    func someDidActivateMethod() -> String {
+        Self.activationSteps.joined(separator: ", ")
+    }
+}
+
+class NotHook: ClassHook<BasicClass> {
+    static let targetName = "NonExistentClass"
+
+    static func hookWillActivate() -> Bool {
+        false
+    }
+
+    func someUnhookedMethod() -> String {
+        "Hooked unhooked method, oops"
+    }
+}
+
+class NamedBasicHook: ClassHook<NSObject> {
+    static let targetName = "BasicClass"
+
+    func methodForNamedTest() -> Bool { true }
+
+    class func classMethodForNamedTest(withArgument arg: String) -> [String] {
+        let origVal = orig.classMethodForNamedTest(withArgument: "\(arg), or is it")
+        return ["Hooked named class method"] + origVal
+    }
+}
+
+class InheritedHook: ClassHook<InheritedClass> {
+    class func someTestMethod3() -> String {
+        "Hooked test class method: \(supr.someTestMethod3())"
+    }
+}
+
+class InitHook: ClassHook<InitClass> {
+    // just a placeholder to allow forwarding
+    func `init`() -> Target { orig.`init`() }
+
+    func `init`(withX x: Int32) -> Target {
+        let this = supr.`init`()
+        Ivars(this)._x = x + 1
+        return this
+    }
+}
+
+class SuperHook: ClassHook<MyClass> {
+    @Property(.nonatomic) var x = 11
+
+    func description() -> String {
+        "hax description: \(supr.description())"
+    }
+
+    func hooked() -> String {
+        if x == 0 {
+            return "zero"
+        } else {
+            x -= 1
+            return "orig: \(orig.hooked()). hax hooked \(supr.description()). x=\(x), prev=\(hooked())"
+        }
+    }
+}
+
+class CPHook: ClassHook<MyCopyClass> {
+    func copy() -> Target {
+        let cp = Target()
+        Ivars(cp)._x = target.x + 10
+        return cp
+    }
+
+    func mutableCopy() -> Target {
+        let cp = orig.mutableCopy()
+        Ivars(cp)._x += 100
+        return cp
+    }
+}
 
 final class ClassHookTests: XCTestCase {
     func testBasicDirectInstanceHooks() {
