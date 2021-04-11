@@ -18,6 +18,8 @@ SUBPKG_1_ID = 14
 SUBPKG_1_NAME = iOS 14
 SUBPKG_1_FW = firmware (>= 14.0), firmware (<< 15.0)
 
+$(info Swift version $(shell $(TARGET_SWIFTC) --version))
+
 IS_OSS_SWIFT := $(shell $(TARGET_SWIFTC) --version | grep -q swiftlang || echo 1)
 ifeq ($(SUBPKG),)
 ifneq ($(IS_OSS_SWIFT),)
