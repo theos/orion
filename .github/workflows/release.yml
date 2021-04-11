@@ -24,7 +24,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: theos/theos
-        ref: 691cbfd92985deaa6ec6d00549353e8f74d2b395
+        ref: a6fab2233074ba7f70d03512cbdb88e6e0a2fc54
         path: theos
         submodules: recursive
     - name: Build Release
