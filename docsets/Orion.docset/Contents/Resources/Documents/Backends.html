@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Orion latest (0.9.1) Docs
+          Orion latest (0.9.2) Docs
         </a>
          (100% documented)
       </p>
@@ -147,7 +147,7 @@
             <a class="nav-group-name-link" href="Class%20Hooking.html">Class Hooking</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Class%20Hooking.html#/s:5Orion9ClassHooka">ClassHook</a>
+                <a class="nav-group-task-link" href="Typealiases/ClassHook.html">ClassHook</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/ClassHookProtocol.html">ClassHookProtocol</a>
@@ -176,7 +176,7 @@
             <a class="nav-group-name-link" href="Function%20Hooking.html">Function Hooking</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Function%20Hooking.html#/s:5Orion12FunctionHooka">FunctionHook</a>
+                <a class="nav-group-task-link" href="Typealiases/FunctionHook.html">FunctionHook</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/FunctionHookProtocol.html">FunctionHookProtocol</a>
@@ -201,7 +201,7 @@
                 <a class="nav-group-task-link" href="Protocols/HookGroup.html">HookGroup</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Groups.html#/s:5Orion12DefaultGroupV">DefaultGroup</a>
+                <a class="nav-group-task-link" href="Structs/DefaultGroup.html">DefaultGroup</a>
               </li>
             </ul>
           </li>
@@ -266,13 +266,13 @@
             <a class="nav-group-name-link" href="Error%20Handling.html">Error Handling</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Error%20Handling.html#/s:5Orion0A12ErrorHandlera">OrionErrorHandler</a>
+                <a class="nav-group-task-link" href="Typealiases/OrionErrorHandler.html">OrionErrorHandler</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Error%20Handling.html#/s:5Orion06updateA12ErrorHandleryys5NeverOSSyXK_s12StaticStringVSutcADSSyXK_AFSutcXEF">updateOrionErrorHandler(_:)</a>
+                <a class="nav-group-task-link" href="Functions/updateOrionErrorHandler%28_%3A%29_%24syys5NeverOSSyXK_s12StaticStringVSutcABSSyXK_ADSutcXEcD.html">updateOrionErrorHandler(_:)</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Error%20Handling.html#/s:5Orion10orionError_4file4lines5NeverOSSyXK_s12StaticStringVSutF">orionError(_:file:line:)</a>
+                <a class="nav-group-task-link" href="Functions/orionError%28_%3Afile%3Aline%3A%29_%24s_4file4lines5NeverOSSyXK_s12StaticStringVSutcD.html">orionError(_:file:line:)</a>
               </li>
             </ul>
           </li>
@@ -304,30 +304,8 @@
                     <code>
                     <a name="/s:5Orion8BackendsO"></a>
                     <a name="//apple_ref/swift/Enum/Backends" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion8BackendsO">Backends</a>
+                    <a class="direct-link" href="Enums/Backends.html">Backends</a>
                     </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A namespace to which <code><a href="Protocols/Backend.html">Backend</a></code>s are added as nested types.</p>
-
-                        <a href="Enums/Backends.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Backends</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Backend.swift#L125">Show on GitHub</a>
-                      </div>
-                    </section>
                   </div>
                 </li>
                 <li class="item">
@@ -335,51 +313,8 @@
                     <code>
                     <a name="/s:5Orion7BackendP"></a>
                     <a name="//apple_ref/swift/Protocol/Backend" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion7BackendP">Backend</a>
+                    <a class="direct-link" href="Protocols/Backend.html">Backend</a>
                     </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>The type that handles hooking of methods and functions.</p>
-
-<p>Unless you have specific requirements, you should be able to use one
-of the pre-defined backends declared on <code><a href="Enums/Backends.html">Backends</a></code>.</p>
-
-<p>If you are creating a custom <code>Backend</code> implementation which is intended
-for distribution, declare it as a nested type in an extension on the
-<code><a href="Enums/Backends.html">Backends</a></code> enumeration. The backend&rsquo;s name is then the type name minus
-the <code><a href="Enums/Backends.html">Backends.</a></code> prefix.</p>
-
-<p>If a custom backend name is specified via the Orion CLI, Orion will
-automatically attempt to import a module named <code>OrionBackend_&lt;backend name&gt;</code>
-if it exists, so it is recommended that you follow this nomenclature while
-naming your framework. Note that when determining the framework name, any
-generic arguments are stripped from the type name, and only the first
-component of the name is used.</p>
-
-<p>For example, a backend with the type <code>Backends.Foo.Bar&lt;Int&gt;</code> will be referred
-to by the name <code>Foo.Bar&lt;Int&gt;</code>, and Orion will attempt to auto-import a module
-named <code>OrionBackend_Foo</code>.</p>
-
-<p>For more information on backends, consult the Orion CLI documentation.</p>
-
-                        <a href="Protocols/Backend.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Backend</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Backend.swift#L53-L60">Show on GitHub</a>
-                      </div>
-                    </section>
                   </div>
                 </li>
                 <li class="item">
@@ -387,30 +322,8 @@ named <code>OrionBackend_Foo</code>.</p>
                     <code>
                     <a name="/s:5Orion14DefaultBackendP"></a>
                     <a name="//apple_ref/swift/Protocol/DefaultBackend" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion14DefaultBackendP">DefaultBackend</a>
+                    <a class="direct-link" href="Protocols/DefaultBackend.html">DefaultBackend</a>
                     </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A backend which Orion can use as a default.</p>
-
-                        <a href="Protocols/DefaultBackend.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">DefaultBackend</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Backend.html">Backend</a></span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Backend.swift#L117-L122">Show on GitHub</a>
-                      </div>
-                    </section>
                   </div>
                 </li>
                 <li class="item">
@@ -418,30 +331,8 @@ named <code>OrionBackend_Foo</code>.</p>
                     <code>
                     <a name="/s:5Orion14HookDescriptorO"></a>
                     <a name="//apple_ref/swift/Enum/HookDescriptor" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion14HookDescriptorO">HookDescriptor</a>
+                    <a class="direct-link" href="Enums/HookDescriptor.html">HookDescriptor</a>
                     </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A type describing a single hook.</p>
-
-                        <a href="Enums/HookDescriptor.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">HookDescriptor</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/79b3835410a6f4be2c913334acb2b6a0055d3708/Sources/Orion/Backend.swift#L4-L29">Show on GitHub</a>
-                      </div>
-                    </section>
                   </div>
                 </li>
               </ul>
