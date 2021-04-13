@@ -31,8 +31,7 @@ public protocol ClassHookProtocol: class, AnyHook {
     /// - See: `_GlueAnyHook`
     ///
     /// :nodoc:
-    associatedtype _Glue: _GlueClassHook = _GlueClassHookPlaceholder<Self>
-        where _Glue.HookType == Self
+    associatedtype _Glue: _GlueClassHook = _GlueClassHookPlaceholder
 
     /// The name of the target class, or the empty string to use `Target.self`.
     ///
@@ -259,7 +258,7 @@ extension ClassHookProtocol {
     @_transparent
     public var orig: Self {
         disableRecursionCheck()
-        guard let unwrapped = _Glue.OrigType(target: target) as? Self
+        guard let target = target as? _Glue.OrigType.Target, let unwrapped = _Glue.OrigType(target: target) as? Self
             else { orionError("Could not get orig") }
         return unwrapped
     }
@@ -277,7 +276,7 @@ extension ClassHookProtocol {
     @_transparent
     public var supr: Self {
         disableRecursionCheck()
-        guard let unwrapped = _Glue.SuprType(target: target) as? Self
+        guard let target = target as? _Glue.SuprType.Target, let unwrapped = _Glue.SuprType(target: target) as? Self
             else { orionError("Could not get supr") }
         return unwrapped
     }

@@ -27,7 +27,8 @@ public final class _GlueClassHookStorage {
 /// used to satisfy the compiler until the actual glue is provided.
 ///
 /// :nodoc:
-public enum _GlueClassHookPlaceholder<HookType: ClassHookProtocol>: _GlueClassHook {
+public enum _GlueClassHookPlaceholder: _GlueClassHook {
+    public class HookType: ClassHook<NSObject> {}
     public typealias OrigType = HookType
     public typealias SuprType = HookType
 
@@ -75,8 +76,8 @@ public struct _GlueClassHookBuilder {
 /// :nodoc:
 public protocol _GlueClassHook: _GlueAnyHook {
     associatedtype HookType: ClassHookProtocol
-    associatedtype OrigType: ClassHookProtocol where OrigType.Target == HookType.Target
-    associatedtype SuprType: ClassHookProtocol where SuprType.Target == HookType.Target
+    associatedtype OrigType: ClassHookProtocol
+    associatedtype SuprType: ClassHookProtocol
 
     static var storage: _GlueClassHookStorage { get }
     static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder)

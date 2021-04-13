@@ -32,7 +32,9 @@ public enum OrionDiagnosticConsumer {
 public class OrionDiagnosticEngine {
     private class MUXConsumer: DiagnosticConsumer {
         // this type pipes messages from many `DiagnosticEngine`s
-        // to one OrionDiagnosticEngine
+        // to one OrionDiagnosticEngine. We maintain a strong ref
+        // to the Orion engine to ensure that it isn't deinit'd
+        // until all of its child `DiagnosticEngine`s are.
         let engine: OrionDiagnosticEngine
         init(engine: OrionDiagnosticEngine) {
             self.engine = engine
