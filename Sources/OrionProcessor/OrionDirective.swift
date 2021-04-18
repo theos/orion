@@ -146,7 +146,8 @@ enum OrionDirectives {
     static let all: [OrionDirective.Type] = [
         ReturnsRetained.self,
         New.self,
-        Disable.self
+        Disable.self,
+        SuprTramp.self
     ]
 
     struct ReturnsRetained: OrionDirective {
@@ -185,13 +186,25 @@ enum OrionDirectives {
     }
 
     struct Disable: OrionDirective {
-        static var matchRule: OrionDirectiveMatchRule = .exact("disable")
+        static let matchRule: OrionDirectiveMatchRule = .exact("disable")
 
         let base: OrionDirectiveBase
         init(base: OrionDirectiveBase) throws {
             self.base = base
             guard base.arguments.isEmpty else {
                 throw OrionDirectiveDiagnostic("disable directive expected zero arguments, got \(base.arguments.count)")
+            }
+        }
+    }
+
+    struct SuprTramp: OrionDirective {
+        static let matchRule: OrionDirectiveMatchRule = .exact("supr_tramp")
+
+        let base: OrionDirectiveBase
+        init(base: OrionDirectiveBase) throws {
+            self.base = base
+            guard base.arguments.isEmpty else {
+                throw OrionDirectiveDiagnostic("supr_tramp directive expected zero arguments, got \(base.arguments.count)")
             }
         }
     }

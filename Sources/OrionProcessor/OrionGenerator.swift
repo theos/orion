@@ -87,10 +87,10 @@ public final class OrionGenerator {
         from method: OrionData.ClassHook.Method,
         className: String,
         index: Int
-    ) -> (orig: String?, supr: String?, main: String, activation: String) {
+    ) -> (orig: String?, supr: String?, main: String, activation: String?) {
         let orig: String?
         let supr: String?
-        let register: String
+        let register: String?
 
         let args = arguments(for: method.function)
         let argsList = args.joined(separator: ", ")
@@ -99,11 +99,11 @@ public final class OrionGenerator {
         // order of operands matters here; we don't want to evaluate isAddition
         // if it's a deinitializer, so that Orion can notify the user if they
         // have a pointless `// orion:new`
-        let isAddition = !method.isDeinitializer && method.isAddition
+        let isAddition = !method.isDeinitializer && method.isAddition()
         let origIdent = "orion_\(isAddition ? "imp" : "orig")\(index)"
         let selIdent = "orion_sel\(index)"
 
-        let returnsRetained = !method.isDeinitializer && method.returnsRetained
+        let returnsRetained = !method.isDeinitializer && method.returnsRetained()
         let takeRetained = returnsRetained ? ".takeRetainedValue()" : ""
         let passRetained = returnsRetained ? "Unmanaged.passRetained" : ""
         let methodClosure = returnsRetained ? method.methodClosureUnmanaged : method.methodClosure
@@ -137,6 +137,8 @@ public final class OrionGenerator {
             addMethod(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod))
             """
         } else {
+            let isTramp = method.isSuprTramp()
+
             // While we don't need to add @objc due to the class being @objcMembers (and the #selector
             // failing if the function can't be represented in objc), this results in better diagnostics
             // than merely having an error on the #selector line
@@ -144,7 +146,7 @@ public final class OrionGenerator {
 
             orig = """
             \(funcOverride) {
-                _Glue.\(origIdent)(target, _Glue.\(selIdent)\(commaArgs))\(takeRetained)
+                \(isTramp ? "trampOrigError()" : "_Glue.\(origIdent)(target, _Glue.\(selIdent)\(commaArgs))\(takeRetained)")
             }
             """
 
@@ -157,7 +159,7 @@ public final class OrionGenerator {
             }
             """
 
-            register = """
+            register = isTramp ? nil : """
             builder.addHook(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod)) { \(origIdent) = $0 }
             """
         }
@@ -209,7 +211,7 @@ public final class OrionGenerator {
                 static let storage = initializeStorage()
         \(indentedMains)
                 static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
-                    \(registers.joined(separator: "\n            "))
+                    \(registers.compactMap { $0 }.joined(separator: "\n            "))
                 }
             }
         }

@@ -221,7 +221,7 @@ extension InitHook {
 
         final class OrigType: InitHook, _GlueClassHookTrampoline {
             @objc override func `init`() -> Target {
-                _Glue.orion_orig1(target, _Glue.orion_sel1)
+                trampOrigError()
             }
 
             @objc override func `init`(withX arg1: Int32) -> Target {
@@ -256,7 +256,6 @@ extension InitHook {
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
-            builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
             builder.addHook(orion_sel2, orion_orig2, isClassMethod: false) { orion_orig2 = $0 }
         }
     }

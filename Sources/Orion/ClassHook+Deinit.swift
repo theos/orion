@@ -68,4 +68,8 @@ extension _GlueClassHookTrampoline {
     public func deinitSuprError(file: StaticString = #file, line: UInt = #line) -> Never {
         orionError("Do not call `supr.deinitializer()`.", file: file, line: line)
     }
+
+    public func trampOrigError(file: StaticString = #file, line: UInt = #line) -> Never {
+        orionError("Attempted to call orig on a supr_tramp method.", file: file, line: line)
+    }
 }

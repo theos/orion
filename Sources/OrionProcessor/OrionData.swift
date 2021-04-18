@@ -17,6 +17,12 @@ public struct OrionData {
             }
             return text
         }
+
+        fileprivate func fetchDirective<T: OrionDirective>(ofType type: T.Type) -> T? {
+            guard let dir = directives.compactMap({ $0 as? T }).last else { return nil }
+            dir.setUsed()
+            return dir
+        }
     }
 
     struct ClassHook {
@@ -35,16 +41,15 @@ public struct OrionData {
             var superClosure: Syntax // (UnsafeRawPointer, Selector, Blah) -> Blah
             var superClosureUnmanaged: Syntax // (UnsafeRawPointer, Selector, Blah) -> Unmanaged<Blah>
 
-            var isAddition: Bool {
-                if let directive = function.directives.compactMap({ $0 as? OrionDirectives.New }).last {
-                    directive.setUsed()
-                    return true
-                } else {
-                    return false
-                }
+            func isSuprTramp() -> Bool {
+                function.fetchDirective(ofType: OrionDirectives.SuprTramp.self) != nil
             }
 
-            var returnsRetained: Bool {
+            func isAddition() -> Bool {
+                function.fetchDirective(ofType: OrionDirectives.New.self) != nil
+            }
+
+            func returnsRetained() -> Bool {
                 // https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html
                 // explains when a method should return a retained value based on the selector. Swift computes
                 // method selectors here:
@@ -53,8 +58,7 @@ public struct OrionData {
                 // the method identifier (Swift could add a With/And but that's not relevant to any of our
                 // prefixes, and additional selector parts have a colon before them.)
 
-                if let directive = function.directives.compactMap({ $0 as? OrionDirectives.ReturnsRetained }).last {
-                    directive.setUsed()
+                if let directive = function.fetchDirective(ofType: OrionDirectives.ReturnsRetained.self) {
                     return directive.mode == .retained
                 }
 

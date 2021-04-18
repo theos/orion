@@ -79,8 +79,8 @@ class InheritedHook: ClassHook<InheritedClass> {
 }
 
 class InitHook: ClassHook<InitClass> {
-    // just a placeholder to allow forwarding
-    func `init`() -> Target { orig.`init`() }
+    // orion:supr_tramp
+    func `init`() -> Target { fatalError() }
 
     func `init`(withX x: Int32) -> Target {
         let this = supr.`init`()
