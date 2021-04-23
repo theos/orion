@@ -1,6 +1,5 @@
 included:
   - Sources
-  - Tests
 disabled_rules:
   - trailing_comma
   - nesting
