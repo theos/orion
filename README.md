@@ -2,7 +2,7 @@
 <p align="center"><strong>A DSL for elegant tweak development in Swift.</strong></p>
 <p align="center">
 <a href="https://theos.dev">Theos</a> –
-<a href="https://orion.theos.dev">Documentation</a> –
+<a href="https://orion.theos.dev/getting-started.html">Documentation</a> –
 <a href="https://github.com/theos/orion/releases">Changelogs</a> –
 <a href="https://github.com/theos/theos/wiki/Help">Get Help</a> –
 <a href="https://twitter.com/theosdev">@theosdev</a> –
@@ -17,7 +17,7 @@ It is possible to use Orion as a regular framework (invoking the preprocessor in
 
 Orion _is not_ a framework for hooking Swift code. As of now, Orion only supports hooking Objective-C and C code, however this may change in the future.
 
-For more information, refer to the [documentation](https://orion.theos.dev).
+For more information, refer to the [documentation](https://orion.theos.dev/getting-started.html).
 
 ## Example
 

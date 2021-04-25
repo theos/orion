@@ -4,14 +4,14 @@
 
 If you are using Orion for tweak development, it is recommended that you use it with Theos. This guide assumes that you have Theos installed; if you haven't done that yet, please follow the [installation instructions](https://github.com/theos/theos/wiki/Installation) for Theos and then return to this guide.
 
-If you wish to use Orion without Theos, please refer to the "[Using Orion Without Theos](/using-orion-without-theos.html)" guide.
+If you wish to use Orion without Theos, please refer to the "[Using Orion Without Theos](using-orion-without-theos.html)" guide.
 
 This guide will show you how to make a simple Orion tweak which… spices up text labels a little. We will target the VLC Media Player iOS app since it is [open source](https://github.com/videolan/vlc-ios) and supports a large range of iOS versions, however most other apps should work too.
 
 To follow along, you will require the following things:
 
 - [Theos](https://github.com/theos/theos/wiki/Installation)
-- A machine running macOS, Windows 10 with WSL, or Linux. If using WSL or Linux, an iOS Swift toolchain is also required.
+- A machine running macOS, Windows 10 with WSL, or Linux. If using WSL or Linux, it is recommended that you use the [official Swift toolchain](https://github.com/kabiroberai/swift-toolchain-linux).
 - A jailbroken iOS device with Orion installed.
 - The target app (in this tutorial, VLC for iOS) installed on your iOS device.
 
@@ -63,24 +63,20 @@ The number of files might seem daunting at first, but each one has a specific pu
 - `Makefile`: This file is the keystone of any Theos project. It describes how your tweak should be built, including the list of source files as well as the flags that should be passed to the compiler.
 - `MyTweak.plist`: This is the [CydiaSubstrate bundle filter](https://iphonedevwiki.net/index.php/Cydia_Substrate#Filters) for your tweak. It tells CydiaSubstrate (or an equivalent tweak loader) which processes your tweak should be loaded into.
 - `control`:  The Debian [control file](https://iphonedevwiki.net/index.php/Packaging#Control_file) which describes your tweak's .deb package to package managers.
-- `Package.swift`: This file is **not** used by Theos itself, but it helps provide Xcode with a description of your tweak's files and compiler flags which is similar to that provided to Theos by the Makefile. This allows you to edit your tweak using the Xcode IDE, with full code completion and whatnot. You'll want to keep this in sync with any changes you make to your Makefile.
-- `Sources`: This is where your source code goes. C/Objective-C files (`.m`, `.mm`, `.c`, `.cpp`) go in the folder with the `C` suffix, and Swift/Orion files (`.swift`, `.x.swift`) go into the folder without the suffix. Theos will automatically find these files while building your tweak, so you need not manually specify them in the `Makefile`. 
-
-For more details about the Theos side of things, see [Advanced Theos Usage](/advanced-theos-usage.html).
+- `Package.swift`: This file is **not** used by Theos itself, but it provides SourceKit with an equivalent description of your project in order to enable code completion.
+- `Sources`: This is where your source code goes. C/Objective-C files (`.m`, `.mm`, `.c`, `.cpp`) go in the folder with the `C` suffix, and Swift/Orion files (`.swift`, `.x.swift`) go into the folder without the suffix. Theos will automatically find these files while building your tweak, so you need not manually specify them in the `Makefile`.
 
 ## Editing your Tweak
 
 Orion uses a preprocessor, and Theos passes all `.x.swift` files through this preprocessor while building. All hooks **must** therefore go into files with a `.x.swift` extension. The template creates a `Tweak.x.swift` for you, so we'll start by editing this.
 
-Now, while one option is to open `Sources/MyTweak/Tweak.x.swift` in your favorite text editor, Orion offers an even better option on macOS: editing your tweak in Xcode!
+Now, before you fire up your favorite text editor and start hammering out code in `Sources/MyTweak/Tweak.x.swift`, Theos has a trick up its sleeve: with some basic configuration, you can get **full code completion** while working on Orion tweaks on any OS, in most editors! Enabling this is simple:
 
-Opening your tweak in Xcode is simple:
+1. Install the [sourcekit-lsp plugin](https://github.com/apple/sourcekit-lsp/tree/main/Editors) corresponding to your editor of choice. (If you're using Xcode, it has built-in SourceKit support so skip this step.)
+2. Run `make spm` to generate metadata about your project, which is needed by Swift Package Manager/SourceKit.
+3. Open the project folder in your chosen editor.
 
-<pre>
-~/mytweak $ <span class="inp">make dev</span>
-</pre>
-
-This should open Xcode with your tweak as a Swift Package. Drill down to `Sources/MyTweak/` and select `Tweak.x.swift`. Delete the contents of the file and replace them with the following:
+Just like that, you should have code completion! Now drill down to `Sources/MyTweak/` and select `Tweak.x.swift`. Delete the contents of the file and replace them with the following:
 
 ```swift
 // 1
@@ -172,7 +168,7 @@ Can you change the text to sPonGEboB cAsE? Try making the characters alternate b
 
 <!-- pretty much just put the code in triple backticks and copied the HTML output -->
 
-Here's one way to achieve this (tailored towards English-based locales):
+Here's one way to achieve this:
 
 <pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Orion</span>
 <span class="kd">import</span> <span class="kt">UIKit</span>
@@ -201,4 +197,5 @@ Here's one way to achieve this (tailored towards English-based locales):
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+<em>Bonus-bonus-challenge: add support for languages besides English :)</em>
 </details>

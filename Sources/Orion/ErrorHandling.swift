@@ -27,6 +27,9 @@ private let errorHandlerQueue = DispatchQueue(label: "error-handler-queue")
 ///
 /// The default error handler is `fatalError`.
 ///
+/// - Important: The new error handler is applied to *all* tweaks, not just
+/// the one calling this method.
+///
 /// - Warning: This function is thread-safe but not reentrant. Do not call
 /// `updateOrionErrorHandler(_:)` or `orionError(_:file:line:)` inside the
 /// `update` block or the returned error handler.

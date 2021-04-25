@@ -11,13 +11,13 @@ documentation: Guides/*.md
 
 theme: fullwidth
 custom_categories:
-  - name: Basic Guides
+  - name: Guides
     children:
       - Getting Started
+      - Using Private Classes
+      - Tweak Preferences
+      - Orion Directives
       - Using Orion Without Theos
-  - name: Advanced Guides
-    children:
-      - Advanced Theos Usage
   - name: Class Hooking
     children:
       - ClassHook
