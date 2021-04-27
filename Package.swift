@@ -9,16 +9,19 @@ enum Builder {
     case spm
 }
 
-let swiftSyntaxVersion: Version = {
-    #if swift(>=5.4)
+let swiftSyntaxVersion: Package.Dependency.Requirement = {
+    #if swift(>=5.5)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
+    #elseif swift(>=5.4)
+//    return .exact("0.50400.0")
+    return .revision("swift-5.4-RELEASE")
     #elseif swift(>=5.3)
-    return "0.50300.0"
+    return .exact("0.50300.0")
     #elseif swift(>=5.2)
-    return "0.50200.0"
+    return .exact("0.50200.0")
     #else
     #error("Orion does not support versions of Swift lower than 5.2.")
     #endif
@@ -77,7 +80,7 @@ var package = Package(
     ],
     dependencies: [
 //        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
-        .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", .exact(swiftSyntaxVersion)),
+        .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", swiftSyntaxVersion),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
     ],
     targets: [

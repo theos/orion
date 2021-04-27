@@ -40,7 +40,7 @@ public enum Function: CustomStringConvertible {
 
 /// The protocol to which function hooks conform. Do not conform to this
 /// directly; use `FunctionHook`.
-public protocol FunctionHookProtocol: class, AnyHook {
+public protocol FunctionHookProtocol: AnyObject, AnyHook {
 
     /// The glue type associated with this hook. Do not implement or use
     /// this yourself.

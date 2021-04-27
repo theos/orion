@@ -5,6 +5,29 @@ import SwiftSyntax
 // swiftlint:disable:next superfluous_disable_command
 // swiftlint:disable type_body_length file_length
 
+#if swift(>=5.4)
+private extension SyntaxFactory {
+    static func makeFunctionType(
+        leftParen: TokenSyntax,
+        arguments: TupleTypeElementListSyntax,
+        rightParen: TokenSyntax,
+        throwsOrRethrowsKeyword: TokenSyntax?,
+        arrow: TokenSyntax,
+        returnType: TypeSyntax
+    ) -> FunctionTypeSyntax {
+        makeFunctionType(
+            leftParen: leftParen,
+            arguments: arguments,
+            rightParen: rightParen,
+            asyncKeyword: nil,
+            throwsOrRethrowsKeyword: throwsOrRethrowsKeyword,
+            arrow: arrow,
+            returnType: returnType
+        )
+    }
+}
+#endif
+
 private extension Diagnostic.Message {
     static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
         .init(.error, "A \(declKind) cannot be private, fileprivate, or final")

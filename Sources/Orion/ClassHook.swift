@@ -16,7 +16,7 @@ public enum SubclassMode {
 
 /// The protocol to which class hooks conform. Do not conform to this
 /// directly; use `ClassHook`.
-public protocol ClassHookProtocol: class, AnyHook {
+public protocol ClassHookProtocol: AnyObject, AnyHook {
 
     /// The type of the target. Specify this via the generic argument on
     /// `ClassHook`.
