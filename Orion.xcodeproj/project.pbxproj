@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		56080B5C25C1F8BF005803BC /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56080B5B25C1F8BE005803BC /* Group.swift */; };
+		562BD3282638154C003C5A00 /* orion_lifecycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 562BD3262638154C003C5A00 /* orion_lifecycle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		562BD3292638154C003C5A00 /* orion_objcrt.h in Headers */ = {isa = PBXBuildFile; fileRef = 562BD3272638154C003C5A00 /* orion_objcrt.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		562BD32C2638155A003C5A00 /* orion_objcrt.m in Sources */ = {isa = PBXBuildFile; fileRef = 562BD32A2638155A003C5A00 /* orion_objcrt.m */; };
+		562BD32D2638155A003C5A00 /* orion_lifecycle.c in Sources */ = {isa = PBXBuildFile; fileRef = 562BD32B2638155A003C5A00 /* orion_lifecycle.c */; };
 		562FA0E325B7003E007A32FE /* Ivars+Weak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562FA0E225B7003E007A32FE /* Ivars+Weak.swift */; };
 		567AF4E325367DF20056182E /* SubstrateBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567AF4E125367DF20056182E /* SubstrateBackend.swift */; };
 		568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5689749C252BBA15006F48E9 /* ClassHook.swift */; };
@@ -21,13 +25,7 @@
 		568974B5252BBA15006F48E9 /* ReadWriteLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A7252BBA15006F48E9 /* ReadWriteLock.swift */; };
 		568974B6252BBA15006F48E9 /* Hook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A8252BBA15006F48E9 /* Hook.swift */; };
 		568974B7252BBA16006F48E9 /* Tweak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568974A9252BBA15006F48E9 /* Tweak.swift */; };
-		568974C4252BBA4F006F48E9 /* super.m in Sources */ = {isa = PBXBuildFile; fileRef = 568974BA252BBA4F006F48E9 /* super.m */; };
-		568974C6252BBA4F006F48E9 /* init.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BD252BBA4F006F48E9 /* init.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		568974C8252BBA4F006F48E9 /* super.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974BF252BBA4F006F48E9 /* super.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		568974CB252BBA4F006F48E9 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 568974C3252BBA4F006F48E9 /* init.c */; };
 		568974CE252BBA7F006F48E9 /* Orion.h in Headers */ = {isa = PBXBuildFile; fileRef = 568974CD252BBA7F006F48E9 /* Orion.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		56AFA08B25A3CE5F00884E2D /* dealloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 56AFA08A25A3CE5F00884E2D /* dealloc.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		56AFA08D25A3CE6500884E2D /* dealloc.m in Sources */ = {isa = PBXBuildFile; fileRef = 56AFA08C25A3CE6500884E2D /* dealloc.m */; };
 		56AFA08F25A3CE8B00884E2D /* ClassHook+Deinit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */; };
 		56D50FAE25F11DEE00AE26FA /* ClassHook+Glue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D50FAD25F11DEE00AE26FA /* ClassHook+Glue.swift */; };
 		56D50FB125F11DF500AE26FA /* FunctionHook+Glue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D50FB025F11DF500AE26FA /* FunctionHook+Glue.swift */; };
@@ -37,6 +35,10 @@
 
 /* Begin PBXFileReference section */
 		56080B5B25C1F8BE005803BC /* Group.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		562BD3262638154C003C5A00 /* orion_lifecycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = orion_lifecycle.h; sourceTree = "<group>"; };
+		562BD3272638154C003C5A00 /* orion_objcrt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = orion_objcrt.h; sourceTree = "<group>"; };
+		562BD32A2638155A003C5A00 /* orion_objcrt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = orion_objcrt.m; sourceTree = "<group>"; };
+		562BD32B2638155A003C5A00 /* orion_lifecycle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = orion_lifecycle.c; sourceTree = "<group>"; };
 		562FA0E225B7003E007A32FE /* Ivars+Weak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Ivars+Weak.swift"; sourceTree = "<group>"; };
 		565F484E25B1ED3400B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
 		565F485725B1F0D000B75BA3 /* libsubstrate.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = libsubstrate.tbd; sourceTree = "<group>"; };
@@ -59,15 +61,9 @@
 		568974A7252BBA15006F48E9 /* ReadWriteLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadWriteLock.swift; sourceTree = "<group>"; };
 		568974A8252BBA15006F48E9 /* Hook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hook.swift; sourceTree = "<group>"; };
 		568974A9252BBA15006F48E9 /* Tweak.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tweak.swift; sourceTree = "<group>"; };
-		568974BA252BBA4F006F48E9 /* super.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = super.m; sourceTree = "<group>"; };
-		568974BD252BBA4F006F48E9 /* init.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = init.h; sourceTree = "<group>"; };
-		568974BF252BBA4F006F48E9 /* super.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = super.h; sourceTree = "<group>"; };
-		568974C3252BBA4F006F48E9 /* init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
 		568974CD252BBA7F006F48E9 /* Orion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Orion.h; sourceTree = "<group>"; };
 		568974D8252BBFF4006F48E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		56AF44C42621D8380041FBF6 /* Orion-Target-iphoneos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Orion-Target-iphoneos.h"; sourceTree = "<group>"; };
-		56AFA08A25A3CE5F00884E2D /* dealloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dealloc.h; sourceTree = "<group>"; };
-		56AFA08C25A3CE6500884E2D /* dealloc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dealloc.m; sourceTree = "<group>"; };
 		56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ClassHook+Deinit.swift"; sourceTree = "<group>"; };
 		56D50FAD25F11DEE00AE26FA /* ClassHook+Glue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ClassHook+Glue.swift"; sourceTree = "<group>"; };
 		56D50FB025F11DF500AE26FA /* FunctionHook+Glue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FunctionHook+Glue.swift"; sourceTree = "<group>"; };
@@ -224,9 +220,8 @@
 			isa = PBXGroup;
 			children = (
 				568974BB252BBA4F006F48E9 /* include */,
-				56AFA08C25A3CE6500884E2D /* dealloc.m */,
-				568974C3252BBA4F006F48E9 /* init.c */,
-				568974BA252BBA4F006F48E9 /* super.m */,
+				562BD32B2638155A003C5A00 /* orion_lifecycle.c */,
+				562BD32A2638155A003C5A00 /* orion_objcrt.m */,
 			);
 			path = OrionC;
 			sourceTree = "<group>";
@@ -234,9 +229,8 @@
 		568974BB252BBA4F006F48E9 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				56AFA08A25A3CE5F00884E2D /* dealloc.h */,
-				568974BD252BBA4F006F48E9 /* init.h */,
-				568974BF252BBA4F006F48E9 /* super.h */,
+				562BD3262638154C003C5A00 /* orion_lifecycle.h */,
+				562BD3272638154C003C5A00 /* orion_objcrt.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -261,9 +255,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				568974CE252BBA7F006F48E9 /* Orion.h in Headers */,
-				568974C8252BBA4F006F48E9 /* super.h in Headers */,
-				568974C6252BBA4F006F48E9 /* init.h in Headers */,
-				56AFA08B25A3CE5F00884E2D /* dealloc.h in Headers */,
+				562BD3282638154C003C5A00 /* orion_lifecycle.h in Headers */,
+				562BD3292638154C003C5A00 /* orion_objcrt.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,11 +291,11 @@
 		56897486252BB9C6006F48E9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1250;
 				TargetAttributes = {
 					5689748E252BB9C6006F48E9 = {
 						CreatedOnToolsVersion = 12.0.1;
-						LastSwiftMigration = 1200;
+						LastSwiftMigration = 1250;
 					};
 				};
 			};
@@ -419,7 +412,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				568974AE252BBA15006F48E9 /* ClassHook+Super.swift in Sources */,
-				56AFA08D25A3CE6500884E2D /* dealloc.m in Sources */,
 				568974B2252BBA15006F48E9 /* Backend.swift in Sources */,
 				56080B5C25C1F8BF005803BC /* Group.swift in Sources */,
 				56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */,
@@ -427,15 +419,15 @@
 				568974B0252BBA15006F48E9 /* Ivars.swift in Sources */,
 				562FA0E325B7003E007A32FE /* Ivars+Weak.swift in Sources */,
 				568974B7252BBA16006F48E9 /* Tweak.swift in Sources */,
-				568974CB252BBA4F006F48E9 /* init.c in Sources */,
 				568974AC252BBA15006F48E9 /* FunctionHook.swift in Sources */,
 				568974AD252BBA15006F48E9 /* InternalBackend.swift in Sources */,
 				568974B6252BBA15006F48E9 /* Hook.swift in Sources */,
+				562BD32D2638155A003C5A00 /* orion_lifecycle.c in Sources */,
 				568974B5252BBA15006F48E9 /* ReadWriteLock.swift in Sources */,
 				56D9F14925C4940900EDB315 /* LazyAtomic.swift in Sources */,
-				568974C4252BBA4F006F48E9 /* super.m in Sources */,
 				56D50FB125F11DF500AE26FA /* FunctionHook+Glue.swift in Sources */,
 				56D50FAE25F11DEE00AE26FA /* ClassHook+Glue.swift in Sources */,
+				562BD32C2638155A003C5A00 /* orion_objcrt.m in Sources */,
 				568974AA252BBA15006F48E9 /* ClassHook.swift in Sources */,
 				568974B1252BBA15006F48E9 /* Property.swift in Sources */,
 				568974AB252BBA15006F48E9 /* Dynamic.swift in Sources */,
