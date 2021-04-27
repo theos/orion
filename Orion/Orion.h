@@ -5,6 +5,5 @@ FOUNDATION_EXPORT const unsigned char OrionVersionString[];
 
 #import "Orion-Target.h"
 
-#import "init.h"
-#import "super.h"
-#import "dealloc.h"
+#import "orion_lifecycle.h"
+#import "orion_objcrt.h"
