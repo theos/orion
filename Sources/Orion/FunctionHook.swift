@@ -48,8 +48,7 @@ public protocol FunctionHookProtocol: AnyObject, AnyHook {
     /// - See: `_GlueAnyHook`
     ///
     /// :nodoc:
-    associatedtype _Glue: _GlueFunctionHook = _GlueFunctionHookPlaceholder<Self>
-        where _Glue.HookType == Self
+    associatedtype _Glue: _GlueFunctionHook = _GlueFunctionHookPlaceholder
 
     /// The function which is to be hooked.
     static var target: Function { get }

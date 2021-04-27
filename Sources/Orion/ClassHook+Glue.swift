@@ -42,7 +42,7 @@ public final class _GlueClassHookStorage {
 ///
 /// :nodoc:
 public enum _GlueClassHookPlaceholder: _GlueClassHook {
-    public class HookType: ClassHook<NSObject> {}
+    public final class HookType: ClassHook<NSObject> {}
     public typealias OrigType = HookType
     public typealias SuprType = HookType
 

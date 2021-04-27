@@ -17,7 +17,10 @@ public final class _GlueFunctionHookStorage {
 /// used to satisfy the compiler until the actual glue is provided.
 ///
 /// :nodoc:
-public enum _GlueFunctionHookPlaceholder<HookType: FunctionHookProtocol>: _GlueFunctionHook {
+public enum _GlueFunctionHookPlaceholder: _GlueFunctionHook {
+    public final class HookType: FunctionHook {
+        public static var target: Function { error() }
+    }
     public typealias OrigType = HookType
 
     public static var origFunction: Void {
