@@ -1,22 +1,9 @@
 import XCTest
 import Orion
 import OrionTestSupport
-import OrionBackend_Fishhook
 
 // NOTE: We don't need the linux testing stuff here because the
 // runtime can only be built on platforms with Objective-C
-
-struct HooksTweak: TweakWithBackend {
-    static let backend = Backends.Fishhook<Backends.Internal>()
-
-    init() {
-        print("Entry!")
-    }
-
-    func tweakDidActivate() {
-        print("Activated!")
-    }
-}
 
 class BasicHook: ClassHook<BasicClass> {
     func someTestMethod() -> String {

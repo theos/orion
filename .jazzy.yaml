@@ -33,8 +33,6 @@ custom_categories:
   - name: All Hooks
     children:
       - AnyHook
-  - name: Groups
-    children:
       - HookGroup
       - DefaultGroup
   - name: Tweaks
@@ -55,6 +53,7 @@ custom_categories:
       - HookDescriptor
   - name: Error Handling
     children:
+      - OrionHookError
       - OrionErrorHandler
       - updateOrionErrorHandler(_:)
       - orionError(_:file:line:)

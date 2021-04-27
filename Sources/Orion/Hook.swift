@@ -68,7 +68,9 @@ extension AnyHook {
 public protocol _GlueAnyHook {
 
     /// Activates the hook. Do not call this directly.
-    static func activate() -> [HookDescriptor]
+    ///
+    /// - Parameter tweak: The tweak to which the hook belongs.
+    static func activate(in tweak: Tweak.Type) -> [HookDescriptor]
 
     /// Trampoline for `AnyHook.hookWillActivate()`. Do not call
     /// this directly.

@@ -3,8 +3,8 @@ import Foundation
 /// A type describing a single hook.
 public enum HookDescriptor {
 
-    /// A closure used to save the original implementation.
-    public typealias SaveOrig = (UnsafeMutableRawPointer) -> Void
+    /// A closure used to save the original implementation or handle errors.
+    public typealias Completion = (Result<UnsafeMutableRawPointer, Error>) -> Void
 
     /// A method hook.
     ///
@@ -13,18 +13,22 @@ public enum HookDescriptor {
     /// The remaining argument types should be the argument types of the hooked Objective-C method
     /// in order, and the return type should be the return type of the method.
     ///
-    /// `saveOrig` is a closure which will be passed the original method implementation when the
-    /// hook is applied.
-    case method(cls: AnyClass, sel: Selector, replacement: UnsafeMutableRawPointer, saveOrig: SaveOrig)
+    /// If a class method is being hooked, `cls` should be the metaclass.
+    ///
+    /// `completion` is a closure which will be passed the original method implementation when the
+    /// hook is applied, or an error on failure. It may be called more than once during the duration
+    /// of `Backend.apply(descriptors:)`.
+    case method(cls: AnyClass, sel: Selector, replacement: UnsafeMutableRawPointer, completion: Completion)
 
     /// A function hook.
     ///
     /// `replacement` should be a `@convention(c)` function with the same signature as the function
     /// which is to be hooked.
     ///
-    /// `saveOrig` is a closure which will be passed the original function implementation when the
-    /// hook is applied.
-    case function(function: Function, replacement: UnsafeMutableRawPointer, saveOrig: SaveOrig)
+    /// `completion` is a closure which will be passed the original method implementation when the
+    /// hook is applied, or an error on failure. It may be called more than once during the duration
+    /// of `Backend.apply(descriptors:)`.
+    case function(function: Function, replacement: UnsafeMutableRawPointer, completion: Completion)
 
 }
 
@@ -58,58 +62,17 @@ public protocol Backend {
 }
 
 extension Backend {
-    func activate(hooks: [_GlueAnyHook.Type]) {
+    func activate(hooks: [_GlueAnyHook.Type], in tweak: Tweak.Type) {
         let hooksToActivate = hooks.filter { $0.hookWillActivate() }
-        apply(descriptors: hooksToActivate.flatMap { $0.activate() })
+        apply(descriptors: hooksToActivate.flatMap { $0.activate(in: tweak) })
         hooksToActivate.forEach { $0.hookDidActivate() }
     }
 }
 
-extension Backend {
-
-    /// Performs a one-off function hook.
-    ///
-    /// - Parameter function: The function which is to be hooked.
-    ///
-    /// - Parameter replacement: The replacement function implementation. See
-    /// `HookDescriptor.function(function:replacement:completion:)` for details.
-    ///
-    /// - Returns: The original function implementation.
-    ///
-    /// Prefer batching with `apply(hooks:)` if you have multiple hooks, as backends
-    /// may be able to optimize batch hooking.
-    public func hookFunction(_ function: Function, replacement: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
-        // NOTE: We can't declare `code` inside the block because `completion` is only
-        // guaranteed to have been called once `hook` is complete
-        var orig: UnsafeMutableRawPointer?
-        apply(descriptors: [.function(function: function, replacement: replacement) { orig = $0 }])
-        guard let unwrapped = orig
-            else { orionError("Hook builder did not call function hook completion") }
-        return unwrapped
-    }
-
-    /// Performs a one-off method hook.
-    ///
-    /// - Parameter cls: The class which contains the method to be hooked.
-    ///
-    /// - Parameter sel: The selector of the method to be hooked.
-    ///
-    /// - Parameter replacement: The replacement method implementation. See
-    /// `HookDescriptor.method(cls:sel:replacement:completion:)` for details.
-    ///
-    /// - Returns: The original method implementation.
-    ///
-    /// Prefer batching with `apply(hooks:)` if you have multiple hooks, as backends
-    /// may be able to optimize batch hooking.
-    public func hookMethod(cls: AnyClass, sel: Selector, replacement: UnsafeMutableRawPointer) -> UnsafeMutableRawPointer {
-        var orig: UnsafeMutableRawPointer?
-        apply(descriptors: [.method(cls: cls, sel: sel, replacement: replacement) { orig = $0 }])
-        guard let unwrapped = orig
-            else { orionError("Hook builder did not call method hook completion") }
-        return unwrapped
-    }
-
-}
+// We don't have one-off hooking methods because some origs need to be saved before
+// hooking is complete since e.g. fishhook uses strcmp during hooking itself which
+// means the orig must be saved before the hook returns (see the FishhookBackend
+// comments for more info).
 
 /// A backend which Orion can use as a default.
 public protocol DefaultBackend: Backend {

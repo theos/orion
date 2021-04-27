@@ -1,5 +1,51 @@
 import Foundation
 
+/// An error that occurred during hooking.
+///
+/// Additional cases may be added to this enum in
+/// the future.
+///
+/// - See: `Tweak.handleError(_:)`
+public enum OrionHookError: LocalizedError, CustomStringConvertible {
+
+    /// Indicates that function hooking failed.
+    case functionHookFailed(target: Function, underlying: Error)
+
+    /// Indicates that a `ClassHook` could not compute its target class.
+    case targetClassNotAvailable(hookName: String, underlying: Error)
+
+    /// Indicates that method hooking failed.
+    case methodHookFailed(cls: AnyClass, sel: Selector, isClassMethod: Bool, underlying: Error)
+
+    /// Indicates that method addition (`orion:new`) failed.
+    ///
+    /// This may occur if, for example, a method with the provided
+    /// selector already exists on the class.
+    case methodAdditionFailed(cls: AnyClass, sel: Selector, isClassMethod: Bool, underlying: Error)
+
+    public var description: String {
+        var isHook = true
+        switch self {
+        case let .functionHookFailed(target, underlying):
+            return "Failed to hook function \(target) (\(underlying))"
+        case let .targetClassNotAvailable(hookName, underlying):
+            return """
+            Could not compute target class for hook \(hookName) (\(underlying))
+            """
+        case let .methodAdditionFailed(cls, sel, isClassMethod, underlying):
+            isHook = false
+            fallthrough
+        case let .methodHookFailed(cls, sel, isClassMethod, underlying):
+            return """
+            Failed to \(isHook ? "hook" : "add") method \(isClassMethod ? "+" : "-")[\(cls) \(sel)] (\(underlying))
+            """
+        }
+    }
+
+    public var errorDescription: String? { description }
+
+}
+
 /// A closure which is called when Orion encounters a non-recoverable
 /// error.
 ///
@@ -27,8 +73,12 @@ private let errorHandlerQueue = DispatchQueue(label: "error-handler-queue")
 ///
 /// The default error handler is `fatalError`.
 ///
-/// - Important: The new error handler is applied to *all* tweaks, not just
-/// the one calling this method.
+/// - Important: You probably want to implement `Tweak.handleError(_:)` instead
+/// of calling this method. Unlike the `Tweak` variant, this updates the _global_
+/// error handler (i.e. for all tweaks), and once a failure bubbles up to this
+/// method it _must_ terminate the app. A valid use case for calling this method
+/// is, for example, a crash reporter that wants to log errors before letting the
+/// process crash.
 ///
 /// - Warning: This function is thread-safe but not reentrant. Do not call
 /// `updateOrionErrorHandler(_:)` or `orionError(_:file:line:)` inside the
@@ -46,7 +96,7 @@ private let errorHandlerQueue = DispatchQueue(label: "error-handler-queue")
 /// updateOrionErrorHandler { old in
 ///     return { message, file, line in
 ///         let str = message()
-///         // do something with str, file, line
+///         // save (str, file, line) to a file
 ///         old(str, file, line)
 ///     }
 /// }

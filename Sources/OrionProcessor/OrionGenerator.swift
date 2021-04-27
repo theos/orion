@@ -134,7 +134,7 @@ public final class OrionGenerator {
             orig = nil
             supr = nil
             register = """
-            addMethod(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod))
+            builder.addMethod(\(selIdent), \(origIdent), isClassMethod: \(method.isClassMethod))
             """
         } else {
             let isTramp = method.isSuprTramp()

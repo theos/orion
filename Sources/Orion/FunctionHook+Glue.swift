@@ -55,9 +55,16 @@ public protocol _GlueFunctionHook: _GlueAnyHook {
 
 /// :nodoc:
 extension _GlueFunctionHook {
-    public static func activate() -> [HookDescriptor] {
+    public static func activate(in tweak: Tweak.Type) -> [HookDescriptor] {
         [.function(function: HookType.target, replacement: unsafeBitCast(origFunction, to: UnsafeMutableRawPointer.self)) {
-            origFunction = unsafeBitCast($0, to: Code.self)
+            switch $0 {
+            case .success(let code):
+                origFunction = unsafeBitCast(code, to: Code.self)
+            case .failure(let error):
+                tweak.handleError(
+                    OrionHookError.functionHookFailed(target: HookType.target, underlying: error)
+                )
+            }
         }]
     }
 

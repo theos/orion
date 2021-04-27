@@ -24,6 +24,15 @@ extension Backends {
 }
 
 extension Backends.Substrate {
+
+    private struct HookingError: LocalizedError, CustomStringConvertible {
+        let description: String
+        var errorDescription: String? { description }
+        init(_ description: String) {
+            self.description = description
+        }
+    }
+
     private struct ImageFetcher {
         var cache: [URL: MSImageRef?] = [:]
 
@@ -55,22 +64,23 @@ extension Backends.Substrate {
             switch $0 {
             case let .function(function, replacement, completion):
                 guard let symbol = address(for: function, fetcher: &imageFetcher) else {
-                    orionError("The function \(function) could not be found")
+                    return completion(.failure(HookingError("Could not find function")))
                 }
                 var old: UnsafeMutableRawPointer?
                 MSHookFunction(symbol, replacement, &old)
-                guard let unwrapped = old
-                    else { orionError("Could not hook function: \(function)") }
-                completion(unwrapped)
+                guard let unwrapped = old else {
+                    return completion(.failure(HookingError("Could not hook function")))
+                }
+                completion(.success(unwrapped))
             case let .method(cls, sel, replacement, completion):
                 var old: IMP?
                 MSHookMessageEx(cls, sel, IMP(replacement), &old)
                 guard let unwrapped = old else {
-                    let method = "\(class_isMetaClass(cls) ? "+" : "-")[\(cls) \(sel)]"
-                    orionError("Could not hook method \(method)")
+                    return completion(.failure(HookingError("Could not hook method")))
                 }
-                completion(.init(unwrapped))
+                completion(.success(.init(unwrapped)))
             }
         }
     }
+
 }

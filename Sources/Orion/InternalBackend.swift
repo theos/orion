@@ -15,20 +15,25 @@ extension Backends {
 }
 
 extension Backends.Internal {
+    private struct HookingError: LocalizedError, CustomStringConvertible {
+        let description: String
+        var errorDescription: String? { description }
+        init(_ description: String) {
+            self.description = description
+        }
+    }
 
     private func hookMethod(
         cls: AnyClass,
         sel: Selector,
         replacement: UnsafeMutableRawPointer
-    ) -> UnsafeMutableRawPointer {
-        let methodDescription = { "\(class_isMetaClass(cls) ? "+" : "-")[\(cls) \(sel)]" }
-
+    ) throws -> UnsafeMutableRawPointer {
         guard let origMethod = class_getInstanceMethod(cls, sel) else {
-            orionError("Could not find method \(methodDescription())")
+            throw HookingError("Could not find method")
         }
 
         guard let types = method_getTypeEncoding(origMethod) else {
-            orionError("Could not get type encoding for method \(methodDescription())")
+            throw HookingError("Could not get type encoding for method")
         }
 
         let imp = IMP(replacement)
@@ -48,12 +53,12 @@ extension Backends.Internal {
     public func apply(descriptors: [HookDescriptor]) {
         descriptors.forEach {
             switch $0 {
-            case .function(let function, _, _):
-                orionError(
-                    "Could not hook \(function). The internal backend does not support function hooking"
-                )
-            case let .method(cls, sel, replacement, saveOrig):
-                saveOrig(hookMethod(cls: cls, sel: sel, replacement: replacement))
+            case let .function(_, _, completion):
+                completion(.failure(HookingError("""
+                Could not hook function. The internal backend does not support function hooking."
+                """)))
+            case let .method(cls, sel, replacement, completion):
+                completion(Result { try hookMethod(cls: cls, sel: sel, replacement: replacement) })
             }
         }
     }

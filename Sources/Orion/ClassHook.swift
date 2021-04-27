@@ -313,3 +313,12 @@ extension ClassHookProtocol {
         return group
     }
 }
+
+enum ClassHookError: Error {
+    case targetNotFound
+    case targetHasIncompatibleType(expected: AnyClass, found: AnyClass)
+    case subclassCreationFailed
+    case protocolAdditionFailed
+    case addedMethodNotFound
+    case additionFailed
+}

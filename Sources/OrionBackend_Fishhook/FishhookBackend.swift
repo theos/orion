@@ -38,11 +38,19 @@ extension Backends {
 
 extension Backends.Fishhook {
 
+    private struct HookingError: LocalizedError, CustomStringConvertible {
+        let description: String
+        var errorDescription: String? { description }
+        init(_ description: String) {
+            self.description = description
+        }
+    }
+
     private struct Request {
         let symbol: String
         let replacement: UnsafeMutableRawPointer
         let image: URL?
-        let saveOrig: (UnsafeMutableRawPointer) -> Void
+        let completion: (Result<UnsafeMutableRawPointer, Error>) -> Void
     }
 
     private func apply(functionHookRequests requests: [Request]) {
@@ -65,15 +73,16 @@ extension Backends.Fishhook {
 
             let handle: UnsafeMutableRawPointer
             if let image = request.image {
-                guard let _handle = image.withUnsafeFileSystemRepresentation({ dlopen($0, RTLD_NOLOAD | RTLD_NOW) })
-                    else { orionError("Image not loaded: \(image.path)") }
+                guard let _handle = image.withUnsafeFileSystemRepresentation({ dlopen($0, RTLD_NOLOAD | RTLD_NOW) }) else {
+                    return request.completion(.failure(HookingError("Image not loaded: \(image.path)")))
+                }
                 handle = _handle
             } else {
                 handle = UnsafeMutableRawPointer(bitPattern: -2)! // RTLD_DEFAULT
             }
 
             guard let orig = dlsym(handle, request.symbol) else {
-                orionError("Could not find function \(function)")
+                return request.completion(.failure(HookingError("Could not find function")))
             }
 
             // we can't call this in the completion handler because if we don't set
@@ -82,7 +91,7 @@ extension Backends.Fishhook {
             // and so if the function is used by fishhook itself before the completion is
             // called, it'll lead to infinite recursion. This can be seen, for example, when
             // hooking strcmp.
-            request.saveOrig(orig)
+            request.completion(.success(orig))
 
             rebindings.append(rebinding(
                 // Turns out fishhook doesn't copy this string so we're responsible for keeping
@@ -101,15 +110,20 @@ extension Backends.Fishhook {
 
             completions.append { brokenOrig in
                 guard brokenOrig != nil else {
-                    orionError("Failed to hook function \(function)")
+                    return request.completion(.failure(HookingError("Failed to hook function")))
                 }
             }
         }
 
-        guard orion_rebind_symbols(&rebindings, rebindings.count) == 0
-            else { orionError("Failed to hook functions") }
+        guard orion_rebind_symbols(&rebindings, rebindings.count) == 0 else {
+            return requests.forEach {
+                $0.completion(.failure(HookingError("Failed to hook function")))
+            }
+        }
 
-        zip(completions, origs).forEach { $0($1) }
+        // don't zip with origs because some origs may be uninitialized due to
+        // hooking failures
+        zip(completions, rebindings).forEach { $0($1.replaced) }
     }
 
     public func apply(descriptors: [HookDescriptor]) {
@@ -118,18 +132,18 @@ extension Backends.Fishhook {
 
         descriptors.forEach {
             switch $0 {
-            case .function(.address, _, _):
-                orionError("""
+            case .function(.address, _, let completion):
+                completion(.failure(HookingError("""
                 The fishhook backend cannot hook functions at raw addresses. If possible, provide \
                 a symbol name and image instead.
-                """)
-            case let .function(.symbol(symbol, image: image), replacement, saveOrig):
+                """)))
+            case let .function(.symbol(symbol, image: image), replacement, completion):
                 requests.append(
                     Request(
                         symbol: symbol,
                         replacement: replacement,
                         image: image,
-                        saveOrig: saveOrig
+                        completion: completion
                     )
                 )
             default:

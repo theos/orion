@@ -82,6 +82,15 @@ class OrionVisitor: SyntaxVisitor {
                 return nil
             }
         }
+
+        func isModifierInvalid(_ modifier: ModifierKind) -> Bool {
+            switch self {
+            case .classHook, .functionHook:
+                return modifier.isUninheritable
+            case .tweak:
+                return modifier.isInaccessible
+            }
+        }
     }
 
     private enum ModifierKind: String {
@@ -91,7 +100,7 @@ class OrionVisitor: SyntaxVisitor {
             .private, .fileprivate, .final
         ]
 
-        static let ignoredInMethod: Set<ModifierKind> = [
+        static let inaccessible: Set<ModifierKind> = [
             .private, .fileprivate
         ]
 
@@ -103,8 +112,8 @@ class OrionVisitor: SyntaxVisitor {
             self.init(rawValue: decl.name.text)
         }
 
+        var isInaccessible: Bool { Self.inaccessible.contains(self) }
         var isUninheritable: Bool { Self.uninheritable.contains(self) }
-        var isIgnoredInMethod: Bool { Self.ignoredInMethod.contains(self) }
         var isInvalidForFunctionHook: Bool { Self.invalidForFunctionHooks.contains(self) }
     }
 
@@ -359,7 +368,7 @@ class OrionVisitor: SyntaxVisitor {
                 guard let modifiers = decl.modifiers else { return true }
                 // This allows users to use one of these declarations to add a helper function,
                 // which isn't actually a hook, to a hook type
-                return !modifiers.contains { ModifierKind($0)?.isIgnoredInMethod == true }
+                return !modifiers.contains { ModifierKind($0)?.isInaccessible == true }
                     && !Self.ignoredMethodNames.contains(decl.identifier.text)
             }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
@@ -486,7 +495,7 @@ class OrionVisitor: SyntaxVisitor {
         case 0: return nil
         case 1:
             let kind = declarationKinds[0]
-            let uninheritable = modifiers?.filter { ModifierKind($0)?.isUninheritable == true } ?? []
+            let uninheritable = modifiers?.filter { ModifierKind($0).map(kind.isModifierInvalid) == true } ?? []
             if !uninheritable.isEmpty {
                 diagnosticEngine.diagnose(
                     .invalidDeclAccess(declKind: "\(kind)"),

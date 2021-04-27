@@ -547,8 +547,8 @@ extension AdditionHook {
         }
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
-            addMethod(orion_sel1, orion_imp1, isClassMethod: false)
-            addMethod(orion_sel2, orion_imp2, isClassMethod: true)
+            builder.addMethod(orion_sel1, orion_imp1, isClassMethod: false)
+            builder.addMethod(orion_sel2, orion_imp2, isClassMethod: true)
         }
     }
 }
@@ -756,7 +756,7 @@ extension BasicSubclass {
     
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
             builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
-            addMethod(orion_sel2, orion_imp2, isClassMethod: false)
+            builder.addMethod(orion_sel2, orion_imp2, isClassMethod: false)
             builder.addHook(orion_sel3, orion_orig3, isClassMethod: false) { orion_orig3 = $0 }
             builder.addHook(orion_sel4, orion_orig4, isClassMethod: true) { orion_orig4 = $0 }
         }
@@ -806,6 +806,75 @@ extension NamedBasicSubclass {
         static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
             builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
             builder.addHook(orion_sel2, orion_orig2, isClassMethod: true) { orion_orig2 = $0 }
+        }
+    }
+}
+
+extension InitGroupHook {
+    enum _Glue: _GlueClassHook {
+        typealias HookType = InitGroupHook
+
+        final class OrigType: InitGroupHook, _GlueClassHookTrampoline {}
+
+        final class SuprType: InitGroupHook, _GlueClassHookTrampoline {}
+
+        static let storage = initializeStorage()
+
+        static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
+            
+        }
+    }
+}
+
+extension BadHook {
+    enum _Glue: _GlueClassHook {
+        typealias HookType = BadHook
+
+        final class OrigType: BadHook, _GlueClassHookTrampoline {}
+
+        final class SuprType: BadHook, _GlueClassHookTrampoline {}
+
+        static let storage = initializeStorage()
+
+        static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
+            
+        }
+    }
+}
+
+extension BadMethodHook {
+    enum _Glue: _GlueClassHook {
+        typealias HookType = BadMethodHook
+
+        final class OrigType: BadMethodHook, _GlueClassHookTrampoline {
+            @objc override func badMethod()  {
+                _Glue.orion_orig1(target, _Glue.orion_sel1)
+            }
+        }
+
+        final class SuprType: BadMethodHook, _GlueClassHookTrampoline {
+            @objc override func badMethod()  {
+                callSuper((@convention(c) (UnsafeRawPointer, Selector) -> Void).self) {
+                    $0($1, _Glue.orion_sel1)
+                }
+            }
+        }
+
+        static let storage = initializeStorage()
+
+        private static let orion_sel1 = #selector(BadMethodHook.badMethod as (BadMethodHook) -> () -> Void)
+        private static var orion_orig1: @convention(c) (Target, Selector) -> Void = { target, _cmd in
+            (BadMethodHook(target: target).badMethod())
+        }
+
+        private static let orion_sel2 = #selector(BadMethodHook.someTestMethod as (BadMethodHook) -> () -> String)
+        private static var orion_imp2: @convention(c) (Target, Selector) -> String = { target, _cmd in
+            (BadMethodHook(target: target).someTestMethod())
+        }
+    
+        static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder) {
+            builder.addHook(orion_sel1, orion_orig1, isClassMethod: false) { orion_orig1 = $0 }
+            builder.addMethod(orion_sel2, orion_imp2, isClassMethod: false)
         }
     }
 }
@@ -864,6 +933,24 @@ extension StringCompareHook {
     }
 }
 
+extension BadFunctionHook {
+    enum _Glue: _GlueFunctionHook {
+        typealias HookType = BadFunctionHook
+
+        final class OrigType: BadFunctionHook, _GlueFunctionHookTrampoline {
+            override func function()  {
+                _Glue.origFunction()
+            }
+        }
+
+        static var origFunction: @convention(c) () -> Void = { 
+            BadFunctionHook().function()
+        }
+
+        static let storage = initializeStorage()
+    }
+}
+
 @_cdecl("orion_init")
 func orion_init() {
     var hooks: [_GlueAnyHook.Type] = []
@@ -889,9 +976,13 @@ func orion_init() {
             PropertyHook2._Glue.self,
             BasicSubclass._Glue.self,
             NamedBasicSubclass._Glue.self,
+            InitGroupHook._Glue.self,
+            BadHook._Glue.self,
+            BadMethodHook._Glue.self,
             AtoiHook._Glue.self,
             AtofHook._Glue.self,
-            StringCompareHook._Glue.self
+            StringCompareHook._Glue.self,
+            BadFunctionHook._Glue.self
         ]
     }
     HooksTweak.activate(

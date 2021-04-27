@@ -5,19 +5,33 @@ import Foundation
 /// :nodoc:
 public final class _GlueClassHookStorage {
     let hookType: AnyClass
-    @LazyAtomic private(set) var targetType: AnyObject.Type
+    @LazyAtomic private(set) var targetTypeOrError: Result<AnyObject.Type, Error>
     @LazyAtomic private(set) var group: HookGroup
+    @LazyAtomic private(set) var targetType: AnyObject.Type
 
     // additional fields may be added here in the future
 
     init(
         hookType: AnyClass,
-        loadTargetType: @escaping () -> AnyObject.Type,
+        loadTargetType: @escaping () -> Result<AnyObject.Type, Error>,
         loadGroup: @escaping () -> HookGroup
     ) {
         self.hookType = hookType
-        _targetType = LazyAtomic(wrappedValue: loadTargetType())
+        _targetTypeOrError = LazyAtomic(wrappedValue: loadTargetType())
         _group = LazyAtomic(wrappedValue: loadGroup())
+        // we need to finish initialization before we can use self
+        // so start with a dummy value
+        _targetType = LazyAtomic(wrappedValue: NSObject.self)
+        _targetType = LazyAtomic(wrappedValue: {
+            switch self.targetTypeOrError {
+            case .success(let type):
+                return type
+            case .failure(let error):
+                // we shouldn't get here because _GlueClassHook.activate(in:) should handle
+                // failures gracefully - unless the user accesses HookType.target before that
+                orionError("Could not get target type for ClassHook \(hookType): \(error)")
+            }
+        }())
     }
 }
 
@@ -51,21 +65,58 @@ public protocol _GlueClassHookTrampoline: ClassHookProtocol {}
 ///
 /// :nodoc:
 public struct _GlueClassHookBuilder {
+    struct MethodAddition {
+        let sel: Selector
+        let imp: IMP
+        let isClassMethod: Bool
+    }
+
     let target: AnyClass
+    let tweak: Tweak.Type
 
     var descriptors: [HookDescriptor] = []
+    var methodAdditions: [MethodAddition] = []
 
+    // completion may be called any number of times while during the duration of
+    // the addHook call (including 0 times)
     public mutating func addHook<Code>(
         _ sel: Selector,
         _ replacement: Code,
         isClassMethod: Bool,
-        saveOrig: @escaping (Code) -> Void
+        completion: @escaping (Code) -> Void
     ) {
+        let tweak = self.tweak
         let cls: AnyClass = isClassMethod ? object_getClass(target)! : target
         descriptors.append(
             .method(cls: cls, sel: sel, replacement: unsafeBitCast(replacement, to: UnsafeMutableRawPointer.self)) {
-                saveOrig(unsafeBitCast($0, to: Code.self))
+                switch $0 {
+                case .success(let code):
+                    completion(unsafeBitCast(code, to: Code.self))
+                case .failure(let error):
+                    tweak.handleError(
+                        OrionHookError.methodHookFailed(
+                            cls: cls,
+                            sel: sel,
+                            isClassMethod: isClassMethod,
+                            underlying: error
+                        )
+                    )
+                }
             }
+        )
+    }
+
+    public mutating func addMethod<Code>(
+        _ sel: Selector,
+        _ imp: Code,
+        isClassMethod: Bool
+    ) {
+        methodAdditions.append(
+            MethodAddition(
+                sel: sel,
+                imp: unsafeBitCast(imp, to: IMP.self),
+                isClassMethod: isClassMethod
+            )
         )
     }
 }
@@ -85,20 +136,43 @@ public protocol _GlueClassHook: _GlueAnyHook {
 
 /// :nodoc:
 extension _GlueClassHook {
-    public static func addMethod<Code>(_ selector: Selector, _ implementation: Code, isClassMethod: Bool) {
-        let methodDescription = { "\(isClassMethod ? "+" : "-")[\(self) \(selector)]" }
-        guard let method = (isClassMethod ? class_getClassMethod : class_getInstanceMethod)(HookType.self, selector)
-            else { orionError("Could not find method \(methodDescription())") }
-        guard let types = method_getTypeEncoding(method)
-            else { orionError("Could not get method signature for \(methodDescription())") }
+    // returns true iff success
+    private static func addMethod(
+        _ selector: Selector,
+        _ implementation: IMP,
+        isClassMethod: Bool
+    ) throws {
+        guard let method = (isClassMethod ? class_getClassMethod : class_getInstanceMethod)(HookType.self, selector),
+              let types = method_getTypeEncoding(method)
+        else { throw ClassHookError.addedMethodNotFound }
         let cls: AnyClass = isClassMethod ? object_getClass(HookType.target)! : HookType.target
-        guard class_addMethod(cls, selector, unsafeBitCast(implementation, to: IMP.self), types)
-            else { orionError("Failed to add method \(methodDescription())") }
+        guard class_addMethod(cls, selector, implementation, types)
+        else { throw ClassHookError.additionFailed }
     }
 
-    public static func activate() -> [HookDescriptor] {
-        var classHookBuilder = _GlueClassHookBuilder(target: HookType.target)
+    public static func activate(in tweak: Tweak.Type) -> [HookDescriptor] {
+        if case let .failure(error) = HookType._Glue.storage.targetTypeOrError {
+            tweak.handleError(
+                .targetClassNotAvailable(hookName: "\(HookType.self)", underlying: error)
+            )
+            return []
+        }
+        var classHookBuilder = _GlueClassHookBuilder(target: HookType.target, tweak: tweak)
         activate(withClassHookBuilder: &classHookBuilder)
+        for addition in classHookBuilder.methodAdditions {
+            do {
+                try addMethod(addition.sel, addition.imp, isClassMethod: addition.isClassMethod)
+            } catch {
+                tweak.handleError(
+                    OrionHookError.methodAdditionFailed(
+                        cls: HookType.target,
+                        sel: addition.sel,
+                        isClassMethod: addition.isClassMethod,
+                        underlying: error
+                    )
+                )
+            }
+        }
         return classHookBuilder.descriptors
     }
 
@@ -119,7 +193,7 @@ extension _GlueClassHook {
         // our concrete subclass
         _GlueClassHookStorage(
             hookType: HookType.self,
-            loadTargetType: HookType.initializeTargetType,
+            loadTargetType: { Result(catching: HookType.initializeTargetType) },
             loadGroup: HookType.loadGroup
         )
     }
@@ -142,25 +216,36 @@ extension SubclassMode {
 extension ClassHookProtocol {
     // since `target` is referred to in `activate()`, this will deterministically be called
     // when a class hook is activated.
-    fileprivate static func initializeTargetType() -> Target.Type {
+    fileprivate static func initializeTargetType() throws -> Target.Type {
         let targetName = self.targetName // only call getter once
-        let baseTarget = targetName.isEmpty ? Target.self : Dynamic(targetName).as(type: Target.self)
+        let baseTarget: Target.Type
+        if targetName.isEmpty {
+            baseTarget = Target.self
+        } else {
+            guard let cls = NSClassFromString(targetName) else {
+                throw ClassHookError.targetNotFound
+            }
+            guard let typed = cls as? Target.Type else {
+                throw ClassHookError.targetHasIncompatibleType(expected: Target.self, found: cls)
+            }
+            baseTarget = typed
+        }
 
         let target: Target.Type
         if let subclassName = subclassMode.subclassName(withType: _Glue.storage.hookType) {
             guard let pair: AnyClass = objc_allocateClassPair(baseTarget, subclassName, 0)
-                else { orionError("Could not allocate subclass for \(self)") }
+                else { throw ClassHookError.subclassCreationFailed }
             objc_registerClassPair(pair)
             guard let _target = pair as? Target.Type
-                else { orionError("Allocated invalid subclass for \(self)") }
+                else { throw ClassHookError.subclassCreationFailed }
             target = _target
         } else {
             target = baseTarget
         }
 
-        protocols.forEach {
+        try protocols.forEach {
             guard class_addProtocol(target, $0)
-                else { orionError("Could not add protocol \($0) to \(target)") }
+                else { throw ClassHookError.protocolAdditionFailed }
         }
         return target
     }

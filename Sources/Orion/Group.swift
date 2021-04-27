@@ -97,8 +97,8 @@ extension HookGroup {
 /// to this group are automatically activated during Orion's standard
 /// initialization process.
 ///
-/// Orion activates this group after calling `Tweak.init()` but prior
-/// to calling `Tweak.tweakDidActivate()`.
+/// Orion activates hooks assigned to this group after calling
+/// `Tweak.init()` but prior to calling `Tweak.tweakDidActivate()`.
 ///
 /// - See: `HookGroup`
 public struct DefaultGroup: HookGroup {}
@@ -108,20 +108,22 @@ public struct DefaultGroup: HookGroup {}
 // Orion simultaneously
 class GroupRegistry {
     private enum GroupState {
-        case pendingActivation(_ activate: () -> Void)
-        case activated(HookGroup)
+        // we're not really using `tweak` atm but it could be useful in the
+        // future, for example if we decide to allow handling errors for groups
+        case pendingActivation(_ tweak: Tweak.Type?, _ activate: () -> Void)
+        case activated(_ tweak: Tweak.Type?, _ group: HookGroup)
     }
 
     private let groupsLock = ReadWriteLock()
     private var groups: [ObjectIdentifier: GroupState] = [
-        DefaultGroup.id: .activated(DefaultGroup())
+        DefaultGroup.id: .activated(nil, DefaultGroup())
     ]
 
     static let shared = GroupRegistry()
     private init() {}
 
     // returns default hooks which should be activated immediately
-    func register(_ hooks: [_GlueAnyHook.Type], withBackend backend: Backend) -> [_GlueAnyHook.Type] {
+    func register(_ hooks: [_GlueAnyHook.Type], tweak: Tweak.Type, backend: Backend) -> [_GlueAnyHook.Type] {
         var newGroups = Dictionary(grouping: hooks) { $0.groupType.id }
         let defaultHooks = newGroups.removeValue(forKey: DefaultGroup.id)
         if !newGroups.isEmpty {
@@ -129,7 +131,9 @@ class GroupRegistry {
                 for (groupID, hooks) in newGroups {
                     switch groups[groupID] {
                     case nil:
-                        groups[groupID] = .pendingActivation { backend.activate(hooks: hooks) }
+                        groups[groupID] = .pendingActivation(tweak) {
+                            backend.activate(hooks: hooks, in: tweak)
+                        }
                     case .pendingActivation:
                         orionError("Group \(hooks[0].groupType) has already been registered")
                     case .activated:
@@ -154,10 +158,10 @@ class GroupRegistry {
                 // but make sure to mark the group as activated to preserve
                 // the correct semantics (isActive, double-activation being
                 // an error, etc)
-                groups[groupID] = .activated(group)
+                groups[groupID] = .activated(nil, group)
                 return nil
-            case .pendingActivation(let activation):
-                groups[groupID] = .activated(group)
+            case let .pendingActivation(tweak, activation):
+                groups[groupID] = .activated(tweak, group)
                 return activation
             case .activated:
                 orionError("Group '\(T.self)' has already been activated")
@@ -175,9 +179,9 @@ class GroupRegistry {
                 orionError("Group '\(T.self)' has not been registered with Orion")
             case .pendingActivation:
                 orionError("Group '\(T.self)' has not been activated")
-            case .activated(let group as T):
+            case .activated(_, let group as T):
                 return group
-            case .activated(let group):
+            case .activated(_, let group):
                 orionError("Expected to find group of type '\(T.self)' but found '\(type(of: group))'")
             }
         }

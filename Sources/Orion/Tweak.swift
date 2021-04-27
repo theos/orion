@@ -28,6 +28,17 @@ public protocol Tweak {
     /// been activated. The default implementation does nothing.
     func tweakDidActivate()
 
+    /// Handles errors that occur during hooking.
+    ///
+    /// The default implementation simply forwards to `handleErrorDefault(_:)`,
+    /// which logs and terminates the process. If you implement this method
+    /// yourself, however, you can choose to **not** terminate the process.
+    ///
+    /// This method may be called even before `Tweak.init()` is called.
+    ///
+    /// - Parameter error: The error that occurred.
+    static func handleError(_ error: OrionHookError)
+
 }
 
 extension Tweak {
@@ -43,14 +54,35 @@ extension Tweak {
         _orion_init_c()
         #endif
 
-        let defaultHooks = GroupRegistry.shared.register(hooks, withBackend: backend)
+        // this must happen before we init `Tweak` because the tweak might want
+        // to activate groups in its `init`.
+        let defaultHooks = GroupRegistry.shared.register(hooks, tweak: Self.self, backend: backend)
 
         let tweak = Self()
-        backend.activate(hooks: defaultHooks)
+        backend.activate(hooks: defaultHooks, in: Self.self)
         tweak.tweakDidActivate()
     }
 
     public func tweakDidActivate() {}
+
+    /// The default implementation of `handleError(_:)`.
+    ///
+    /// This method forwards to `orionError(_:file:line:)`, thereby logging the
+    /// error and terminating the app with `fatalError`.
+    ///
+    /// If you implement `handleError(_:)` yourself, you may call this
+    /// method at the end of your implementation.
+    ///
+    /// - Parameter error: The error that occurred.
+    ///
+    /// - See: `handleError(_:)`
+    public static func handleErrorDefault(_ error: OrionHookError) -> Never {
+        orionError("Error in tweak \(self): \(error)")
+    }
+
+    public static func handleError(_ error: OrionHookError) {
+        handleErrorDefault(error)
+    }
 
 }
 
