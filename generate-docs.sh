@@ -18,14 +18,14 @@ elif [[ $# = 2 ]]; then
 	perma_args=(--module-version "${version}" --github-file-prefix "${file_prefix}" --root-url "${root_url}versions/${version}/")
 	outdir=".."
 else
-	echo "Usage: $0 [cached|<<git hash> <version>>]" >&2
+	echo "Usage: $0 [watch|cached|<<git hash> <version>>]" >&2
 	exit 1
 fi
 common_args=(--head "$(cat head.html)" --separate-global-declarations --sourcekitten-sourcefile docs.json)
 
 rm -rf "${outdir}/docs" "${outdir}/docs-perm"
 
-# if $# = 1 then it's a cached build; use the existing docs.json
+# if it's a cached build, use the existing docs.json
 if [[ $# = 1 && $1 = "cached" ]]; then
 	if [[ ! -r docs.json ]]; then
 		echo "Error: You cannot perform a cached build without having normally generated the docs at least once." >&2

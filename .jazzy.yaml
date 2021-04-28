@@ -18,6 +18,7 @@ custom_categories:
       - Tweak Preferences
       - Orion Directives
       - Using Orion Without Theos
+      - Troubleshooting
   - name: Class Hooking
     children:
       - ClassHook
