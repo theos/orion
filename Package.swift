@@ -16,8 +16,7 @@ let swiftSyntaxVersion: Package.Dependency.Requirement = {
     Please check https://github.com/theos/Orion for progress updates.
     """)
     #elseif swift(>=5.4)
-//    return .exact("0.50400.0")
-    return .revision("swift-5.4-RELEASE")
+    return .exact("0.50400.0")
     #elseif swift(>=5.3)
     return .exact("0.50300.0")
     #elseif swift(>=5.2)
