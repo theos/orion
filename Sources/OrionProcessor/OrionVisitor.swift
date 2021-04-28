@@ -228,15 +228,17 @@ class OrionVisitor: SyntaxVisitor {
         return prevTrailing + leading
     }
 
-    private func makeFunction(for function: FunctionDeclSyntax) -> Syntax {
-        let elements = function.signature.input.parameterList.enumerated().map { idx, element -> FunctionParameterSyntax in
+    private func makeFunction(for function: FunctionDeclSyntax) -> Syntax? {
+        let paramList = function.signature.input.parameterList
+        let elements = paramList.enumerated().compactMap { idx, element -> FunctionParameterSyntax? in
             var element = element
-            // TODO: Fix force unwrapping
-            if element.firstName!.trailingTrivia.isEmpty {
+            guard let name = element.firstName else { return nil }
+            if name.trailingTrivia.isEmpty {
                 element = element.withFirstName(element.firstName?.withTrailingTrivia(.spaces(1)))
             }
             return element.withSecondName(SyntaxFactory.makeIdentifier("arg\(idx + 1)"))
         }
+        guard elements.count == paramList.count else { return nil }
         let input = function.signature.input.withParameterList(SyntaxFactory.makeFunctionParameterList(elements))
         let signature = function.signature.withInput(input).withOutput(function.signature.output?.withoutTrailingTrivia())
         let function2 = function.withoutTrivia().withSignature(signature)
@@ -254,17 +256,21 @@ class OrionVisitor: SyntaxVisitor {
         return Syntax(function2)
     }
 
-    private func makeIdentifier(for function: FunctionDeclSyntax) -> Syntax {
+    private func makeIdentifier(for function: FunctionDeclSyntax) -> Syntax? {
         let declNameArguments: DeclNameArgumentsSyntax?
 
         let params = function.signature.input.parameterList
         if params.isEmpty {
             declNameArguments = nil
         } else {
-            let argumentsArray = function.signature.input.parameterList.map {
-                // TODO: Fix force unwrapping
-                SyntaxFactory.makeDeclNameArgument(name: $0.firstName!.withoutTrivia(), colon: $0.colon!.withoutTrivia())
+            let params = function.signature.input.parameterList
+            let argumentsArray = params.compactMap { param -> DeclNameArgumentSyntax? in
+                guard let firstName = param.firstName, let colon = param.colon else { return nil }
+                return SyntaxFactory.makeDeclNameArgument(
+                    name: firstName.withoutTrivia(), colon: colon.withoutTrivia()
+                )
             }
+            guard argumentsArray.count == params.count else { return nil }
             declNameArguments = SyntaxFactory.makeDeclNameArguments(
                 leftParen: SyntaxFactory.makeLeftParenToken(),
                 arguments: SyntaxFactory.makeDeclNameArgumentList(argumentsArray),
@@ -280,8 +286,10 @@ class OrionVisitor: SyntaxVisitor {
         case method(firstType: String, returnsUnmanaged: Bool)
     }
 
-    private func makeClosure(for function: FunctionDeclSyntax, kind: FunctionKind) -> Syntax {
+    private func makeClosure(for function: FunctionDeclSyntax, kind: FunctionKind) -> Syntax? {
         let params = function.signature.input.parameterList
+        let rawParamTypes = params.compactMap { $0.type }
+        guard rawParamTypes.count == params.count else { return nil }
 
         let prefixTypes: [TypeSyntax]
         let returnsUnmanaged: Bool
@@ -296,8 +304,7 @@ class OrionVisitor: SyntaxVisitor {
             ]
             returnsUnmanaged = _returnsUnmanaged
         }
-        // TODO: Fix force unwrapping
-        let types = prefixTypes + params.map { $0.type! }
+        let types = prefixTypes + rawParamTypes
 
         let last = types.last
         let argumentsArray = types.map { type in
@@ -337,12 +344,16 @@ class OrionVisitor: SyntaxVisitor {
         return Syntax(type)
     }
 
-    private func orionFunction(for function: FunctionDeclSyntax) -> OrionData.Function {
-        OrionData.Function(
+    private func orionFunction(for function: FunctionDeclSyntax) -> OrionData.Function? {
+        guard let fn = makeFunction(for: function),
+              let id = makeIdentifier(for: function),
+              let closure = makeClosure(for: function, kind: .function)
+        else { return nil }
+        return OrionData.Function(
             numberOfArguments: function.signature.input.parameterList.count,
-            function: makeFunction(for: function),
-            identifier: makeIdentifier(for: function),
-            closure: makeClosure(for: function, kind: .function),
+            function: fn,
+            identifier: id,
+            closure: closure,
             directives: makeDirectives(for: Syntax(function)),
             location: function.startLocation(converter: converter, afterLeadingTrivia: true)
         )
@@ -350,12 +361,6 @@ class OrionVisitor: SyntaxVisitor {
 
     private func staticModifier(in function: FunctionDeclSyntax) -> DeclModifierSyntax? {
         function.modifiers?.first { ModifierKind($0) == .static }
-    }
-
-    // TODO: Maybe use a comment above the function instead? Something
-    // like `// orion:set:next addition` (similar to swiftlint)
-    private func functionIsAddition(_ function: FunctionDeclSyntax) -> Bool {
-        function.modifiers?.contains { ModifierKind($0) == .final } == true
     }
 
     private func classModifier(in function: FunctionDeclSyntax) -> DeclModifierSyntax? {
@@ -440,27 +445,33 @@ class OrionVisitor: SyntaxVisitor {
                     didFail = true
                     return nil
                 }
+                guard let orionFn = orionFunction(for: function),
+                      let methodClosure = makeClosure(
+                        for: function,
+                        kind: .method(firstType: isClass ? "AnyClass" : "Target", returnsUnmanaged: false)
+                      ),
+                      let methodClosureUnmanaged = makeClosure(
+                        for: function,
+                        kind: .method(firstType: isClass ? "AnyClass" : "Target", returnsUnmanaged: true)
+                      ),
+                      let superClosure = makeClosure(
+                        for: function,
+                        kind: .method(firstType: "UnsafeRawPointer", returnsUnmanaged: false)
+                      ),
+                      let superClosureUnmanaged = makeClosure(
+                        for: function,
+                        kind: .method(firstType: "UnsafeRawPointer", returnsUnmanaged: true)
+                      )
+                else { return nil }
                 return OrionData.ClassHook.Method(
                     isClassMethod: isClass,
                     objcAttribute: functionObjCAttribute(function),
                     isDeinitializer: isDeinit,
-                    function: orionFunction(for: function),
-                    methodClosure: makeClosure(
-                        for: function,
-                        kind: .method(firstType: isClass ? "AnyClass" : "Target", returnsUnmanaged: false)
-                    ),
-                    methodClosureUnmanaged: makeClosure(
-                        for: function,
-                        kind: .method(firstType: isClass ? "AnyClass" : "Target", returnsUnmanaged: true)
-                    ),
-                    superClosure: makeClosure(
-                        for: function,
-                        kind: .method(firstType: "UnsafeRawPointer", returnsUnmanaged: false)
-                    ),
-                    superClosureUnmanaged: makeClosure(
-                        for: function,
-                        kind: .method(firstType: "UnsafeRawPointer", returnsUnmanaged: true)
-                    )
+                    function: orionFn,
+                    methodClosure: methodClosure,
+                    methodClosureUnmanaged: methodClosureUnmanaged,
+                    superClosure: superClosure,
+                    superClosureUnmanaged: superClosureUnmanaged
                 )
             }
         data.classHooks.append(OrionData.ClassHook(
@@ -496,9 +507,10 @@ class OrionVisitor: SyntaxVisitor {
             return
         }
 
+        guard let orionFn = orionFunction(for: function) else { return }
         data.functionHooks.append(OrionData.FunctionHook(
             name: node.identifier.text,
-            function: orionFunction(for: function),
+            function: orionFn,
             availability: availability(for: node),
             converter: converter
         ))
