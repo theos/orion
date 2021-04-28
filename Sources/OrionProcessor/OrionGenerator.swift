@@ -32,6 +32,15 @@ private extension Sequence {
     }
 }
 
+private extension SourceLocation {
+    func decl() -> String? {
+        guard let file = file, let line = line else { return nil }
+        let standard = URL(fileURLWithPath: file).standardized.path
+        // TODO: Maybe escape `standard`
+        return "#sourceLocation(file: \"\(standard)\", line: \(line))"
+    }
+}
+
 private extension Diagnostic.Message {
     static func multipleTweaks() -> Diagnostic.Message {
         .init(.error, "Cannot have more than one Tweak type in a module")
@@ -40,6 +49,22 @@ private extension Diagnostic.Message {
 
 // and y'all thought *C* macros were bad
 public final class OrionGenerator {
+
+    public struct Options {
+        public var backend: Backend
+        public var extraBackendModules: Set<String>
+        public var emitSourceLocations: Bool
+
+        public init(
+            backend: Backend = .internal,
+            extraBackendModules: Set<String> = [],
+            emitSourceLocations: Bool = true
+        ) {
+            self.backend = backend
+            self.extraBackendModules = extraBackendModules
+            self.emitSourceLocations = emitSourceLocations
+        }
+    }
 
     // Backends should be declared as extensions on the `Backends` enum. The backend
     // "name" is the name of the type minus `Backends.` will be the backend name. Orion
@@ -73,10 +98,16 @@ public final class OrionGenerator {
 
     private let engine: DiagnosticEngine
     public let data: OrionData
+    public let options: Options
 
-    public init(data: OrionData, diagnosticEngine: OrionDiagnosticEngine = .init()) {
+    public init(data: OrionData, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) {
         self.data = data
         self.engine = diagnosticEngine.createEngine()
+        self.options = options
+    }
+
+    private func sourceLocDecl(for sourceLocation: SourceLocation) -> String {
+        options.emitSourceLocations ? (sourceLocation.decl().map { "\($0)\n" } ?? "") : ""
     }
 
     private func arguments(for function: OrionData.Function) -> [String] {
@@ -107,6 +138,8 @@ public final class OrionGenerator {
         let takeRetained = returnsRetained ? ".takeRetainedValue()" : ""
         let passRetained = returnsRetained ? "Unmanaged.passRetained" : ""
         let methodClosure = returnsRetained ? method.methodClosureUnmanaged : method.methodClosure
+
+        let loc = sourceLocDecl(for: method.function.location)
 
         if method.isDeinitializer {
             orig = """
@@ -145,15 +178,21 @@ public final class OrionGenerator {
             let funcOverride = "\(method.objcAttribute == nil ? "@objc " : "")\(method.function.function)"
 
             orig = """
+            \(loc)\
             \(funcOverride) {
+            \(loc.isEmpty ? "" : "#sourceLocation()\n")\
                 \(isTramp ? "trampOrigError()" : "_Glue.\(origIdent)(target, _Glue.\(selIdent)\(commaArgs))\(takeRetained)")
             }
             """
 
             let superClosure = returnsRetained ? method.superClosureUnmanaged : method.superClosure
             supr = """
+            \(loc)\
             \(funcOverride) {
+            \(loc.isEmpty ? "" : "#sourceLocation()\n")\
+            \(loc)\
                 callSuper((@convention(c) \(superClosure)).self) {
+            \(loc.isEmpty ? "" : "#sourceLocation()\n")\
                     $0($1, _Glue.\(selIdent)\(commaArgs))\(takeRetained)
                 }
             }
@@ -168,8 +207,12 @@ public final class OrionGenerator {
         // because it could refer to either. Adding the signature disambiguates.
         let selSig = "\(method.isClassMethod ? "" : "(\(className)) -> ")\(method.function.closure)"
         let main = """
+        \(loc)\
         private static let \(selIdent) = #selector(\(className).\(method.function.identifier) as \(selSig))
+        \(loc.isEmpty ? "" : "#sourceLocation()\n")\
+        \(loc)\
         private static var \(origIdent): @convention(c) \(methodClosure) = { target, _cmd\(commaArgs) in
+        \(loc.isEmpty ? "" : "#sourceLocation()\n")\
             \(passRetained)(\(className)\(method.isClassMethod ? "" : "(target: target)").\(method.function.identifier)(\(argsList)))
         }
         """
@@ -224,6 +267,7 @@ public final class OrionGenerator {
         from functionHook: OrionData.FunctionHook,
         idx: Int
     ) -> (hook: String, glue: (name: String, availability: String?)) {
+        let loc = sourceLocDecl(for: functionHook.function.location)
         let args = arguments(for: functionHook.function)
         let argsList = args.joined(separator: ", ")
         let argsIn = args.isEmpty ? "" : "\(argsList) in"
@@ -238,7 +282,9 @@ public final class OrionGenerator {
                     }
                 }
 
+        \(loc)\
                 static var origFunction: @convention(c) \(functionHook.function.closure) = { \(argsIn)
+        \(loc.isEmpty ? "" : "#sourceLocation()\n")\
                     \(functionHook.name)().\(functionHook.function.identifier)(\(argsList))
                 }
 
@@ -253,10 +299,7 @@ public final class OrionGenerator {
         "\(items.joined(separator: separation))\(items.isEmpty ? "" : "\n\n")"
     }
 
-    public func generate(
-        backend: Backend = .internal,
-        extraBackendModules: Set<String> = []
-    ) throws -> String {
+    public func generate() throws -> String {
         let (classes, classHookGlues) = data.classHooks.enumerated()
             .map { generateConcreteClassHook(from: $1, idx: $0 + 1) }
             .unzip()
@@ -298,9 +341,9 @@ public final class OrionGenerator {
         }
 
         let importBackend: String
-        if !hasCustomBackend, let module = backend.implicitModule {
+        if !hasCustomBackend, let module = options.backend.implicitModule {
             importBackend = """
-            \(join(extraBackendModules.sorted().map { "import \($0)" }, separation: "\n"))\
+            \(join(options.extraBackendModules.sorted().map { "import \($0)" }, separation: "\n"))\
             #if canImport(\(module))
             import \(module)
             #endif\n\n
@@ -331,7 +374,7 @@ public final class OrionGenerator {
             var hooks: [_GlueAnyHook.Type] = []
         \(allHooks)
             \(tweakName).activate(
-        \(hasCustomBackend ? "" : "        backend: Backends.\(backend.name)(),\n")\
+        \(hasCustomBackend ? "" : "        backend: Backends.\(options.backend.name)(),\n")\
                 hooks: hooks
             )
         }\n

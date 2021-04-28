@@ -9,6 +9,7 @@ public struct OrionData {
         var identifier: Syntax // foo(bar:)
         var closure: Syntax // (Blah) -> Blah
         var directives: [OrionDirective]
+        var location: SourceLocation
 
         var firstPart: String {
             let text = identifier.as(IdentifierExprSyntax.self)!.identifier.text

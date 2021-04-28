@@ -11,7 +11,8 @@ final class IntegrationTests: XCTestCase {
 
         let parser = OrionBatchParser(inputs: [orionTests])
         let data = try parser.parse()
-        let generator = OrionGenerator(data: data)
+        let options = OrionGenerator.Options(emitSourceLocations: false)
+        let generator = OrionGenerator(data: data, options: options)
         let source = try generator.generate()
 
         XCTAssertEqual(source, fixture)

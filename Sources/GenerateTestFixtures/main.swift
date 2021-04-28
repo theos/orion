@@ -9,7 +9,8 @@ engine.addConsumer(.printing)
 let orionTests = URL(fileURLWithPath: #file).deletingLastPathComponent().appendingPathComponent("../../Tests/OrionTests")
 
 let data = try OrionBatchParser(inputs: [orionTests], diagnosticEngine: engine).parse()
-let generator = OrionGenerator(data: data, diagnosticEngine: engine)
+let options = OrionGenerator.Options(emitSourceLocations: false)
+let generator = OrionGenerator(data: data, diagnosticEngine: engine, options: options)
 let glue = try generator.generate()
 
 let dest = orionTests.appendingPathComponent("Generated.xc.swift")

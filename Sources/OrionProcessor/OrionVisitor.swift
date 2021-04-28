@@ -343,7 +343,8 @@ class OrionVisitor: SyntaxVisitor {
             function: makeFunction(for: function),
             identifier: makeIdentifier(for: function),
             closure: makeClosure(for: function, kind: .function),
-            directives: makeDirectives(for: Syntax(function))
+            directives: makeDirectives(for: Syntax(function)),
+            location: function.startLocation(converter: converter, afterLeadingTrivia: true)
         )
     }
 

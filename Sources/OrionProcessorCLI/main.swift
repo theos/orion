@@ -53,6 +53,19 @@ struct OrionCommand: ParsableCommand {
         )
     ) var backendModules: [String] = []
 
+    @Flag(
+        inversion: .prefixedNo,
+        help: ArgumentHelp(
+            "Emit source locations.",
+            discussion: """
+            Creates a source map from locations in the glue file to locations in your code. \
+            Allows for better compiler diagnostics, but may increase compilation time and glue \
+            file size. There is no impact on the compiled binary.
+            """
+        )
+    )
+    var sourceLocations: Bool = true
+
     @Argument(
         help: ArgumentHelp(
             "Directories/source files to process.",
@@ -92,8 +105,13 @@ struct OrionCommand: ParsableCommand {
             data = try parser.parse()
         }
 
-        let generator = OrionGenerator(data: data, diagnosticEngine: engine)
-        let out = try generator.generate(backend: backend, extraBackendModules: Set(backendModules))
+        let options = OrionGenerator.Options(
+            backend: backend,
+            extraBackendModules: Set(backendModules),
+            emitSourceLocations: sourceLocations
+        )
+        let generator = OrionGenerator(data: data, diagnosticEngine: engine, options: options)
+        let out = try generator.generate()
         if let output = output {
             let outputURL = URL(fileURLWithPath: output)
             try out.write(to: outputURL, atomically: true, encoding: .utf8)
