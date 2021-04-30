@@ -53,6 +53,17 @@ struct OrionCommand: ParsableCommand {
         )
     ) var backendModules: [String] = []
 
+    @Option(
+        help: ArgumentHelp(
+            "Add name to schema.",
+            discussion: """
+            The schema list can be used to conditionally enable Orion directives. It is \
+            empty by default. Read the documentation on directives for more information.
+            """,
+            valueName: "name"
+        )
+    ) var schema: [String] = []
+
     @Flag(
         inversion: .prefixedNo,
         help: ArgumentHelp(
@@ -85,6 +96,8 @@ struct OrionCommand: ParsableCommand {
         let engine = OrionDiagnosticEngine()
         engine.addConsumer(.printing)
 
+        let parserOptions = OrionParser.Options(schema: Set(schema))
+
         let data: OrionData
         if inputs == ["-"] {
             var input = ""
@@ -94,23 +107,25 @@ struct OrionCommand: ParsableCommand {
             }
             let parser = OrionParser(
                 contents: input,
-                diagnosticEngine: engine
+                diagnosticEngine: engine,
+                options: parserOptions
             )
             data = try parser.parse()
         } else {
             let parser = OrionBatchParser(
                 inputs: inputs.map(URL.init(fileURLWithPath:)),
-                diagnosticEngine: engine
+                diagnosticEngine: engine,
+                options: parserOptions
             )
             data = try parser.parse()
         }
 
-        let options = OrionGenerator.Options(
+        let generatorOptions = OrionGenerator.Options(
             backend: backend,
             extraBackendModules: Set(backendModules),
             emitSourceLocations: sourceLocations
         )
-        let generator = OrionGenerator(data: data, diagnosticEngine: engine, options: options)
+        let generator = OrionGenerator(data: data, diagnosticEngine: engine, options: generatorOptions)
         let out = try generator.generate()
         if let output = output {
             let outputURL = URL(fileURLWithPath: output)

@@ -78,7 +78,7 @@ struct OrionDirectiveDiagnostic: Error, LocalizedError {
 
 final class OrionDirectiveParser {
     static let shared = OrionDirectiveParser()
-    private static let prefix = "orion:"
+    private static let prefix = "orion"
 
     private let exactMap: [String: OrionDirective.Type]
     private let prefixMap: [String: OrionDirective.Type]
@@ -115,10 +115,29 @@ final class OrionDirectiveParser {
         return customList.lazy.compactMap { $0(name) }.first
     }
 
-    func directive(from text: String, at location: SourceLocation) throws -> OrionDirective? {
+    func directive(from text: String, at location: SourceLocation, schema: Set<String> = []) throws -> OrionDirective? {
         guard text.hasPrefix(Self.prefix) else { return nil }
         let dropped = text.dropFirst(Self.prefix.count)
-        let parts = dropped.split(separator: " ")
+        // directives can be of the form `orion:foo` or `orion[mySchema]:foo`.
+        // check which form it is, and if it's the latter then only parse
+        // the directive if the schema is within our enabled schema set.
+        let body: Substring // the `foo` bit
+        switch dropped.first {
+        case ":":
+            body = dropped.dropFirst()
+        case "[":
+            let withoutOpening = dropped.dropFirst() // mySchema]:foo
+            guard let endIdx = withoutOpening.firstIndex(of: "]")
+            else { return nil }
+            let textSchema = withoutOpening[..<endIdx] // mySchema
+            guard schema.contains(String(textSchema)) else { return nil }
+            let afterSchema = withoutOpening[endIdx...] // ]:foo
+            guard afterSchema.hasPrefix("]:") else { return nil }
+            body = afterSchema.dropFirst(2)
+        default:
+            return nil
+        }
+        let parts = body.split(separator: " ")
         guard let name = parts.first.map(String.init) else { return nil }
         let arguments = parts.dropFirst().map(String.init)
         guard let matched = type(matching: name) else {
@@ -147,7 +166,8 @@ enum OrionDirectives {
         ReturnsRetained.self,
         New.self,
         Disable.self,
-        SuprTramp.self
+        SuprTramp.self,
+        IgnoreImport.self,
     ]
 
     struct ReturnsRetained: OrionDirective {
@@ -205,6 +225,18 @@ enum OrionDirectives {
             self.base = base
             guard base.arguments.isEmpty else {
                 throw OrionDirectiveDiagnostic("supr_tramp directive expected zero arguments, got \(base.arguments.count)")
+            }
+        }
+    }
+
+    struct IgnoreImport: OrionDirective {
+        static let matchRule: OrionDirectiveMatchRule = .exact("ignore_import")
+
+        let base: OrionDirectiveBase
+        init(base: OrionDirectiveBase) throws {
+            self.base = base
+            guard base.arguments.isEmpty else {
+                throw OrionDirectiveDiagnostic("ignore_import directive expected zero arguments, got \(base.arguments.count)")
             }
         }
     }

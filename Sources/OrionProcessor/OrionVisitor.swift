@@ -146,11 +146,17 @@ class OrionVisitor: SyntaxVisitor {
         "hookWillActivate", "hookDidActivate"
     ]
 
+    let options: OrionParser.Options
     let converter: SourceLocationConverter
     let diagnosticEngine: DiagnosticEngine
-    init(diagnosticEngine: DiagnosticEngine, sourceLocationConverter: SourceLocationConverter) {
+    init(
+        diagnosticEngine: DiagnosticEngine,
+        sourceLocationConverter: SourceLocationConverter,
+        options: OrionParser.Options
+    ) {
         self.diagnosticEngine = diagnosticEngine
         self.converter = sourceLocationConverter
+        self.options = options
     }
 
     private(set) var data = OrionData()
@@ -185,7 +191,7 @@ class OrionVisitor: SyntaxVisitor {
                 return nil
             }
             do {
-                return try OrionDirectiveParser.shared.directive(from: directive, at: location)
+                return try OrionDirectiveParser.shared.directive(from: directive, at: location, schema: options.schema)
             } catch let err as OrionDirectiveDiagnostic {
                 if warnOnFailure {
                     diagnosticEngine.diagnose(err.diagnosticMessage, location: location)
@@ -601,6 +607,12 @@ class OrionVisitor: SyntaxVisitor {
     }
 
     override func visitPost(_ node: ImportDeclSyntax) {
+        let directives = makeDirectives(for: Syntax(node))
+        let ignoreImports = directives.filter { $0 is OrionDirectives.IgnoreImport }
+        guard ignoreImports.isEmpty else {
+            ignoreImports.forEach { $0.setUsed() }
+            return
+        }
         data.imports.append(node.withoutTrivia())
     }
 

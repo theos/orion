@@ -3,6 +3,14 @@ import SwiftSyntax
 
 public final class OrionParser {
 
+    public struct Options {
+        public let schema: Set<String>
+
+        public init(schema: Set<String> = []) {
+            self.schema = schema
+        }
+    }
+
     private enum Source {
         case file(URL)
         case contents(String)
@@ -25,22 +33,25 @@ public final class OrionParser {
     }
 
     public let engine: DiagnosticEngine
+    public let options: Options
     private let source: Source
 
-    public init(file: URL, diagnosticEngine: OrionDiagnosticEngine = .init()) {
+    public init(file: URL, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) {
         source = .file(file)
         self.engine = diagnosticEngine.createEngine()
+        self.options = options
     }
 
-    public init(contents: String, diagnosticEngine: OrionDiagnosticEngine = .init()) {
+    public init(contents: String, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) {
         source = .contents(contents)
         self.engine = diagnosticEngine.createEngine()
+        self.options = options
     }
 
     public func parse() throws -> OrionData {
         let syntax = try source.parseSyntax(diagnosticEngine: engine)
         let converter = SourceLocationConverter(file: source.filename, tree: syntax)
-        let visitor = OrionVisitor(diagnosticEngine: engine, sourceLocationConverter: converter)
+        let visitor = OrionVisitor(diagnosticEngine: engine, sourceLocationConverter: converter, options: options)
         visitor.walk(syntax)
         guard !visitor.didFail else {
             throw OrionFailure()

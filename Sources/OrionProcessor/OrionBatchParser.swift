@@ -33,10 +33,12 @@ public final class OrionBatchParser {
 
     public let inputs: [URL]
     public let diagnosticEngine: OrionDiagnosticEngine
+    public let options: OrionParser.Options
     // Note: inputs can include directories
-    public init(inputs: [URL], diagnosticEngine: OrionDiagnosticEngine = .init()) {
+    public init(inputs: [URL], diagnosticEngine: OrionDiagnosticEngine = .init(), options: OrionParser.Options = .init()) {
         self.inputs = inputs
         self.diagnosticEngine = diagnosticEngine
+        self.options = options
     }
 
     private func computeFiles() throws -> [URL] {
@@ -71,7 +73,7 @@ public final class OrionBatchParser {
         let files = try computeFiles().sorted { $0.path < $1.path }
         let engine = diagnosticEngine
         let allData = files.concurrentMap { file -> Result<OrionData, Error> in
-            Result { try OrionParser(file: file, diagnosticEngine: engine).parse() }
+            Result { try OrionParser(file: file, diagnosticEngine: engine, options: options).parse() }
         }
         return OrionData(merging: try allData.map { try $0.get() })
     }
