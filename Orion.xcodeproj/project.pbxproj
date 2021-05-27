@@ -594,7 +594,7 @@
 					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/lib$(EFFECTIVE_PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
-				MARKETING_VERSION = 0.9.3;
+				MARKETING_VERSION = 0.9.4;
 				OTHER_LDFLAGS = "-weak-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -643,7 +643,7 @@
 					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/lib$(EFFECTIVE_PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
-				MARKETING_VERSION = 0.9.3;
+				MARKETING_VERSION = 0.9.4;
 				OTHER_LDFLAGS = "-weak-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
