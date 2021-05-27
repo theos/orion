@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Orion latest (0.9.3) Docs
+          Orion latest (0.9.4) Docs
         </a>
          (100% documented)
       </p>
@@ -125,21 +125,25 @@
       <nav class="navigation">
         <ul class="nav-groups">
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Basic%20Guides.html">Basic Guides</a>
+            <a class="nav-group-name-link" href="../Guides.html">Guides</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../getting-started.html">Getting Started</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../using-private-classes.html">Using Private Classes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../tweak-preferences.html">Tweak Preferences</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../orion-directives.html">Orion Directives</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../using-orion-without-theos.html">Using Orion Without Theos</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Advanced%20Guides.html">Advanced Guides</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../advanced-theos-usage.html">Advanced Theos Usage</a>
+                <a class="nav-group-task-link" href="../troubleshooting.html">Troubleshooting</a>
               </li>
             </ul>
           </li>
@@ -192,11 +196,6 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/AnyHook.html">AnyHook</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Groups.html">Groups</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
               </li>
@@ -266,6 +265,9 @@
             <a class="nav-group-name-link" href="../Error%20Handling.html">Error Handling</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/OrionHookError.html">OrionHookError</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Typealiases/OrionErrorHandler.html">OrionErrorHandler</a>
               </li>
               <li class="nav-group-task">
@@ -304,7 +306,16 @@
 a non-recoverable error.</p>
 
 <p>The default error handler is <code>fatalError</code>.</p>
-<div class="aside aside-warning">
+<div class="aside aside-important">
+    <p class="aside-title">Important</p>
+    <p>You probably want to implement <code><a href="../Protocols/Tweak.html#/s:5Orion5TweakP11handleErroryyAA0a4HookD0OFZ">Tweak.handleError(_:)</a></code> instead
+of calling this method. Unlike the <code><a href="../Protocols/Tweak.html">Tweak</a></code> variant, this updates the <em>global</em>
+error handler (i.e. for all tweaks), and once a failure bubbles up to this
+method it <em>must</em> terminate the app. A valid use case for calling this method
+is, for example, a crash reporter that wants to log errors before letting the
+process crash.</p>
+
+</div><div class="aside aside-warning">
     <p class="aside-title">Warning</p>
     <p>This function is thread-safe but not reentrant. Do not call
 <code>updateOrionErrorHandler(_:)</code> or <code><a href="../Functions/orionError%28_%3Afile%3Aline%3A%29_%24s_4file4lines5NeverOSSyXK_s12StaticStringVSutcD.html">orionError(_:file:line:)</a></code> inside the
@@ -315,7 +326,7 @@ a non-recoverable error.</p>
 <pre class="highlight swift"><code><span class="n">updateOrionErrorHandler</span> <span class="p">{</span> <span class="n">old</span> <span class="k">in</span>
     <span class="k">return</span> <span class="p">{</span> <span class="n">message</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">line</span> <span class="k">in</span>
         <span class="k">let</span> <span class="nv">str</span> <span class="o">=</span> <span class="nf">message</span><span class="p">()</span>
-        <span class="c1">// do something with str, file, line</span>
+        <span class="c1">// save (str, file, line) to a file</span>
         <span class="nf">old</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -355,7 +366,7 @@ at the end of your error handler closure.</p>
                 </table>
               </div>
               <div class="slightly-smaller">
-                <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/ErrorHandling.swift#L51-L57">Show on GitHub</a>
+                <a href="https://github.com/theos/orion/tree/52c0c12b34fc358f04bc3052b82b72c2dfe2f42d/Sources/Orion/ErrorHandling.swift#L104-L110">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -369,7 +380,7 @@ at the end of your error handler closure.</p>
     </div>
     <section class="footer">
       <p>© 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external">Theos</a>. Licensed under the <a class="link" href="https://github.com/theos/orion/blob/master/LICENSE.md" target="_blank" rel="external">MIT License</a>.</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.7</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

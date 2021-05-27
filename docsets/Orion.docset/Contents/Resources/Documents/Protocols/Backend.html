@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Orion latest (0.9.3) Docs
+          Orion latest (0.9.4) Docs
         </a>
          (100% documented)
       </p>
@@ -125,21 +125,25 @@
       <nav class="navigation">
         <ul class="nav-groups">
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Basic%20Guides.html">Basic Guides</a>
+            <a class="nav-group-name-link" href="../Guides.html">Guides</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../getting-started.html">Getting Started</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../using-private-classes.html">Using Private Classes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../tweak-preferences.html">Tweak Preferences</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../orion-directives.html">Orion Directives</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../using-orion-without-theos.html">Using Orion Without Theos</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Advanced%20Guides.html">Advanced Guides</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../advanced-theos-usage.html">Advanced Theos Usage</a>
+                <a class="nav-group-task-link" href="../troubleshooting.html">Troubleshooting</a>
               </li>
             </ul>
           </li>
@@ -192,11 +196,6 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/AnyHook.html">AnyHook</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Groups.html">Groups</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
               </li>
@@ -266,6 +265,9 @@
             <a class="nav-group-name-link" href="../Error%20Handling.html">Error Handling</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/OrionHookError.html">OrionHookError</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Typealiases/OrionErrorHandler.html">OrionErrorHandler</a>
               </li>
               <li class="nav-group-task">
@@ -320,7 +322,7 @@ to by the name <code>Foo.Bar&lt;Int&gt;</code>, and Orion will attempt to auto-i
 named <code>OrionBackend_Foo</code>.</p>
 
               <div class="slightly-smaller">
-                <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/Backend.swift#L51-L58">Show on GitHub</a>
+                <a href="https://github.com/theos/orion/tree/52c0c12b34fc358f04bc3052b82b72c2dfe2f42d/Sources/Orion/Backend.swift#L55-L62">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -373,163 +375,7 @@ named <code>OrionBackend_Foo</code>.</p>
                         </table>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/Backend.swift#L56">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:5Orion7BackendPAAE12hookFunction_11replacementSvAA0D0O_SvtF"></a>
-                    <a name="//apple_ref/swift/Method/hookFunction(_:replacement:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion7BackendPAAE12hookFunction_11replacementSvAA0D0O_SvtF">hookFunction(_:<wbr>replacement:<wbr>)</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Performs a one-off function hook.</p>
-
-<p>Prefer batching with <code>apply(hooks:)</code> if you have multiple hooks, as backends
-may be able to optimize batch hooking.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">hookFunction</span><span class="p">(</span><span class="n">_</span> <span class="nv">function</span><span class="p">:</span> <span class="kt"><a href="../Enums/Function.html">Function</a></span><span class="p">,</span> <span class="nv">replacement</span><span class="p">:</span> <span class="kt">UnsafeMutableRawPointer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">UnsafeMutableRawPointer</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>function</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The function which is to be hooked.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>replacement</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The replacement function implementation. See
-<code>HookDescriptor.function(function:replacement:completion:)</code> for details.</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>The original function implementation.</p>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/Backend.swift#L81-L89">Show on GitHub</a>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:5Orion7BackendPAAE10hookMethod3cls3sel11replacementSvyXlXp_10ObjectiveC8SelectorVSvtF"></a>
-                    <a name="//apple_ref/swift/Method/hookMethod(cls:sel:replacement:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion7BackendPAAE10hookMethod3cls3sel11replacementSvyXlXp_10ObjectiveC8SelectorVSvtF">hookMethod(cls:<wbr>sel:<wbr>replacement:<wbr>)</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Performs a one-off method hook.</p>
-
-<p>Prefer batching with <code>apply(hooks:)</code> if you have multiple hooks, as backends
-may be able to optimize batch hooking.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">hookMethod</span><span class="p">(</span><span class="nv">cls</span><span class="p">:</span> <span class="kt">AnyClass</span><span class="p">,</span> <span class="nv">sel</span><span class="p">:</span> <span class="kt">Selector</span><span class="p">,</span> <span class="nv">replacement</span><span class="p">:</span> <span class="kt">UnsafeMutableRawPointer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">UnsafeMutableRawPointer</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>cls</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The class which contains the method to be hooked.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>sel</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The selector of the method to be hooked.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>replacement</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>The replacement method implementation. See
-<code>HookDescriptor.method(cls:sel:replacement:completion:)</code> for details.</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>The original method implementation.</p>
-                      </div>
-                      <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/Backend.swift#L104-L110">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/52c0c12b34fc358f04bc3052b82b72c2dfe2f42d/Sources/Orion/Backend.swift#L60">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -543,7 +389,7 @@ may be able to optimize batch hooking.</p>
     </div>
     <section class="footer">
       <p>© 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external">Theos</a>. Licensed under the <a class="link" href="https://github.com/theos/orion/blob/master/LICENSE.md" target="_blank" rel="external">MIT License</a>.</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.7</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

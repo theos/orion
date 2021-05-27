@@ -88,7 +88,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Orion latest (0.9.3) Docs
+          Orion latest (0.9.4) Docs
         </a>
          (100% documented)
       </p>
@@ -124,21 +124,25 @@
       <nav class="navigation">
         <ul class="nav-groups">
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Basic%20Guides.html">Basic Guides</a>
+            <a class="nav-group-name-link" href="Guides.html">Guides</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="getting-started.html">Getting Started</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="using-private-classes.html">Using Private Classes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="tweak-preferences.html">Tweak Preferences</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="orion-directives.html">Orion Directives</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="using-orion-without-theos.html">Using Orion Without Theos</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Advanced%20Guides.html">Advanced Guides</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="advanced-theos-usage.html">Advanced Theos Usage</a>
+                <a class="nav-group-task-link" href="troubleshooting.html">Troubleshooting</a>
               </li>
             </ul>
           </li>
@@ -191,11 +195,6 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/AnyHook.html">AnyHook</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="Groups.html">Groups</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/HookGroup.html">HookGroup</a>
               </li>
@@ -265,6 +264,9 @@
             <a class="nav-group-name-link" href="Error%20Handling.html">Error Handling</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/OrionHookError.html">OrionHookError</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Typealiases/OrionErrorHandler.html">OrionErrorHandler</a>
               </li>
               <li class="nav-group-task">
@@ -295,7 +297,7 @@
 
 <p>If you are using Orion for tweak development, it is recommended that you use it with Theos. This guide assumes that you have Theos installed; if you haven&rsquo;t done that yet, please follow the <a href="https://github.com/theos/theos/wiki/Installation">installation instructions</a> for Theos and then return to this guide.</p>
 
-<p>If you wish to use Orion without Theos, please refer to the &ldquo;<a href="/using-orion-without-theos.html">Using Orion Without Theos</a>&rdquo; guide.</p>
+<p>If you wish to use Orion without Theos, please refer to the &ldquo;<a href="using-orion-without-theos.html">Using Orion Without Theos</a>&rdquo; guide.</p>
 
 <p>This guide will show you how to make a simple Orion tweak which… spices up text labels a little. We will target the VLC Media Player iOS app since it is <a href="https://github.com/videolan/vlc-ios">open source</a> and supports a large range of iOS versions, however most other apps should work too.</p>
 
@@ -303,7 +305,7 @@
 
 <ul>
 <li><a href="https://github.com/theos/theos/wiki/Installation">Theos</a></li>
-<li>A machine running macOS, Windows 10 with WSL, or Linux. If using WSL or Linux, an iOS Swift toolchain is also required.</li>
+<li>A machine running macOS, Windows 10 with WSL, or Linux. If using WSL or Linux, it is recommended that you use the <a href="https://github.com/kabiroberai/swift-toolchain-linux">official Swift toolchain</a>.</li>
 <li>A jailbroken iOS device with Orion installed.</li>
 <li>The target app (in this tutorial, VLC for iOS) installed on your iOS device.</li>
 </ul>
@@ -356,24 +358,22 @@ Done.
 <li><code>Makefile</code>: This file is the keystone of any Theos project. It describes how your tweak should be built, including the list of source files as well as the flags that should be passed to the compiler.</li>
 <li><code>MyTweak.plist</code>: This is the <a href="https://iphonedevwiki.net/index.php/Cydia_Substrate#Filters">CydiaSubstrate bundle filter</a> for your tweak. It tells CydiaSubstrate (or an equivalent tweak loader) which processes your tweak should be loaded into.</li>
 <li><code>control</code>:  The Debian <a href="https://iphonedevwiki.net/index.php/Packaging#Control_file">control file</a> which describes your tweak&rsquo;s .deb package to package managers.</li>
-<li><code>Package.swift</code>: This file is <strong>not</strong> used by Theos itself, but it helps provide Xcode with a description of your tweak&rsquo;s files and compiler flags which is similar to that provided to Theos by the Makefile. This allows you to edit your tweak using the Xcode IDE, with full code completion and whatnot. You&rsquo;ll want to keep this in sync with any changes you make to your Makefile.</li>
+<li><code>Package.swift</code>: This file is <strong>not</strong> used by Theos itself, but it provides SourceKit with an equivalent description of your project in order to enable code completion.</li>
 <li><code>Sources</code>: This is where your source code goes. C/Objective-C files (<code>.m</code>, <code>.mm</code>, <code>.c</code>, <code>.cpp</code>) go in the folder with the <code>C</code> suffix, and Swift/Orion files (<code>.swift</code>, <code>.x.swift</code>) go into the folder without the suffix. Theos will automatically find these files while building your tweak, so you need not manually specify them in the <code>Makefile</code>.</li>
 </ul>
-
-<p>For more details about the Theos side of things, see <a href="/advanced-theos-usage.html">Advanced Theos Usage</a>.</p>
 <h2 id='editing-your-tweak' class='heading'>Editing your Tweak</h2>
 
 <p>Orion uses a preprocessor, and Theos passes all <code>.x.swift</code> files through this preprocessor while building. All hooks <strong>must</strong> therefore go into files with a <code>.x.swift</code> extension. The template creates a <code>Tweak.x.swift</code> for you, so we&rsquo;ll start by editing this.</p>
 
-<p>Now, while one option is to open <code>Sources/MyTweak/Tweak.x.swift</code> in your favorite text editor, Orion offers an even better option on macOS: editing your tweak in Xcode!</p>
+<p>Now, before you fire up your favorite text editor and start hammering out code in <code>Sources/MyTweak/Tweak.x.swift</code>, Theos has a trick up its sleeve: with some basic configuration, you can get <strong>full code completion</strong> while working on Orion tweaks on any OS, in most editors! Enabling this is simple:</p>
 
-<p>Opening your tweak in Xcode is simple:</p>
+<ol>
+<li>Install the <a href="https://github.com/apple/sourcekit-lsp/tree/main/Editors">sourcekit-lsp plugin</a> corresponding to your editor of choice. (If you&rsquo;re using Xcode, it has built-in SourceKit support so skip this step.)</li>
+<li>Run <code>make spm</code> to generate metadata about your project, which is needed by Swift Package Manager/SourceKit.</li>
+<li>Open the project folder in your chosen editor.</li>
+</ol>
 
-<pre>
-~/mytweak $ <span class="inp">make dev</span>
-</pre>
-
-<p>This should open Xcode with your tweak as a Swift Package. Drill down to <code>Sources/MyTweak/</code> and select <code>Tweak.x.swift</code>. Delete the contents of the file and replace them with the following:</p>
+<p>Just like that, you should have code completion! Now drill down to <code>Sources/MyTweak/</code> and select <code>Tweak.x.swift</code>. Delete the contents of the file and replace them with the following:</p>
 <pre class="highlight swift"><code><span class="c1">// 1</span>
 <span class="kd">import</span> <span class="kt">Orion</span>
 <span class="kd">import</span> <span class="kt">UIKit</span>
@@ -463,7 +463,7 @@ Setting up com.kabiroberai.mytweak (0.0.1-1+debug) ...
 
 <!-- pretty much just put the code in triple backticks and copied the HTML output -->
 
-Here&rsquo;s one way to achieve this (tailored towards English-based locales):
+Here&rsquo;s one way to achieve this:
 
 <pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Orion</span>
 <span class="kd">import</span> <span class="kt">UIKit</span>
@@ -492,6 +492,7 @@ Here&rsquo;s one way to achieve this (tailored towards English-based locales):
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+<em>Bonus-bonus-challenge: add support for languages besides English :)</em>
 </details>
 
           </div>
@@ -502,7 +503,7 @@ Here&rsquo;s one way to achieve this (tailored towards English-based locales):
     </div>
     <section class="footer">
       <p>© 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external">Theos</a>. Licensed under the <a class="link" href="https://github.com/theos/orion/blob/master/LICENSE.md" target="_blank" rel="external">MIT License</a>.</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.7</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>

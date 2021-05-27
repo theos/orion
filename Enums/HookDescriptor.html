@@ -89,7 +89,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="../index.html">
-          Orion latest (0.9.3) Docs
+          Orion latest (0.9.4) Docs
         </a>
          (100% documented)
       </p>
@@ -125,21 +125,25 @@
       <nav class="navigation">
         <ul class="nav-groups">
           <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Basic%20Guides.html">Basic Guides</a>
+            <a class="nav-group-name-link" href="../Guides.html">Guides</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../getting-started.html">Getting Started</a>
               </li>
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../using-private-classes.html">Using Private Classes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../tweak-preferences.html">Tweak Preferences</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../orion-directives.html">Orion Directives</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../using-orion-without-theos.html">Using Orion Without Theos</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Advanced%20Guides.html">Advanced Guides</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../advanced-theos-usage.html">Advanced Theos Usage</a>
+                <a class="nav-group-task-link" href="../troubleshooting.html">Troubleshooting</a>
               </li>
             </ul>
           </li>
@@ -192,11 +196,6 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/AnyHook.html">AnyHook</a>
               </li>
-            </ul>
-          </li>
-          <li class="nav-group-name">
-            <a class="nav-group-name-link" href="../Groups.html">Groups</a>
-            <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
               </li>
@@ -266,6 +265,9 @@
             <a class="nav-group-name-link" href="../Error%20Handling.html">Error Handling</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/OrionHookError.html">OrionHookError</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Typealiases/OrionErrorHandler.html">OrionErrorHandler</a>
               </li>
               <li class="nav-group-task">
@@ -301,7 +303,7 @@
             <p>A type describing a single hook.</p>
 
               <div class="slightly-smaller">
-                <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/Backend.swift#L4-L29">Show on GitHub</a>
+                <a href="https://github.com/theos/orion/tree/52c0c12b34fc358f04bc3052b82b72c2dfe2f42d/Sources/Orion/Backend.swift#L4-L33">Show on GitHub</a>
               </div>
           </div>
         </section>
@@ -313,18 +315,18 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Orion14HookDescriptorO8SaveOriga"></a>
-                    <a name="//apple_ref/swift/Alias/SaveOrig" class="dashAnchor"></a>
-                    <a class="direct-link" href="../Enums/HookDescriptor/SaveOrig.html">SaveOrig</a>
+                    <a name="/s:5Orion14HookDescriptorO10Completiona"></a>
+                    <a name="//apple_ref/swift/Alias/Completion" class="dashAnchor"></a>
+                    <a class="direct-link" href="../Enums/HookDescriptor/Completion.html">Completion</a>
                     </code>
                   </div>
                 </li>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Orion14HookDescriptorO6methodyACyXlXp_10ObjectiveC8SelectorVSvySvctcACmF"></a>
-                    <a name="//apple_ref/swift/Element/method(cls:sel:replacement:saveOrig:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion14HookDescriptorO6methodyACyXlXp_10ObjectiveC8SelectorVSvySvctcACmF">method(cls:<wbr>sel:<wbr>replacement:<wbr>saveOrig:<wbr>)</a>
+                    <a name="/s:5Orion14HookDescriptorO6methodyACyXlXp_10ObjectiveC8SelectorVSvys6ResultOySvs5Error_pGctcACmF"></a>
+                    <a name="//apple_ref/swift/Element/method(cls:sel:replacement:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion14HookDescriptorO6methodyACyXlXp_10ObjectiveC8SelectorVSvys6ResultOySvs5Error_pGctcACmF">method(cls:<wbr>sel:<wbr>replacement:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -339,20 +341,23 @@ function which takes <code>self: AnyObject</code> and <code>_cmd: Selector</code
 The remaining argument types should be the argument types of the hooked Objective-C method
 in order, and the return type should be the return type of the method.</p>
 
-<p><code>saveOrig</code> is a closure which will be passed the original method implementation when the
-hook is applied.</p>
+<p>If a class method is being hooked, <code>cls</code> should be the metaclass.</p>
+
+<p><code>completion</code> is a closure which will be passed the original method implementation when the
+hook is applied, or an error on failure. It may be called more than once during the duration
+of <code><a href="../Protocols/Backend.html#/s:5Orion7BackendP5apply11descriptorsySayAA14HookDescriptorOG_tF">Backend.apply(descriptors:)</a></code>.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">method</span><span class="p">(</span><span class="nv">cls</span><span class="p">:</span> <span class="kt">AnyClass</span><span class="p">,</span> <span class="nv">sel</span><span class="p">:</span> <span class="kt">Selector</span><span class="p">,</span> <span class="nv">replacement</span><span class="p">:</span> <span class="kt">UnsafeMutableRawPointer</span><span class="p">,</span> <span class="nv">saveOrig</span><span class="p">:</span> <span class="kt"><a href="../Enums/HookDescriptor/SaveOrig.html">SaveOrig</a></span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">method</span><span class="p">(</span><span class="nv">cls</span><span class="p">:</span> <span class="kt">AnyClass</span><span class="p">,</span> <span class="nv">sel</span><span class="p">:</span> <span class="kt">Selector</span><span class="p">,</span> <span class="nv">replacement</span><span class="p">:</span> <span class="kt">UnsafeMutableRawPointer</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kt"><a href="../Enums/HookDescriptor/Completion.html">Completion</a></span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/Backend.swift#L18">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/52c0c12b34fc358f04bc3052b82b72c2dfe2f42d/Sources/Orion/Backend.swift#L21">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -360,9 +365,9 @@ hook is applied.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:5Orion14HookDescriptorO8functionyAcA8FunctionO_SvySvctcACmF"></a>
-                    <a name="//apple_ref/swift/Element/function(function:replacement:saveOrig:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:5Orion14HookDescriptorO8functionyAcA8FunctionO_SvySvctcACmF">function(function:<wbr>replacement:<wbr>saveOrig:<wbr>)</a>
+                    <a name="/s:5Orion14HookDescriptorO8functionyAcA8FunctionO_Svys6ResultOySvs5Error_pGctcACmF"></a>
+                    <a name="//apple_ref/swift/Element/function(function:replacement:completion:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:5Orion14HookDescriptorO8functionyAcA8FunctionO_Svys6ResultOySvs5Error_pGctcACmF">function(function:<wbr>replacement:<wbr>completion:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -375,20 +380,21 @@ hook is applied.</p>
 <p><code>replacement</code> should be a <code>@convention(c)</code> function with the same signature as the function
 which is to be hooked.</p>
 
-<p><code>saveOrig</code> is a closure which will be passed the original function implementation when the
-hook is applied.</p>
+<p><code>completion</code> is a closure which will be passed the original method implementation when the
+hook is applied, or an error on failure. It may be called more than once during the duration
+of <code><a href="../Protocols/Backend.html#/s:5Orion7BackendP5apply11descriptorsySayAA14HookDescriptorOG_tF">Backend.apply(descriptors:)</a></code>.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">function</span><span class="p">(</span><span class="nv">function</span><span class="p">:</span> <span class="kt"><a href="../Enums/Function.html">Function</a></span><span class="p">,</span> <span class="nv">replacement</span><span class="p">:</span> <span class="kt">UnsafeMutableRawPointer</span><span class="p">,</span> <span class="nv">saveOrig</span><span class="p">:</span> <span class="kt"><a href="../Enums/HookDescriptor/SaveOrig.html">SaveOrig</a></span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">function</span><span class="p">(</span><span class="nv">function</span><span class="p">:</span> <span class="kt"><a href="../Enums/Function.html">Function</a></span><span class="p">,</span> <span class="nv">replacement</span><span class="p">:</span> <span class="kt">UnsafeMutableRawPointer</span><span class="p">,</span> <span class="nv">completion</span><span class="p">:</span> <span class="kt"><a href="../Enums/HookDescriptor/Completion.html">Completion</a></span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
                       <div class="slightly-smaller">
-                        <a href="https://github.com/theos/orion/tree/b828e186278a3d29a5a10c5f3dea128e5d413a31/Sources/Orion/Backend.swift#L27">Show on GitHub</a>
+                        <a href="https://github.com/theos/orion/tree/52c0c12b34fc358f04bc3052b82b72c2dfe2f42d/Sources/Orion/Backend.swift#L31">Show on GitHub</a>
                       </div>
                     </section>
                   </div>
@@ -402,7 +408,7 @@ hook is applied.</p>
     </div>
     <section class="footer">
       <p>© 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external">Theos</a>. Licensed under the <a class="link" href="https://github.com/theos/orion/blob/master/LICENSE.md" target="_blank" rel="external">MIT License</a>.</p>
-      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.6</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.7</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
 </div>
