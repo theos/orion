@@ -10,11 +10,13 @@ enum Builder {
 }
 
 let swiftSyntaxVersion: Package.Dependency.Requirement = {
-    #if swift(>=5.5)
+    #if swift(>=5.6)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
+    #elseif swift(>=5.5)
+    return .branch("release/5.5")
     #elseif swift(>=5.4)
     return .exact("0.50400.0")
     #elseif swift(>=5.3)
