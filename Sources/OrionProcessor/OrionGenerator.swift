@@ -35,9 +35,8 @@ private extension Sequence {
 private extension SourceLocation {
     func decl() -> String? {
         guard let file = file, let line = line else { return nil }
-        let standard = URL(fileURLWithPath: file).standardized.path
-        // TODO: Maybe escape `standard`
-        return "#sourceLocation(file: \"\(standard)\", line: \(line))"
+        // TODO: Maybe escape `file`
+        return "#sourceLocation(file: \"\(file)\", line: \(line))"
     }
 }
 
