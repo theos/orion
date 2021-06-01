@@ -36,6 +36,7 @@ if env["SPM_THEOS_BUILD"] == "1" {
     builder = .spm
 }
 
+// based on
 // https://github.com/muter-mutation-testing/muter/blob/dc53a9cd1792b2ffd3c9a1a0795aae99e8c7334d/Package.swift#L40
 let rpathLinkerSettings: [LinkerSetting]? = {
     #if os(macOS)
@@ -43,17 +44,24 @@ let rpathLinkerSettings: [LinkerSetting]? = {
 
     let stdout = Pipe()
     let select = Process()
-    select.launchPath = "/usr/bin/xcode-select"
-    select.arguments = ["-p"]
+    // this is better than $(xcode-select -p) because what we're actually looking
+    // for is the Swift resource dir, which is relative to the swift executable.
+    // The swift executable that xcrun finds may not be in the developer dir, eg
+    // when using TOOLCHAINS=swift
+    select.launchPath = "/usr/bin/xcrun"
+    select.arguments = ["-f", "swift"]
     select.standardOutput = stdout
+    select.standardError = nil
     select.launch()
     select.waitUntilExit()
 
-    let xcodeSelectPath = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)!
+    let swiftPath = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)!
         .trimmingCharacters(in: .whitespacesAndNewlines)
-    let rpath = "\(xcodeSelectPath)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx"
+    let resDir = URL(fileURLWithPath: swiftPath)
+        .deletingLastPathComponent().deletingLastPathComponent()
+        .appendingPathComponent("lib/swift/macosx")
     return [
-        .unsafeFlags(["-rpath", rpath])
+        .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", resDir.path])
     ]
     #else
     return nil
