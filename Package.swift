@@ -16,7 +16,7 @@ let swiftSyntaxVersion: Package.Dependency.Requirement = {
     Please check https://github.com/theos/Orion for progress updates.
     """)
     #elseif swift(>=5.5)
-    return .branch("release/5.5")
+    return .branch("release/5.5-05142021")
     #elseif swift(>=5.4)
     return .exact("0.50400.0")
     #elseif swift(>=5.3)
@@ -38,32 +38,50 @@ if env["SPM_THEOS_BUILD"] == "1" {
     builder = .spm
 }
 
+func system(_ path: String, _ args: String...) -> String {
+    let pipe = Pipe()
+    let process = Process()
+    process.launchPath = path
+    process.arguments = args
+    process.standardOutput = pipe
+    process.standardError = nil
+    process.launch()
+    process.waitUntilExit()
+    return String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)!
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
 // based on
 // https://github.com/muter-mutation-testing/muter/blob/dc53a9cd1792b2ffd3c9a1a0795aae99e8c7334d/Package.swift#L40
 let rpathLinkerSettings: [LinkerSetting]? = {
     #if os(macOS)
     guard builder == .xcode else { return nil }
 
-    let stdout = Pipe()
-    let select = Process()
-    // this is better than $(xcode-select -p) because what we're actually looking
-    // for is the Swift resource dir, which is relative to the swift executable.
-    // The swift executable that xcrun finds may not be in the developer dir, eg
-    // when using TOOLCHAINS=swift
-    select.launchPath = "/usr/bin/xcrun"
-    select.arguments = ["-f", "swift"]
-    select.standardOutput = stdout
-    select.standardError = nil
-    select.launch()
-    select.waitUntilExit()
-
-    let swiftPath = String(data: stdout.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)!
-        .trimmingCharacters(in: .whitespacesAndNewlines)
-    let resDir = URL(fileURLWithPath: swiftPath)
+    let xcrunSwiftPath = system("/usr/bin/xcrun", "-f", "swift")
+    let overriddenPrefix = URL(fileURLWithPath: xcrunSwiftPath)
         .deletingLastPathComponent().deletingLastPathComponent()
-        .appendingPathComponent("lib/swift/macosx")
+
+    let defaultPlatformPath = system("/usr/bin/xcodebuild", "-version", "-sdk", "macosx", "PlatformPath")
+    let defaultPrefix = URL(fileURLWithPath: defaultPlatformPath)
+        .deletingLastPathComponent().deletingLastPathComponent()
+        .appendingPathComponent("Toolchains/XcodeDefault.xctoolchain/usr")
+
+    let computedPrefix: URL
+    if overriddenPrefix == defaultPrefix {
+        // there's no explicit toolchain override. A more specific override may exist
+        // inside the PATH
+        let xcodebuildPath = system("/usr/bin/type", "-p", "xcodebuild")
+        let platformPath = system(xcodebuildPath, "-version", "-sdk", "macosx", "PlatformPath")
+        computedPrefix = URL(fileURLWithPath: platformPath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("Toolchains/XcodeDefault.xctoolchain/usr")
+    } else {
+        computedPrefix = overriddenPrefix
+    }
+
+    let rpath = computedPrefix.appendingPathComponent("lib/swift/macosx")
     return [
-        .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", resDir.path])
+        .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", rpath.path])
     ]
     #else
     return nil

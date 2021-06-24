@@ -1,0 +1,12 @@
+framework module Orion {
+  umbrella header "Orion.h"
+
+  export *
+  module * { export * }
+}
+// ORION_PRIVATE_MODULE_BEGIN
+framework module Orion_Private {
+  header "orion_objcrt.h"
+  header "orion_lifecycle.h"
+}
+// ORION_PRIVATE_MODULE_END

@@ -16,14 +16,20 @@ SUBPKG_0_FW = firmware (>= 12.2), firmware (<< 14.0)
 
 SUBPKG_1_ID = 14
 SUBPKG_1_NAME = iOS 14
-SUBPKG_1_FW = firmware (>= 14.0), firmware (<< 15.0)
+SUBPKG_1_FW = firmware (>= 14.0), firmware (<< 16.0)
 
-IS_OSS_SWIFT := $(shell swiftc --version | grep -q swiftlang || echo 1)
+ifeq ($(SWIFT_VERSION_COMPUTED),)
+export SWIFT_VERSION_COMPUTED := 1
+export IS_OSS_SWIFT := $(shell swiftc --version 2>/dev/null | grep -q swiftlang || echo 1)
+ifeq ($(IS_OSS_SWIFT),)
+export APPLE_SWIFT_VERSION := $(shell swiftc --version 2>/dev/null | cut -d' ' -f4)
+endif
+endif
+
 ifeq ($(SUBPKG),)
 ifneq ($(IS_OSS_SWIFT),)
 SUBPKG := 0
 else
-APPLE_SWIFT_VERSION := $(shell swiftc --version | cut -d' ' -f4)
 ifeq ($(shell $(THEOS_BIN_PATH)/vercmp.pl $(APPLE_SWIFT_VERSION) ge 5.3),1)
 SUBPKG := 1
 else
@@ -44,7 +50,7 @@ before-package::
 
 internal-stage::
 	$(ECHO_NOTHING)mkdir -p $(THEOS_PACKAGE_DIR)$(ECHO_END)
-	$(ECHO_NOTHING)rm -rf $(SDK_DIR) $(DSYM_DIR)$(ECHO_END)
+	$(ECHO_NOTHING)rm -rf $(SDK_DIR) $(DSYM_DIR) $(THEOS_STAGING_DIR)/Library/Frameworks/Orion.framework/PrivateHeaders$(ECHO_END)
 	$(ECHO_NOTHING)cp -a $(THEOS_STAGING_DIR)/Library/Frameworks/Orion.framework $(SDK_DIR)$(ECHO_END)
 ifeq ($(_THEOS_FINAL_PACKAGE),$(_THEOS_TRUE))
 	$(ECHO_NOTHING)cp -a $(THEOS_OBJ_DIR)/dSYMs/Orion.framework.dSYM $(DSYM_DIR)$(ECHO_END)
@@ -54,8 +60,9 @@ endif
 		ln -s Versions/Current/Orion.tbd $(SDK_DIR)/Orion.tbd; \
 		rm $(SDK_DIR)/Versions/Current/Orion; \
 	fi$(ECHO_END)
+	$(ECHO_NOTHING)sed -i '' -e '/ORION_PRIVATE_MODULE_BEGIN/,/ORION_PRIVATE_MODULE_END/d' $(SDK_DIR)/Modules/module.modulemap$(ECHO_END)
 	$(ECHO_NOTHING)rm $(SDK_DIR)/Orion $(SDK_DIR)/Modules/Orion.swiftmodule/*.swiftmodule$(ECHO_END)
-	$(ECHO_NOTHING)rm -rf $(THEOS_STAGING_DIR)/Library/Frameworks/Orion.framework/{Headers,Modules}$(ECHO_END)
+	$(ECHO_NOTHING)rm -rf $(THEOS_STAGING_DIR)/Library/Frameworks/Orion.doccarchive $(THEOS_STAGING_DIR)/Library/Frameworks/Orion.framework/{Headers,Modules}$(ECHO_END)
 
 .PHONY: vendor
 

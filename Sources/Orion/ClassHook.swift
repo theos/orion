@@ -182,7 +182,9 @@ extension ClassHookProtocol {
 /// the method, your first statement should be a call to an initializer on `supr`
 /// or `orig`, after which you can configure `target` as you desire before you
 /// return it. To hook `NSObject.init`, use backticks to escape the init keyword:
-/// ```func `init`() -> Target```.
+/// ```
+/// func `init`() -> Target.
+/// ```
 ///
 /// Example of hooking `initWithFrame`:
 /// ```

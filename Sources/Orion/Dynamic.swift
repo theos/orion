@@ -110,7 +110,7 @@ import Foundation
 /// # Calling Initializers
 ///
 /// In order to call a private initializer using `Dynamic`, declare
-/// an interface with the initializer method (escaping ``` `init` ``` with
+/// an interface with the initializer method (escaping \`init\` with
 /// backticks if required). Then call `alloc(interface:)` on the class
 /// or an instance of `Dynamic` corresponding to it, passing in the
 /// interface. Finally, call the initializer method on the returned object.
