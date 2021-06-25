@@ -64,7 +64,7 @@ public protocol FunctionHookProtocol: AnyObject, AnyHook {
 /// this directly; use `FunctionHook`.
 ///
 /// :nodoc:
-open class FunctionHookClass {
+open class _FunctionHookClass {
 
     /// Initialize the function hook type. Do not invoke or override this;
     /// use `AnyHook.hookWillActivate()` or `AnyHook.hookDidActivate()` for
@@ -100,7 +100,7 @@ open class FunctionHookClass {
 ///     }
 /// }
 /// ```
-public typealias FunctionHook = FunctionHookClass & FunctionHookProtocol
+public typealias FunctionHook = FunctionHookProtocol & _FunctionHookClass
 
 extension FunctionHookProtocol {
 

@@ -46,7 +46,7 @@ extension Tweak {
     /// Activates the tweak. Do not call this yourself.
     ///
     /// :nodoc:
-    public static func activate<BackendType: Backend>(backend: BackendType, hooks: [_GlueAnyHook.Type]) {
+    public static func _activate<BackendType: Backend>(backend: BackendType, hooks: [_GlueAnyHook.Type]) {
         #if SWIFT_PACKAGE
         // this is effectively a no-op but we need it in order to prevent the
         // compiler from stripping out the constructor because it doesn't see
@@ -105,8 +105,8 @@ extension TweakWithBackend {
     /// Activates the tweak. Do not call this yourself.
     ///
     /// :nodoc:
-    public static func activate(hooks: [_GlueAnyHook.Type]) {
-        activate(backend: backend, hooks: hooks)
+    public static func _activate(hooks: [_GlueAnyHook.Type]) {
+        _activate(backend: backend, hooks: hooks)
     }
 
 }
@@ -117,3 +117,8 @@ extension TweakWithBackend {
 public struct DefaultTweak: Tweak {
     public init() {}
 }
+
+#if SWIFT_PACKAGE
+@available(*, unavailable, message: "orion_init should not be called when using Orion from SPM.")
+public func orion_init() {}
+#endif

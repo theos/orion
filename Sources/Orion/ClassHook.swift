@@ -105,7 +105,7 @@ extension ClassHookProtocol {
 /// this directly; use `ClassHook`.
 ///
 /// :nodoc:
-@objcMembers open class ClassHookClass<Target: AnyObject> {
+@objcMembers open class _ClassHookClass<Target: AnyObject> {
 
     /// The current instance of the hooked class, upon which a hooked method
     /// has been called.
@@ -245,7 +245,7 @@ extension ClassHookProtocol {
 /// }
 /// ```
 ///
-public typealias ClassHook<Target: AnyObject> = ClassHookClass<Target> & ClassHookProtocol
+public typealias ClassHook<Target: AnyObject> = ClassHookProtocol & _ClassHookClass<Target>
 // swiftlint:enable line_length
 // we don't declare ClassHookProtocol conformance on ClassHookClass directly since that would
 // result in ClassHookClass inheriting the default implementations of ClassHookProtocol and

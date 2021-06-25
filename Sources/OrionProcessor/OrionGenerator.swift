@@ -372,7 +372,7 @@ public final class OrionGenerator {
         func orion_init() {
             var hooks: [_GlueAnyHook.Type] = []
         \(allHooks)
-            \(tweakName).activate(
+            \(tweakName)._activate(
         \(hasCustomBackend ? "" : "        backend: Backends.\(options.backend.name)(),\n")\
                 hooks: hooks
             )

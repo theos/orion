@@ -4,24 +4,24 @@ import Foundation
 /// your own code.
 ///
 /// :nodoc:
-public protocol OptionalProtocol {
+public protocol _OptionalProtocol {
     associatedtype Wrapped
 
     // we can't declare .some and .none as protocol witnesses
     // since a) that requires Swift 5.3+ and b) there's
     // a bug with that in Swift 5.3:
     // https://bugs.swift.org/browse/SR-14071
-    init(optional: Wrapped?)
+    init(_orionOptional: Wrapped?)
 }
 
 /// :nodoc:
-extension Optional: OptionalProtocol {
-    public init(optional: Wrapped?) {
-        self = optional
+extension Optional: _OptionalProtocol {
+    public init(_orionOptional: Wrapped?) {
+        self = _orionOptional
     }
 }
 
-extension Ivars where IvarType: OptionalProtocol, IvarType.Wrapped: AnyObject {
+extension Ivars where IvarType: _OptionalProtocol, IvarType.Wrapped: AnyObject {
     /// An enumeration indicating that the instance variable in question
     /// uses `weak` semantics.
     public enum WeakStorage {
@@ -72,7 +72,7 @@ extension Ivars {
 }
 
 /// :nodoc:
-extension Ivars where IvarType: OptionalProtocol, IvarType.Wrapped: AnyObject {
+extension Ivars where IvarType: _OptionalProtocol, IvarType.Wrapped: AnyObject {
     /// Access an Objective-C instance variable on the object, failing gracefully
     /// if the instance variable does not exist.
     ///
@@ -90,10 +90,10 @@ extension Ivars where IvarType: OptionalProtocol, IvarType.Wrapped: AnyObject {
             return withIvar(ivarName) {
                 guard let pointer = $0 else { return nil }
                 guard let loaded = objc_loadWeak(.init(pointer))
-                    else { return IvarType(optional: nil) }
+                    else { return IvarType(_orionOptional: nil) }
                 guard let converted = loaded as? IvarType.Wrapped
                     else { return nil }
-                return IvarType(optional: converted)
+                return IvarType(_orionOptional: converted)
             }
         }
         nonmutating set {
@@ -126,13 +126,13 @@ extension Ivars where IvarType: OptionalProtocol, IvarType.Wrapped: AnyObject {
                 guard let pointer = $0
                     else { orionError("Ivar '\(ivarName)' not found on object \(object)") }
                 guard let loaded = objc_loadWeak(.init(pointer))
-                    else { return IvarType(optional: nil) }
+                    else { return IvarType(_orionOptional: nil) }
                 guard let converted = loaded as? IvarType.Wrapped else {
                     orionError("""
                     Ivar '\(ivarName)' does not have the expected type \(IvarType.Wrapped.self)
                     """)
                 }
-                return IvarType(optional: converted)
+                return IvarType(_orionOptional: converted)
             }
         }
         nonmutating set {

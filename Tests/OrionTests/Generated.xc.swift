@@ -985,7 +985,7 @@ func orion_init() {
             BadFunctionHook._Glue.self
         ]
     }
-    HooksTweak.activate(
+    HooksTweak._activate(
         hooks: hooks
     )
 }
