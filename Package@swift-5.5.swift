@@ -88,6 +88,14 @@ let rpathLinkerSettings: [LinkerSetting]? = {
     #endif
 }()
 
+// Note:
+// Currently (as of Xcode 13b2) using plugins requires
+// SWIFTPM_ENABLE_PLUGINS=1. to use plugins in Xcode,
+// quit Xcode and open it again with
+// `SWIFTPM_ENABLE_PLUGINS=1 xed Package.swift`.
+// you might also want to xcode-select the beta (or
+// use DEVELOPER_DIR)
+
 var package = Package(
     name: "Orion",
     platforms: [.macOS("10.12")],
@@ -97,11 +105,15 @@ var package = Package(
             targets: ["OrionProcessor"]
         ),
         .executable(
-            name: "orion",
+            name: "OrionProcessorCLI",
             targets: ["OrionProcessorCLI"]
         ),
+        .plugin(
+            name: "OrionProcessorPlugin",
+            targets: ["OrionProcessorPlugin"]
+        ),
         .executable(
-            name: "generate-test-fixtures",
+            name: "GenerateTestFixtures",
             targets: ["GenerateTestFixtures"]
         ),
     ],
@@ -122,6 +134,11 @@ var package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             linkerSettings: rpathLinkerSettings
+        ),
+        .plugin(
+            name: "OrionProcessorPlugin",
+            capability: .buildTool(),
+            dependencies: ["OrionProcessorCLI"]
         ),
         .executableTarget(
             name: "GenerateTestFixtures",

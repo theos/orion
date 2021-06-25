@@ -97,11 +97,11 @@ var package = Package(
             targets: ["OrionProcessor"]
         ),
         .executable(
-            name: "orion",
+            name: "OrionProcessorCLI",
             targets: ["OrionProcessorCLI"]
         ),
         .executable(
-            name: "generate-test-fixtures",
+            name: "GenerateTestFixtures",
             targets: ["GenerateTestFixtures"]
         ),
     ],
