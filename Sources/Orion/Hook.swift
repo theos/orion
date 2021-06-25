@@ -40,7 +40,6 @@ public protocol AnyHook {
 
 }
 
-/// :nodoc:
 extension AnyHook {
     public static func hookWillActivate() -> Bool { true }
     public static func hookDidActivate() {}
@@ -63,8 +62,6 @@ extension AnyHook {
 /// type provided by the glue file's extensions over the placeholder,
 /// which changes the code's behavior and enables it to actually perform
 /// the desired hooking.
-///
-/// :nodoc:
 public protocol _GlueAnyHook {
 
     /// Activates the hook. Do not call this directly.

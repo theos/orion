@@ -16,7 +16,6 @@ public enum DeinitPolicy {
     case callSupr
 }
 
-/// :nodoc:
 extension _GlueClassHookBuilder {
     private static let deallocSelector = NSSelectorFromString("dealloc")
 
@@ -61,7 +60,6 @@ extension _GlueClassHookBuilder {
     }
 }
 
-/// :nodoc:
 extension _GlueClassHookTrampoline {
     public func deinitOrigError(file: StaticString = #file, line: UInt = #line) -> Never {
         orionError("Do not call `orig.deinitializer()`.", file: file, line: line)

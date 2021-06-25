@@ -1,6 +1,6 @@
 import Foundation
 
-/// A type describing a single hook.
+/// A type describing a single hook passed to a ``Backend``.
 public enum HookDescriptor {
 
     /// A closure used to save the original implementation or handle errors.
@@ -17,7 +17,7 @@ public enum HookDescriptor {
     ///
     /// `completion` is a closure which will be passed the original method implementation when the
     /// hook is applied, or an error on failure. It may be called more than once during the duration
-    /// of `Backend.apply(descriptors:)`.
+    /// of ``Backend/apply(descriptors:)``.
     case method(cls: AnyClass, sel: Selector, replacement: UnsafeMutableRawPointer, completion: Completion)
 
     /// A function hook.
@@ -27,7 +27,7 @@ public enum HookDescriptor {
     ///
     /// `completion` is a closure which will be passed the original method implementation when the
     /// hook is applied, or an error on failure. It may be called more than once during the duration
-    /// of `Backend.apply(descriptors:)`.
+    /// of ``Backend/apply(descriptors:)``.
     case function(function: Function, replacement: UnsafeMutableRawPointer, completion: Completion)
 
 }
@@ -35,11 +35,11 @@ public enum HookDescriptor {
 /// The type that handles hooking of methods and functions.
 ///
 /// Unless you have specific requirements, you should be able to use one
-/// of the pre-defined backends declared on `Backends`.
+/// of the pre-defined backends declared on ``Backends``.
 ///
 /// If you are creating a custom `Backend` implementation which is intended
 /// for distribution, declare it as a nested type in an extension on the
-/// `Backends` enumeration. The backend's name (which is understood by the
+/// ``Backends`` enumeration. The backend's name (which is understood by the
 /// Orion CLI) is then the type name minus the `Backends.` prefix.
 ///
 /// If a custom backend name is specified via the Orion CLI, Orion will
@@ -82,5 +82,5 @@ public protocol DefaultBackend: Backend {
 
 }
 
-/// A namespace to which `Backend`s are added as nested types.
+/// A namespace to which ``Backend``s are added as nested types.
 public enum Backends {}

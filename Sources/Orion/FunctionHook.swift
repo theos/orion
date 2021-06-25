@@ -46,8 +46,6 @@ public protocol FunctionHookProtocol: AnyObject, AnyHook {
     /// this yourself.
     ///
     /// - See: `_GlueAnyHook`
-    ///
-    /// :nodoc:
     associatedtype _Glue: _GlueFunctionHook = _GlueFunctionHookPlaceholder
 
     /// The function which is to be hooked.
@@ -62,8 +60,6 @@ public protocol FunctionHookProtocol: AnyObject, AnyHook {
 
 /// The class which all function hooks inherit from. Do not subclass
 /// this directly; use `FunctionHook`.
-///
-/// :nodoc:
 open class _FunctionHookClass {
 
     /// Initialize the function hook type. Do not invoke or override this;
@@ -121,7 +117,6 @@ extension FunctionHookProtocol {
 
 }
 
-/// :nodoc:
 extension FunctionHookProtocol {
     public static var group: Group {
         guard let group = _Glue.storage.group as? Group else {

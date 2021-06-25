@@ -84,7 +84,6 @@ public protocol HookGroup {
     func groupDidActivate()
 }
 
-/// :nodoc:
 extension HookGroup {
     public func groupDidActivate() {}
 
@@ -222,7 +221,6 @@ extension HookGroup {
     }
 }
 
-/// :nodoc:
 extension AnyHook {
     static func loadGroup() -> Group {
         GroupRegistry.shared.group(ofType: Group.self)

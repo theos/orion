@@ -1,8 +1,6 @@
 import Foundation
 
 /// Internal storage associated with a `ClassHook`. Do not use this yourself.
-///
-/// :nodoc:
 public final class _GlueClassHookStorage {
     let hookType: AnyClass
     @LazyAtomic private(set) var targetTypeOrError: Result<AnyObject.Type, Error>
@@ -39,8 +37,6 @@ public final class _GlueClassHookStorage {
 ///
 /// This type is the default value for the `ClassHookProtocol._Glue` constraint,
 /// used to satisfy the compiler until the actual glue is provided.
-///
-/// :nodoc:
 public enum _GlueClassHookPlaceholder: _GlueClassHook {
     public final class HookType: ClassHook<NSObject> {}
     public typealias OrigType = HookType
@@ -56,14 +52,10 @@ public enum _GlueClassHookPlaceholder: _GlueClassHook {
 
 /// A marker protocol to which `_GlueClassHook`'s orig/supr trampolines conform. Do
 /// not use this yourself.
-///
-/// :nodoc:
 public protocol _GlueClassHookTrampoline: ClassHookProtocol {}
 
 /// A helper type used in the glue file for applying class hooks. Do not
 /// use this directly.
-///
-/// :nodoc:
 public struct _GlueClassHookBuilder {
     struct MethodAddition {
         let sel: Selector
@@ -123,8 +115,6 @@ public struct _GlueClassHookBuilder {
 
 /// A concrete class hook, implemented in the glue file. Do not use
 /// this directly.
-///
-/// :nodoc:
 public protocol _GlueClassHook: _GlueAnyHook {
     associatedtype HookType: ClassHookProtocol
     associatedtype OrigType: ClassHookProtocol
@@ -134,7 +124,6 @@ public protocol _GlueClassHook: _GlueAnyHook {
     static func activate(withClassHookBuilder builder: inout _GlueClassHookBuilder)
 }
 
-/// :nodoc:
 extension _GlueClassHook {
     // returns true iff success
     private static func addMethod(
@@ -212,7 +201,6 @@ extension SubclassMode {
     }
 }
 
-/// :nodoc:
 extension ClassHookProtocol {
     // since `target` is referred to in `activate()`, this will deterministically be called
     // when a class hook is activated.

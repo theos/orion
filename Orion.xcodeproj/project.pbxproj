@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		56080B5C25C1F8BF005803BC /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56080B5B25C1F8BE005803BC /* Group.swift */; };
+		561A3F5F268525B6004998C9 /* Orion.docc in Sources */ = {isa = PBXBuildFile; fileRef = 561A3F5E268525B6004998C9 /* Orion.docc */; };
 		562BD3282638154C003C5A00 /* orion_lifecycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 562BD3262638154C003C5A00 /* orion_lifecycle.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		562BD3292638154C003C5A00 /* orion_objcrt.h in Headers */ = {isa = PBXBuildFile; fileRef = 562BD3272638154C003C5A00 /* orion_objcrt.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		562BD32C2638155A003C5A00 /* orion_objcrt.m in Sources */ = {isa = PBXBuildFile; fileRef = 562BD32A2638155A003C5A00 /* orion_objcrt.m */; };
@@ -36,6 +37,7 @@
 
 /* Begin PBXFileReference section */
 		56080B5B25C1F8BE005803BC /* Group.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		561A3F5E268525B6004998C9 /* Orion.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Orion.docc; sourceTree = "<group>"; };
 		562BD3262638154C003C5A00 /* orion_lifecycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = orion_lifecycle.h; sourceTree = "<group>"; };
 		562BD3272638154C003C5A00 /* orion_objcrt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = orion_objcrt.h; sourceTree = "<group>"; };
 		562BD32A2638155A003C5A00 /* orion_objcrt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = orion_objcrt.m; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 		56897491252BB9C6006F48E9 /* Orion */ = {
 			isa = PBXGroup;
 			children = (
+				561A3F5E268525B6004998C9 /* Orion.docc */,
 				568974A4252BBA15006F48E9 /* Backend.swift */,
 				5689749C252BBA15006F48E9 /* ClassHook.swift */,
 				56AFA08E25A3CE8A00884E2D /* ClassHook+Deinit.swift */,
@@ -419,6 +422,7 @@
 			files = (
 				568974AE252BBA15006F48E9 /* ClassHook+Super.swift in Sources */,
 				568974B2252BBA15006F48E9 /* Backend.swift in Sources */,
+				561A3F5F268525B6004998C9 /* Orion.docc in Sources */,
 				56080B5C25C1F8BF005803BC /* Group.swift in Sources */,
 				56D5B37F258F6F9D00F3DB6E /* ErrorHandling.swift in Sources */,
 				56AFA08F25A3CE8B00884E2D /* ClassHook+Deinit.swift in Sources */,

@@ -2,8 +2,6 @@ import Foundation
 
 /// A protocol-based definition of `Optional`. Do not use this in
 /// your own code.
-///
-/// :nodoc:
 public protocol _OptionalProtocol {
     associatedtype Wrapped
 
@@ -14,7 +12,6 @@ public protocol _OptionalProtocol {
     init(_orionOptional: Wrapped?)
 }
 
-/// :nodoc:
 extension Optional: _OptionalProtocol {
     public init(_orionOptional: Wrapped?) {
         self = _orionOptional
@@ -71,7 +68,6 @@ extension Ivars {
     }
 }
 
-/// :nodoc:
 extension Ivars where IvarType: _OptionalProtocol, IvarType.Wrapped: AnyObject {
     /// Access an Objective-C instance variable on the object, failing gracefully
     /// if the instance variable does not exist.

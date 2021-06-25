@@ -1,6 +1,6 @@
 import Foundation
 
-/// An enumeration describing a `ClassHook`'s subclassing behavior.
+/// An enumeration describing a ``ClassHook``'s subclassing behavior.
 public enum SubclassMode {
 
     /// Do not create a subclass for this hook.
@@ -15,11 +15,11 @@ public enum SubclassMode {
 }
 
 /// The protocol to which class hooks conform. Do not conform to this
-/// directly; use `ClassHook`.
+/// directly; use ``ClassHook``.
 public protocol ClassHookProtocol: AnyObject, AnyHook {
 
     /// The type of the target. Specify this via the generic argument on
-    /// `ClassHook`.
+    /// ``ClassHook``.
     ///
     /// This type must be either the target's own class or a class in
     /// its inheritance chain.
@@ -29,8 +29,6 @@ public protocol ClassHookProtocol: AnyObject, AnyHook {
     /// this yourself.
     ///
     /// - See: `_GlueAnyHook`
-    ///
-    /// :nodoc:
     associatedtype _Glue: _GlueClassHook = _GlueClassHookPlaceholder
 
     /// The name of the target class, or the empty string to use `Target.self`.
@@ -88,7 +86,6 @@ public protocol ClassHookProtocol: AnyObject, AnyHook {
 
 }
 
-/// :nodoc:
 extension ClassHookProtocol {
 
     public static var targetName: String { "" }
@@ -103,8 +100,6 @@ extension ClassHookProtocol {
 
 /// The class which all class hooks inherit from. Do not subclass
 /// this directly; use `ClassHook`.
-///
-/// :nodoc:
 @objcMembers open class _ClassHookClass<Target: AnyObject> {
 
     /// The current instance of the hooked class, upon which a hooked method
@@ -136,9 +131,9 @@ extension ClassHookProtocol {
 /// at compile-time), and provide the actual target class' name by implementing
 /// the static `targetName` property.
 ///
-/// # Hooking Methods
+/// ## Hooking Methods
 ///
-/// ## Instance/Class Methods
+/// ### Instance/Class Methods
 ///
 /// To hook an instance method on the target class, simply declare an instance
 /// method with the same name and method signature in your hook class. The
@@ -159,14 +154,14 @@ extension ClassHookProtocol {
 /// declaration. These directives behave like `NS_RETURNS_RETAINED` and
 /// `NS_RETURNS_NOT_RETAINED` respectively.
 ///
-/// ## Accessing Target Information
+/// ### Accessing Target Information
 ///
 /// Within a method hook function, the object upon which the hooked method was
 /// invoked can be accessed via `target`. To call the original implementation
 /// of the method, call the method itself on the `orig` proxy. Similarly, the
 /// superclass implementation can be accessed via the `supr` proxy.
 ///
-/// ## Method Naming
+/// ### Method Naming
 ///
 /// To figure out the required Swift name for an Objective-C method, you may want
 /// to follow the way that Objective-C APIs are [renamed](https://github.com/apple/swift-evolution/blob/main/proposals/0005-objective-c-name-translation.md)
@@ -174,7 +169,7 @@ extension ClassHookProtocol {
 /// Swift name for the method, you can also provide the Objective-C selector name
 /// directly by declaring the function as `@objc(selector:name:) func`.
 ///
-/// ## Initializers
+/// ### Initializers
 ///
 /// In order to hook an initializer with Orion, declare an _instance_ method with
 /// the initializer's name and Objective-C method signature, with a return type of
@@ -197,31 +192,31 @@ extension ClassHookProtocol {
 /// }
 /// ```
 ///
-/// ## Deinitializers
+/// ### Deinitializers
 ///
 /// If you find the need to perform custom behavior when a target object is
 /// deallocated, you can declare a `deinitializer` function (**not** `deinit`).
 /// For more information, see `ClassHookProtocol.deinitializer()`.
 ///
-/// # Adding to the Class
+/// ## Adding to the Class
 ///
-/// ## Properties
+/// ### Properties
 ///
 /// Use the `@Property` property wrapper. For more information, refer to its
 /// documentation.
 ///
-/// ## Protocols
+/// ### Protocols
 ///
 /// You can specify a list of protocols for which conformance will be added
 /// to the class, by declaring the `ClassHookProtocol.protocols` property.
 ///
-/// ## New Methods
+/// ### New Methods
 ///
 /// To add a new method to the target class, simply declare it on the hook and mark
 /// it as `final`. This may be useful, for example, to make the target class conform
 /// to a protocol requirement.
 ///
-/// # Creating Subclasses
+/// ## Creating Subclasses
 ///
 /// In some situations, you may need to declare a subclass for a base class which is
 /// not known at compile-time. In this case, create a `ClassHook` with the `Target`
@@ -233,7 +228,7 @@ extension ClassHookProtocol {
 /// to add methods, properties, protocols, and so on to the subclass as described
 /// above.
 ///
-/// # Example
+/// ## Example
 ///
 /// To change the text of all `UILabel`s to "hello", one could write something like this:
 ///
@@ -306,7 +301,6 @@ extension ClassHookProtocol {
     }
 }
 
-/// :nodoc:
 extension ClassHookProtocol {
     public static var group: Group {
         guard let group = _Glue.storage.group as? Group else {
