@@ -953,7 +953,8 @@ extension BadFunctionHook {
 
 @_cdecl("orion_init")
 func orion_init() {
-    var hooks: [_GlueAnyHook.Type] = []
+    var hooks: [_GlueAnyHook.Type]
+    hooks = []
     if true {
         hooks += [
             BasicHook._Glue.self,
