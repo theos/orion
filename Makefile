@@ -1,3 +1,5 @@
+ARCHS = arm64 arm64e
+
 include $(THEOS)/makefiles/common.mk
 
 XCODEPROJ_NAME = Orion
