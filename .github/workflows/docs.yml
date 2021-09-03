@@ -21,6 +21,7 @@ jobs:
     - name: Update docs
       run: |
         cd master-branch
+        git fetch --prune --unshallow --tags
         version="$(git describe --abbrev=0 --tags)"
 
         for v in `sort -rV <(printf '%s\n%s' "${version}" "$(ls ../docs-branch/versions)")`; do
