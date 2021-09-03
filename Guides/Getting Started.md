@@ -10,12 +10,18 @@ This guide will show you how to make a simple Orion tweak which… spices up tex
 
 To follow along, you will require the following things:
 
-- [Theos](https://github.com/theos/theos/wiki/Installation)
-- A machine running macOS, Windows 10 with WSL, or Linux. If using WSL or Linux, it is recommended that you use the [official Swift toolchain](https://github.com/kabiroberai/swift-toolchain-linux).
-- A jailbroken iOS device with Orion installed.
+- [Theos](https://github.com/theos/theos/wiki/Installation) on a machine running macOS, Windows 10 with WSL, or Linux.
+- A jailbroken iOS device.
 - The target app (in this tutorial, VLC for iOS) installed on your iOS device.
 
 Note that this guide will use the format <pre>&lt;current directory&gt; $ <span class="inp">&lt;command&gt;</span></pre> for all shell commands. User input will be in <code><span class="inp">red</span></code>. Some text may be truncated using <code><span class="trunc">[...]</span></code>.
+
+## Setup
+
+Orion is currently in beta, so you need to take a few additional steps to use it once Theos is installed:
+
+1. Add Theos repo (https://repo.theos.dev/) to your jailbroken device's package manager, and install the Orion package (pick iOS 12-13 or iOS 14 depending on your version).
+2. Inside your Theos installation directory (`$THEOS`), switch to the `orion` branch by running `git fetch && git checkout orion && git submodule update --init`.
 
 ## Initializing an Orion Tweak
 
