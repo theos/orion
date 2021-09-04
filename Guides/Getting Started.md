@@ -20,7 +20,7 @@ Note that this guide will use the format <pre>&lt;current directory&gt; $ <span 
 
 Orion is currently in beta, so you need to take a few additional steps to use it once Theos is installed:
 
-1. Add Theos repo (https://repo.theos.dev/) to your jailbroken device's package manager, and install the Orion package (pick iOS 12-13 or iOS 14 depending on your version).
+1. Add the Theos repo (https://repo.theos.dev/) to your jailbroken device's package manager, and install the Orion package (pick iOS 12-13 or iOS 14 depending on your version).
 2. Inside your Theos installation directory (`$THEOS`), switch to the `orion` branch by running `git fetch && git checkout orion && git submodule update --init`.
 
 ## Initializing an Orion Tweak
