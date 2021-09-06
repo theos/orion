@@ -60,7 +60,7 @@ Description: An awesome Orion tweak!
 Maintainer: Juliette
 Author: Juliette
 Section: Tweaks
-Depends: ${ORION}, firmware (>= 12.2)
+Depends: dev.theos.orion (= 0.9.5), firmware (>= 12.2)
 ```
  
 ### mytweak.plist
@@ -81,7 +81,7 @@ __attribute__((constructor)) static void init() {
  
 ### Sources/mytweakC/include/module.modulemap
 ```modulemap
-module testC {
+module mytweakC {
        umbrella "."
        export *
 }
@@ -198,7 +198,7 @@ Now that we have have the preprocessed version of mytweak.x.swift, let's compile
  
 For example, if I had Dragon installed and had `https://github.com/theos/lib.git` installed at `$HOME/.dragon/vendor/lib`, I would run:
 <pre>
-~/mytweak $ <span class="inp">swiftc -c -I$HOME/.dragon/include -I$HOME/.dragon/vendor/include -I$HOME/.dragon/include/_fallback -Xfrontend -color-diagnostics -Xcc -fcolor-diagnostics -Xcc -DTARGET_IPHONE=1 -Xcc -O0 -Xcc -Wall -Xcc -ggdb -Xcc -Wno-unused-command-line-argument -Xcc -Qunused-arguments -Xcc -Werror -Xcc -isysroot -Xcc "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.5.sdk" -Xcc -target -Xcc arm64-apple-ios12.2 -Xcc -fobjc-arc -Xcc -ISources/testC/include -Xcc -DDEBUG -Xcc -O0 -Xcc -DTHEOS_INSTANCE_NAME="\"test\"" -Xcc -fmodules -Xcc -fcxx-modules -Xcc -fmodule-name=test  -Xcc -fmodules-prune-interval=86400 -Xcc -arch -Xcc arm64 -Xcc -stdlib=libc++ -Xcc -F$HOME/.dragon/lib -Xcc -F$HOME/.dragon/vendor/lib -DTHEOS_SWIFT -DTARGET_IPHONE  -module-name test -g -F$HOME/.dragon/lib -F$HOME/.dragon/vendor/lib -swift-version 5 -sdk "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.5.sdk"  -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/swift  -ISources/testC/include -DDEBUG -Onone -incremental -target arm64-apple-ios12.2 -output-file-map .out/arm64/filemap.json -emit-objc-header-path .out/arm64/mytweak-Swift.h -emit-dependencies Sources/mytweak/mytweak.x.swift .out/mytweak.xc.swift</span></pre>
+~/mytweak $ <span class="inp">swiftc -c -I$HOME/.dragon/include -I$HOME/.dragon/vendor/include -I$HOME/.dragon/include/_fallback -Xfrontend -color-diagnostics -Xcc -fcolor-diagnostics -Xcc -DTARGET_IPHONE=1 -Xcc -O0 -Xcc -Wall -Xcc -ggdb -Xcc -Wno-unused-command-line-argument -Xcc -Qunused-arguments -Xcc -Werror -Xcc -isysroot -Xcc "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.5.sdk" -Xcc -target -Xcc arm64-apple-ios12.2 -Xcc -fobjc-arc -Xcc -ISources/mytweakC/include -Xcc -DDEBUG -Xcc -O0 -Xcc -DTHEOS_INSTANCE_NAME="\"test\"" -Xcc -fmodules -Xcc -fcxx-modules -Xcc -fmodule-name=test  -Xcc -fmodules-prune-interval=86400 -Xcc -arch -Xcc arm64 -Xcc -stdlib=libc++ -Xcc -F$HOME/.dragon/lib -Xcc -F$HOME/.dragon/vendor/lib -DTHEOS_SWIFT -DTARGET_IPHONE  -module-name test -g -F$HOME/.dragon/lib -F$HOME/.dragon/vendor/lib -swift-version 5 -sdk "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.5.sdk"  -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/swift  -ISources/mytweakC/include -DDEBUG -Onone -incremental -target arm64-apple-ios12.2 -output-file-map .out/arm64/filemap.json -emit-objc-header-path .out/arm64/mytweak-Swift.h -emit-dependencies Sources/mytweak/mytweak.x.swift .out/mytweak.xc.swift</span></pre>
  
 ## Stage two part two
 In the previous part, we compiled our tweak for ARM64, now we need to compile it for ARM64e. You can do this by running:
@@ -242,13 +242,16 @@ For the previous steps, we've been compiling for both ARM64 and ARM64e, creating
  
 ## Stage six
 Now we need to sign our dylib. You can do this by running:
-<pre>                                                                   ~/mytweak $ <span class="inp">codesign -s - .out/mytweak.dylib</span></pre>
+<pre>
+~/mytweak/.out $ <span class="inp">codesign -s - .out/mytweak.dylib</span></pre>
  
 You now have a working dylib of a tweak written in Swift!
  
 ## Stage six
 Now that we have the dylib, we need to create the deb. So in the .out folder run these commands
-<pre>                                                                   ~/mytweak $ <span class="inp">mkdir deb && mkdir deb/DEBIAN && cp ../control deb/DEBIAN/ && mkdir -p Library/MobileSubstrate/DynamicLibraries && cp mytweak.dylib deb/Library/MobileSubstrate/DynamicLibraries/ && cp ../mytweak.plist deb/Library/MobileSubstrate/DynamicLibraries/ && dpkg -b deb</span></pre>
+<pre>
+~/mytweak/.out $ <span class="inp">mkdir deb && mkdir deb/DEBIAN && cp ../control deb/DEBIAN/ && mkdir -p Library/MobileSubstrate/DynamicLibraries && cp mytweak.dylib deb/Library/MobileSubstrate/DynamicLibraries/ && cp ../mytweak.plist deb/Library/MobileSubstrate/DynamicLibraries/ && dpkg -b deb</span></pre>
  
 Now you have a deb and you can send it to your iDevice and install it and open VLC. You should see that all (or most) text labels have become uppercase with 👏 emojis instead of spaces.
+
 
