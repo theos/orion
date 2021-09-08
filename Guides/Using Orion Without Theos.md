@@ -97,11 +97,11 @@ module mytweakC {
  },
  "Sources/mytweak/mytweak.x.swift": {
    "object": ".out/arm64/mytweak.x.swift.o",
-   "dependencies": ".out/arm64e/mytweak.x.swift.Td",
+   "dependencies": ".out/arm64/mytweak.x.swift.Td",
    "swift-dependencies": ".out/arm64/mytweak.x.swift.swiftdeps"
  },
  "": {
-   "dependencies": ".out/arm64e/master.Td",
+   "dependencies": ".out/arm64/master.Td",
    "swift-dependencies": ".out/arm64/master.swiftdeps"
  }
 }
