@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>NSObject Extension Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://use.typekit.net/cve8hhe.css">
+
+<style>
+    @media screen and (max-width: 880px) {
+        .header {
+            flex-direction: column;
+        }
+
+        .twitter-typeahead {
+            width: 100%;
+        }
+
+        form[role=search] {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        form[role=search] input {
+            width: 100%;
+        }
+    }
+
+    /* undo the media query which makes it two columns */
+    @media (max-width: 1150px) {
+        .content-wrapper {
+            flex-direction: column !important;
+        }
+
+        .navigation {
+            order: 2;
+            width: inherit;
+            max-width: inherit;
+            padding-bottom: inherit;
+            overflow: inherit;
+            word-wrap: inherit;
+            background: inherit;
+            border-right: inherit;
+        }
+
+        .main-content {
+            order: 1;
+            flex: inherit;
+            padding-bottom: inherit;
+        }
+    }
+
+    .nav-group-task {
+        white-space: normal;
+    }
+
+    .inp {
+        color: #d14;
+    }
+
+    .trunc {
+        color: gray;
+    }
+
+    body {
+        font: 16px/1.7 sofia-pro, sans-serif !important;
+    }
+
+    .ansi-r { color: red; }
+    .ansi-g { color: green; }
+    .ansi-b { color: blue; }
+    .ansi-y { color: darkgoldenrod; }
+    .ansi-lb { color: skyblue; }
+</style>
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Extension/NSObject" class="dashAnchor"></a>
+
+    <a title="NSObject Extension Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          Orion 1.0.0 Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/theos/orion">
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Forion.theos.dev%2Fversions%2F1.0.0%2Fdocsets%2FOrion.xml">
+            <img class="header-icon" src="../img/dash.png" alt="Dash"/>
+            Install in Dash
+          </a>
+        </p>
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">Orion Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      NSObject Extension Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../getting-started.html">Getting Started</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../using-private-classes.html">Using Private Classes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../tweak-preferences.html">Tweak Preferences</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../orion-directives.html">Orion Directives</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../using-orion-without-theos.html">Using Orion Without Theos</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../troubleshooting.html">Troubleshooting</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Class%20Hooking.html">Class Hooking</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases/ClassHook.html">ClassHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ClassHookProtocol.html">ClassHookProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property.html">Property</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property/Assign.html">– Assign</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property/Atomicity.html">– Atomicity</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property/RetainOrCopy.html">– RetainOrCopy</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/SubclassMode.html">SubclassMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/DeinitPolicy.html">DeinitPolicy</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Function%20Hooking.html">Function Hooking</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases/FunctionHook.html">FunctionHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/FunctionHookProtocol.html">FunctionHookProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Function.html">Function</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../All%20Hooks.html">All Hooks</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AnyHook.html">AnyHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/DefaultGroup.html">DefaultGroup</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Tweaks.html">Tweaks</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Tweak.html">Tweak</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/TweakWithBackend.html">TweakWithBackend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/DefaultTweak.html">DefaultTweak</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Utilities.html">Utilities</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Ivars.html">Ivars</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Ivars/WeakStorage.html">– WeakStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Dynamic.html">Dynamic</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/NSObject.html">NSObject</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Backends.html">Backends</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends.html">Backends</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends/Internal.html">– Internal</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends/Substrate.html">– Substrate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends/Fishhook.html">– Fishhook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Backend.html">Backend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/DefaultBackend.html">DefaultBackend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/HookDescriptor.html">HookDescriptor</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Error%20Handling.html">Error Handling</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/OrionHookError.html">OrionHookError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases/OrionErrorHandler.html">OrionErrorHandler</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions/updateOrionErrorHandler%28_%3A%29_%24syys5NeverOSSyXK_s12StaticStringVSutcABSSyXK_ADSutcXEcD.html">updateOrionErrorHandler(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions/orionError%28_%3Afile%3Aline%3A%29_%24s_4file4lines5NeverOSSyXK_s12StaticStringVSutcD.html">orionError(_:file:line:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Versions.html">Versions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../versions.html">Versions</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>NSObject</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">NSObject</span></code></pre>
+
+                </div>
+              </div>
+            
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:So8NSObjectC5OrionE2as9interfacexxm_tlF"></a>
+                    <a name="//apple_ref/swift/Method/as(interface:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:So8NSObjectC5OrionE2as9interfacexxm_tlF">as(interface:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Casts the receiver to the given interface type.</p>
+
+<p>For more information, see the documentation for the <code><a href="../Structs/Dynamic.html">Dynamic</a></code> struct.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="err">`</span><span class="k">as</span><span class="err">`</span><span class="o">&lt;</span><span class="kt">I</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">interface</span><span class="p">:</span> <span class="kt">I</span><span class="o">.</span><span class="k">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">I</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>interface</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The interface to which the receiver should be
+converted.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The receiver as if it conformed to the given interface.</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/e7a029a6bb37424cd9a4c474cb71d3f2a9071d66/Sources/Orion/Dynamic.swift#L322-L324">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:So8NSObjectC5OrionE2as9interface8protocolxxm_So8ProtocolCSgtlFZ"></a>
+                    <a name="//apple_ref/swift/Method/as(interface:protocol:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:So8NSObjectC5OrionE2as9interface8protocolxxm_So8ProtocolCSgtlFZ">as(interface:<wbr>protocol:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the class referred to by the receiver as if it conformed
+to the given interface.</p>
+
+<p>Methods on the interface should be declared as <strong>instance</strong> methods.</p>
+
+<p>For more information, see the documentation for the <code><a href="../Structs/Dynamic.html">Dynamic</a></code> struct.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="err">`</span><span class="k">as</span><span class="err">`</span><span class="o">&lt;</span><span class="kt">I</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">interface</span><span class="p">:</span> <span class="kt">I</span><span class="o">.</span><span class="k">Type</span><span class="p">,</span> <span class="nv">protocol</span><span class="p">:</span> <span class="kt">Protocol</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">I</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>interface</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The interface to which the class should
+be cast.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>protocol</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>If the interface is a private protocol or is
+otherwise invisible to Objective-C via <code>NSClassFromString</code>, you may
+need to pass the protocol a second time as this parameter. For example,
+<code>MyClass.as(interface: MyInterface.self, protocol: MyInterface.self)</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The class, &ldquo;cast&rdquo; to the interface.</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/e7a029a6bb37424cd9a4c474cb71d3f2a9071d66/Sources/Orion/Dynamic.swift#L342-L344">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:So8NSObjectC5OrionE5alloc9interfacexxm_tlFZ"></a>
+                    <a name="//apple_ref/swift/Method/alloc(interface:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:So8NSObjectC5OrionE5alloc9interfacexxm_tlFZ">alloc(interface:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Allocates an object corresponding to the callee&rsquo;s class and casts it
+to the type of the passed interface.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="n">alloc</span><span class="o">&lt;</span><span class="kt">I</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">interface</span><span class="p">:</span> <span class="kt">I</span><span class="o">.</span><span class="k">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">I</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>interface</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The interface which the allocated type should
+be cast to. You usually want this to have an initializer method which
+should be chained to this call.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>The allocated instance of the class, as the <code>interface</code> type.</p>
+                      </div>
+                      <div class="slightly-smaller">
+                        <a href="https://github.com/theos/orion/tree/e7a029a6bb37424cd9a4c474cb71d3f2a9071d66/Sources/Orion/Dynamic.swift#L354-L356">Show on GitHub</a>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>© 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external noopener">Theos</a>. Licensed under the <a class="link" href="https://github.com/theos/orion/blob/master/LICENSE.md" target="_blank" rel="external noopener">MIT License</a>.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

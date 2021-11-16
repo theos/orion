@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ClassHook Type Alias Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://use.typekit.net/cve8hhe.css">
+
+<style>
+    @media screen and (max-width: 880px) {
+        .header {
+            flex-direction: column;
+        }
+
+        .twitter-typeahead {
+            width: 100%;
+        }
+
+        form[role=search] {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        form[role=search] input {
+            width: 100%;
+        }
+    }
+
+    /* undo the media query which makes it two columns */
+    @media (max-width: 1150px) {
+        .content-wrapper {
+            flex-direction: column !important;
+        }
+
+        .navigation {
+            order: 2;
+            width: inherit;
+            max-width: inherit;
+            padding-bottom: inherit;
+            overflow: inherit;
+            word-wrap: inherit;
+            background: inherit;
+            border-right: inherit;
+        }
+
+        .main-content {
+            order: 1;
+            flex: inherit;
+            padding-bottom: inherit;
+        }
+    }
+
+    .nav-group-task {
+        white-space: normal;
+    }
+
+    .inp {
+        color: #d14;
+    }
+
+    .trunc {
+        color: gray;
+    }
+
+    body {
+        font: 16px/1.7 sofia-pro, sans-serif !important;
+    }
+
+    .ansi-r { color: red; }
+    .ansi-g { color: green; }
+    .ansi-b { color: blue; }
+    .ansi-y { color: darkgoldenrod; }
+    .ansi-lb { color: skyblue; }
+</style>
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Alias/ClassHook" class="dashAnchor"></a>
+
+    <a title="ClassHook Type Alias Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          Orion 1.0.0 Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/theos/orion">
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="dash-feed://https%3A%2F%2Forion.theos.dev%2Fversions%2F1.0.0%2Fdocsets%2FOrion.xml">
+            <img class="header-icon" src="../img/dash.png" alt="Dash"/>
+            Install in Dash
+          </a>
+        </p>
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">Orion Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      ClassHook Type Alias Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../getting-started.html">Getting Started</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../using-private-classes.html">Using Private Classes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../tweak-preferences.html">Tweak Preferences</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../orion-directives.html">Orion Directives</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../using-orion-without-theos.html">Using Orion Without Theos</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../troubleshooting.html">Troubleshooting</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Class%20Hooking.html">Class Hooking</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases/ClassHook.html">ClassHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ClassHookProtocol.html">ClassHookProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property.html">Property</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property/Assign.html">– Assign</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property/Atomicity.html">– Atomicity</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Property/RetainOrCopy.html">– RetainOrCopy</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/SubclassMode.html">SubclassMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/DeinitPolicy.html">DeinitPolicy</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Function%20Hooking.html">Function Hooking</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases/FunctionHook.html">FunctionHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/FunctionHookProtocol.html">FunctionHookProtocol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Function.html">Function</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../All%20Hooks.html">All Hooks</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AnyHook.html">AnyHook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/HookGroup.html">HookGroup</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/DefaultGroup.html">DefaultGroup</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Tweaks.html">Tweaks</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Tweak.html">Tweak</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/TweakWithBackend.html">TweakWithBackend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/DefaultTweak.html">DefaultTweak</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Utilities.html">Utilities</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Ivars.html">Ivars</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Ivars/WeakStorage.html">– WeakStorage</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Dynamic.html">Dynamic</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/NSObject.html">NSObject</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Backends.html">Backends</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends.html">Backends</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends/Internal.html">– Internal</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends/Substrate.html">– Substrate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Backends/Fishhook.html">– Fishhook</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Backend.html">Backend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/DefaultBackend.html">DefaultBackend</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/HookDescriptor.html">HookDescriptor</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Error%20Handling.html">Error Handling</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/OrionHookError.html">OrionHookError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases/OrionErrorHandler.html">OrionErrorHandler</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions/updateOrionErrorHandler%28_%3A%29_%24syys5NeverOSSyXK_s12StaticStringVSutcABSSyXK_ADSutcXEcD.html">updateOrionErrorHandler(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Functions/orionError%28_%3Afile%3Aline%3A%29_%24s_4file4lines5NeverOSSyXK_s12StaticStringVSutcD.html">orionError(_:file:line:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Versions.html">Versions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../versions.html">Versions</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>ClassHook</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">Target</span><span class="o">&gt;</span> <span class="o">=</span> <span class="kt"><a href="../Protocols/ClassHookProtocol.html">ClassHookProtocol</a></span> <span class="o">&amp;</span> <span class="n">_ClassHookClass</span><span class="o">&lt;</span><span class="kt">Target</span><span class="o">&gt;</span> <span class="k">where</span> <span class="kt">Target</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                </div>
+              </div>
+            <p>The base class hook type. All class hooks must subclass this.</p>
+
+<p>This type allows hooking methods of a chosen target class. For
+a detailed description of all available configuration options,
+see <code><a href="../Protocols/ClassHookProtocol.html">ClassHookProtocol</a></code>.</p>
+<h1 id='specifying-a-target-class' class='heading'>Specifying a Target Class</h1>
+
+<p>In order to hook a class which is known by the Swift compiler at
+compile-time, specialize <code>ClassHook</code> with that class as the <code>Target</code>
+type. For example, to hook <code>MyClass</code> one could declare
+<code>class MyHook: ClassHook&lt;MyClass&gt;</code>.</p>
+
+<p>In order to hook a class which is not known by the Swift compiler
+at compile-time, specify a class in its inheritance chain as <code>Target</code>
+(you can use <code>NSObject</code> if no class which is more specific is available
+at compile-time), and provide the actual target class&rsquo; name by implementing
+the static <code>targetName</code> property.</p>
+<h1 id='hooking-methods' class='heading'>Hooking Methods</h1>
+<h2 id='instance-class-methods' class='heading'>Instance/Class Methods</h2>
+
+<p>To hook an instance method on the target class, simply declare an instance
+method with the same name and method signature in your hook class. The
+contents of your method will replace the original method implementation.</p>
+
+<p>In order to hook a class method, declare the replacement method as a <code>class</code>
+method.</p>
+
+<p>In either case, the method must not be <code>final</code> or <code>static</code>. Methods which have
+a visibility of <code>fileprivate</code> or <code>private</code> will be ignored by Orion and can
+thus be used as helper methods.</p>
+
+<p>Methods which have an Objective-C selector that begins with <code>alloc</code>, <code>new</code>,
+<code>copy</code>, or <code>mutableCopy</code>, follow the appropriate Objective-C conventions
+described <a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html">here</a>.
+In the rare case that you need to manually override this behavior,
+add <code>// orion:returns_retained true</code> (or <code>false</code>) above your method
+declaration. These directives behave like <code>NS_RETURNS_RETAINED</code> and
+<code>NS_RETURNS_NOT_RETAINED</code> respectively.</p>
+<h2 id='accessing-target-information' class='heading'>Accessing Target Information</h2>
+
+<p>Within a method hook function, the object upon which the hooked method was
+invoked can be accessed via <code>target</code>. To call the original implementation
+of the method, call the method itself on the <code>orig</code> proxy. Similarly, the
+superclass implementation can be accessed via the <code>supr</code> proxy.</p>
+<h2 id='method-naming' class='heading'>Method Naming</h2>
+
+<p>To figure out the required Swift name for an Objective-C method, you may want
+to follow the way that Objective-C APIs are <a href="https://github.com/apple/swift-evolution/blob/main/proposals/0005-objective-c-name-translation.md">renamed</a>
+when they are imported into Swift, in reverse. If you cannot figure out the
+Swift name for the method, you can also provide the Objective-C selector name
+directly by declaring the function as <code>@objc(selector:name:) func</code>.</p>
+<h2 id='initializers' class='heading'>Initializers</h2>
+
+<p>In order to hook an initializer with Orion, declare an <em>instance</em> method with
+the initializer&rsquo;s name and Objective-C method signature, with a return type of
+<code>Target</code>. For example <code>func initWithFrame(_ frame: CGRect) -&gt; Target</code>. Inside
+the method, your first statement should be a call to an initializer on <code>supr</code>
+or <code>orig</code>, after which you can configure <code>target</code> as you desire before you
+return it. To hook <code>NSObject.init</code>, use backticks to escape the init keyword:</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="err">`</span><span class="kd">init</span><span class="err">`</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Target</span><span class="o">.</span>
+</code></pre>
+
+<p>Example of hooking <code>initWithFrame</code>:</p>
+<pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">ViewHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UIView</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">initWithFrame</span><span class="p">(</span><span class="n">_</span> <span class="nv">frame</span><span class="p">:</span> <span class="kt">CGRect</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Target</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">target</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="nf">initWithFrame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="c1">// configure target</span>
+        <span class="k">return</span> <span class="n">target</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='deinitializers' class='heading'>Deinitializers</h2>
+
+<p>If you find the need to perform custom behavior when a target object is
+deallocated, you can declare a <code>deinitializer</code> function (<strong>not</strong> <code>deinit</code>).
+For more information, see <code><a href="../Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP13deinitializerAA12DeinitPolicyOyF">ClassHookProtocol.deinitializer()</a></code>.</p>
+<h1 id='adding-to-the-class' class='heading'>Adding to the Class</h1>
+<h2 id='properties' class='heading'>Properties</h2>
+
+<p>Use the <code><a href="../Structs/Property.html">@Property</a></code> property wrapper. For more information, refer to its
+documentation.</p>
+<h2 id='protocols' class='heading'>Protocols</h2>
+
+<p>You can specify a list of protocols for which conformance will be added
+to the class, by declaring the <code><a href="../Protocols/ClassHookProtocol.html#/s:5Orion17ClassHookProtocolP9protocolsSaySo0D0CGvpZ">ClassHookProtocol.protocols</a></code> property.</p>
+<h2 id='new-methods' class='heading'>New Methods</h2>
+
+<p>To add a new method to the target class, simply declare it on the hook and mark
+it as <code>final</code>. This may be useful, for example, to make the target class conform
+to a protocol requirement.</p>
+<h1 id='creating-subclasses' class='heading'>Creating Subclasses</h1>
+
+<p>In some situations, you may need to declare a subclass for a base class which is
+not known at compile-time. In this case, create a <code>ClassHook</code> with the <code>Target</code>
+or <code>targetName</code> as the base class, and declare the <code>subclassMode</code> property with
+a value of <code><a href="../Enums/SubclassMode.html#/s:5Orion12SubclassModeO06createB0yA2CmF">SubclassMode.createSubclass</a></code> (to automatically pick a subclass name)
+or use <code><a href="../Enums/SubclassMode.html#/s:5Orion12SubclassModeO06createB5NamedyACSScACmF">SubclassMode.createSubclassNamed(_:)</a></code> if you need a specific name.</p>
+
+<p>The static <code>target</code> property will refer to the subclass type. It is possible
+to add methods, properties, protocols, and so on to the subclass as described
+above.</p>
+<h1 id='example' class='heading'>Example</h1>
+
+<p>To change the text of all <code>UILabel</code>s to &ldquo;hello&rdquo;, one could write something like this:</p>
+<pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">MyHook</span><span class="p">:</span> <span class="kt">ClassHook</span><span class="o">&lt;</span><span class="kt">UILabel</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="kd">func</span> <span class="nf">setText</span><span class="p">(</span><span class="n">_</span> <span class="nv">text</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">orig</span><span class="o">.</span><span class="nf">setText</span><span class="p">(</span><span class="s">"hello"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+              <div class="slightly-smaller">
+                <a href="https://github.com/theos/orion/tree/e7a029a6bb37424cd9a4c474cb71d3f2a9071d66/Sources/Orion/ClassHook.swift#L248">Show on GitHub</a>
+              </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>© 2020 <a class="link" href="https://theos.dev" target="_blank" rel="external noopener">Theos</a>. Licensed under the <a class="link" href="https://github.com/theos/orion/blob/master/LICENSE.md" target="_blank" rel="external noopener">MIT License</a>.</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>
