@@ -600,7 +600,7 @@
 					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/lib$(EFFECTIVE_PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
-				MARKETING_VERSION = 0.9.5;
+				MARKETING_VERSION = 1.0.0;
 				MODULEMAP_FILE = Orion/module.modulemap;
 				OTHER_LDFLAGS = "-weak-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
@@ -651,7 +651,7 @@
 					"$(PROJECT_DIR)/Sources/CydiaSubstrate/lib/lib$(EFFECTIVE_PLATFORM_NAME)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14.4;
-				MARKETING_VERSION = 0.9.5;
+				MARKETING_VERSION = 1.0.0;
 				MODULEMAP_FILE = Orion/module.modulemap;
 				OTHER_LDFLAGS = "-weak-lsubstrate";
 				PRODUCT_BUNDLE_IDENTIFIER = dev.theos.orion;
