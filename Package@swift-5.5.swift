@@ -10,11 +10,13 @@ enum Builder {
 }
 
 let swiftSyntaxVersion: Package.Dependency.Requirement = {
-    #if swift(>=5.6)
+    #if swift(>=5.7)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
+    #elseif swift(>=5.6)
+    return .branch("release/5.6")
     #elseif swift(>=5.5)
     return .exact("0.50500.0")
     #elseif swift(>=5.4)
@@ -25,6 +27,14 @@ let swiftSyntaxVersion: Package.Dependency.Requirement = {
     return .exact("0.50200.0")
     #else
     #error("Orion does not support versions of Swift lower than 5.2.")
+    #endif
+}()
+
+let swiftSyntaxDep: String = {
+    #if swift(>=5.6)
+    return "SwiftSyntaxParser"
+    #else
+    return "SwiftSyntax"
     #endif
 }()
 
@@ -113,7 +123,9 @@ var package = Package(
     targets: [
         .target(
             name: "OrionProcessor",
-            dependencies: ["SwiftSyntax"]
+            dependencies: [
+                .product(name: swiftSyntaxDep, package: "SwiftSyntax")
+            ]
         ),
         .executableTarget(
             name: "OrionProcessorCLI",
