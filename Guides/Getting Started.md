@@ -2,7 +2,7 @@
 
 ## Preface
 
-If you are using Orion for tweak development, it is recommended that you use it with Theos. This guide assumes that you have Theos installed; if you haven't done that yet, please follow the [installation instructions](https://github.com/theos/theos/wiki/Installation) for Theos and then return to this guide.
+If you are using Orion for tweak development, it is recommended that you use it with Theos. This guide assumes that you have Theos installed; if you haven't done that yet, please follow the [installation instructions](https://theos.dev/docs/installation) for Theos and then return to this guide.
 
 If you wish to use Orion without Theos, please refer to the "[Using Orion Without Theos](using-orion-without-theos.html)" guide.
 
@@ -10,7 +10,7 @@ This guide will show you how to make a simple Orion tweak which… spices up tex
 
 To follow along, you will require the following things:
 
-- [Theos](https://github.com/theos/theos/wiki/Installation) on a machine running macOS, Windows 10 with WSL, or Linux.
+- [Theos](https://github.com/theos/theos/wiki/Installation) on a machine running macOS, Windows 10 with WSL, or Linux. If you're on a Linux environment, please make sure to install the Swift package from [here](https://www.swift.org/download/).
 - A jailbroken iOS device.
 - The target app (in this tutorial, VLC for iOS) installed on your iOS device.
 
