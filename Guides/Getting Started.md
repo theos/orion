@@ -10,7 +10,7 @@ This guide will show you how to make a simple Orion tweak which… spices up tex
 
 To follow along, you will require the following things:
 
-- [Theos](https://github.com/theos/theos/wiki/Installation) on a machine running macOS, Windows 10 with WSL, or Linux. If you're on a Linux environment, please make sure to install the Swift package from [here](https://www.swift.org/download/).
+- [Theos](https://theos.dev/docs/installation) on a machine running macOS, Windows 10 with WSL, or Linux. If you're in a Linux environment, you must install a [host Swift toolchain](https://www.swift.org/download/) in addition to a Swift-compatible iOS toolchain.
 - A jailbroken iOS device.
 - The target app (in this tutorial, VLC for iOS) installed on your iOS device.
 
