@@ -107,12 +107,12 @@ var package = Package(
             targets: ["OrionProcessor"]
         ),
         .executable(
-            name: "orion",
-            targets: ["OrionProcessorCLI"]
+            name: "OrionCLI",
+            targets: ["OrionCLI"]
         ),
-        .executable(
-            name: "generate-test-fixtures",
-            targets: ["GenerateTestFixtures"]
+        .plugin(
+            name: "OrionPlugin",
+            targets: ["OrionPlugin"]
         ),
     ],
     dependencies: [
@@ -128,22 +128,22 @@ var package = Package(
             ]
         ),
         .executableTarget(
-            name: "OrionProcessorCLI",
+            name: "OrionCLI",
             dependencies: [
                 "OrionProcessor",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             linkerSettings: rpathLinkerSettings
         ),
-        .executableTarget(
-            name: "GenerateTestFixtures",
-            dependencies: ["OrionProcessor"],
-            linkerSettings: rpathLinkerSettings
-        ),
         .testTarget(
             name: "OrionProcessorTests",
             dependencies: ["OrionProcessor"],
             linkerSettings: rpathLinkerSettings
+        ),
+        .plugin(
+            name: "OrionPlugin",
+            capability: .buildTool(),
+            dependencies: ["OrionCLI"]
         ),
     ]
 )
@@ -202,7 +202,8 @@ if builder != .theos {
         ),
         .testTarget(
             name: "OrionTests",
-            dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"]
+            dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"],
+            plugins: ["OrionPlugin"]
         ),
     ]
 }
