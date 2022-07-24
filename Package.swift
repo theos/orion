@@ -10,11 +10,13 @@ enum Builder {
 }
 
 let swiftSyntaxVersion: Package.Dependency.Requirement = {
-    #if swift(>=5.5)
+    #if swift(>=5.6)
     #error("""
     Internal error: Swift Package Manager should be reading from
-    Package@swift-5.5.swift, not Package.swift.
+    Package@swift-5.6.swift, not Package.swift.
     """)
+    #elseif swift(>=5.5)
+    return .exact("0.50500.0")
     #elseif swift(>=5.4)
     return .exact("0.50400.0")
     #elseif swift(>=5.3)
@@ -104,7 +106,6 @@ var package = Package(
         ),
     ],
     dependencies: [
-//        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
         .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", swiftSyntaxVersion),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
     ],

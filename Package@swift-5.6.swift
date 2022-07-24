@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.6
 
 import PackageDescription
 import Foundation
@@ -9,31 +9,21 @@ enum Builder {
     case spm
 }
 
-let swiftSyntaxVersion: Package.Dependency.Requirement = {
+let swiftSyntax: Package.Dependency = {
     #if swift(>=5.8)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
     #elseif swift(>=5.7)
-    return .branch("release/5.7")
+    return .package(url: "https://github.com/apple/swift-syntax.git", branch: "release/5.7")
     #elseif swift(>=5.6)
-    return .exact("0.50600.1")
-    #elseif swift(>=5.5)
-    return .exact("0.50500.0")
+    return .package(url: "https://github.com/apple/swift-syntax.git", exact: "0.50600.1")
     #else
     #error("""
     Internal error: Swift Package Manager should be reading from
-    Package.swift, not Package@swift-5.5.swift.
+    Package.swift, not Package@swift-5.6.swift.
     """)
-    #endif
-}()
-
-let swiftSyntaxDep: String = {
-    #if swift(>=5.6)
-    return "SwiftSyntaxParser"
-    #else
-    return "SwiftSyntax"
     #endif
 }()
 
@@ -114,15 +104,14 @@ var package = Package(
         ),
     ],
     dependencies: [
-//        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
-        .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", swiftSyntaxVersion),
-        .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
+        swiftSyntax,
+        .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
     ],
     targets: [
         .target(
             name: "OrionProcessor",
             dependencies: [
-                .product(name: swiftSyntaxDep, package: "SwiftSyntax")
+                .product(name: "SwiftSyntaxParser", package: "swift-syntax")
             ]
         ),
         .executableTarget(
