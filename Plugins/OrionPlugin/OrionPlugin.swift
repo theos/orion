@@ -1,16 +1,43 @@
 import PackagePlugin
 
 @main struct OrionPlugin: BuildToolPlugin {
-    func createBuildCommands(context: PluginContext, target: Target) async throws -> [Command] {
-        let tool = try context.tool(named: "OrionCLI")
-        let output = context.pluginWorkDirectory.appending("Generated.xc.swift")
-        return [.buildCommand(
+    private func createCommand(
+        orion: Path,
+        workDirectory: Path,
+        inputs: [Path]
+    ) -> Command {
+        let output = workDirectory.appending("Generated.xc.swift")
+        return .buildCommand(
             displayName: "Run Orion Preprocessor",
-            executable: tool.path,
-            arguments: ["--output", output, "--", target.directory],
+            executable: orion,
+            arguments: ["--output", output, "--"] + inputs,
             environment: [:],
-            inputFiles: [target.directory],
+            inputFiles: inputs,
             outputFiles: [output]
+        )
+    }
+
+    func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
+        [createCommand(
+            orion: try context.tool(named: "OrionCLI").path,
+            workDirectory: context.pluginWorkDirectory,
+            inputs: [target.directory]
         )]
     }
 }
+
+#if canImport(XcodeProjectPlugin)
+import XcodeProjectPlugin
+
+extension OrionPlugin: XcodeBuildToolPlugin {
+    func createBuildCommands(context: XcodePluginContext, target: XcodeTarget) throws -> [Command] {
+        [createCommand(
+            orion: try context.tool(named: "OrionCLI").path,
+            workDirectory: context.pluginWorkDirectory,
+            inputs: target.inputFiles
+                .filter { $0.type == .source && $0.path.extension == "swift" }
+                .map(\.path)
+        )]
+    }
+}
+#endif
