@@ -10,23 +10,22 @@ enum Builder {
 }
 
 let swiftSyntaxVersion: Package.Dependency.Requirement = {
-    #if swift(>=5.7)
+    #if swift(>=5.8)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
+    #elseif swift(>=5.7)
+    return .branch("release/5.7")
     #elseif swift(>=5.6)
     return .exact("0.50600.1")
     #elseif swift(>=5.5)
     return .exact("0.50500.0")
-    #elseif swift(>=5.4)
-    return .exact("0.50400.0")
-    #elseif swift(>=5.3)
-    return .exact("0.50300.0")
-    #elseif swift(>=5.2)
-    return .exact("0.50200.0")
     #else
-    #error("Orion does not support versions of Swift lower than 5.2.")
+    #error("""
+    Internal error: Swift Package Manager should be reading from
+    Package.swift, not Package@swift-5.5.swift.
+    """)
     #endif
 }()
 
@@ -61,12 +60,10 @@ func system(_ path: String, _ args: String...) -> String {
         .trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
-// based on
+// allow lib_InternalSwiftSyntaxParser to be located at runtime. Based on
 // https://github.com/muter-mutation-testing/muter/blob/dc53a9cd1792b2ffd3c9a1a0795aae99e8c7334d/Package.swift#L40
 let rpathLinkerSettings: [LinkerSetting]? = {
     #if os(macOS)
-    guard builder == .xcode else { return nil }
-
     let xcrunSwiftPath = system("/usr/bin/xcrun", "-f", "swift")
     let overriddenPrefix = URL(fileURLWithPath: xcrunSwiftPath)
         .deletingLastPathComponent().deletingLastPathComponent()
@@ -94,6 +91,7 @@ let rpathLinkerSettings: [LinkerSetting]? = {
         .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", rpath.path])
     ]
     #else
+    // TODO: Do we need an rpath here too?
     return nil
     #endif
 }()
