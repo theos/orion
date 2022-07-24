@@ -95,8 +95,8 @@ var package = Package(
             targets: ["OrionProcessor"]
         ),
         .executable(
-            name: "orion",
-            targets: ["OrionProcessorCLI"]
+            name: "OrionCLI",
+            targets: ["OrionCLI"]
         ),
         .executable(
             name: "generate-test-fixtures",
@@ -114,7 +114,7 @@ var package = Package(
             dependencies: ["SwiftSyntax"]
         ),
         .target(
-            name: "OrionProcessorCLI",
+            name: "OrionCLI",
             dependencies: [
                 "OrionProcessor",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
