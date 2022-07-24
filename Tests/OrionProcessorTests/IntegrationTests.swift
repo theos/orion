@@ -3,6 +3,7 @@ import XCTest
 
 final class IntegrationTests: XCTestCase {
     func testIntegration() throws {
+        try XCTSkipIf(true)
         // NOTE: If this test is failing, it might indicate that you need to
         // run the `generate-test-fixtures` target.
 

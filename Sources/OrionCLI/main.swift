@@ -11,7 +11,7 @@ extension OrionGenerator.Backend: ExpressibleByArgument {
 
 struct OrionCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "orion",
+        commandName: "OrionCLI",
         abstract: "The Orion preprocessor."
     )
 

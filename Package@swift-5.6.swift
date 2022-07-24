@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.6
 
 import PackageDescription
 import Foundation
@@ -9,32 +9,21 @@ enum Builder {
     case spm
 }
 
-let swiftSyntaxVersion: Package.Dependency.Requirement = {
-    #if swift(>=5.7)
+let swiftSyntax: Package.Dependency = {
+    #if swift(>=5.8)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
+    #elseif swift(>=5.7)
+    return .package(url: "https://github.com/apple/swift-syntax.git", branch: "release/5.7")
     #elseif swift(>=5.6)
-    return .exact("0.50600.1")
-    #elseif swift(>=5.5)
-    return .exact("0.50500.0")
-    #elseif swift(>=5.4)
-    return .exact("0.50400.0")
-    #elseif swift(>=5.3)
-    return .exact("0.50300.0")
-    #elseif swift(>=5.2)
-    return .exact("0.50200.0")
+    return .package(url: "https://github.com/apple/swift-syntax.git", exact: "0.50600.1")
     #else
-    #error("Orion does not support versions of Swift lower than 5.2.")
-    #endif
-}()
-
-let swiftSyntaxDep: String = {
-    #if swift(>=5.6)
-    return "SwiftSyntaxParser"
-    #else
-    return "SwiftSyntax"
+    #error("""
+    Internal error: Swift Package Manager should be reading from
+    Package.swift, not Package@swift-5.6.swift.
+    """)
     #endif
 }()
 
@@ -61,12 +50,10 @@ func system(_ path: String, _ args: String...) -> String {
         .trimmingCharacters(in: .whitespacesAndNewlines)
 }
 
-// based on
+// allow lib_InternalSwiftSyntaxParser to be located at runtime. Based on
 // https://github.com/muter-mutation-testing/muter/blob/dc53a9cd1792b2ffd3c9a1a0795aae99e8c7334d/Package.swift#L40
 let rpathLinkerSettings: [LinkerSetting]? = {
     #if os(macOS)
-    guard builder == .xcode else { return nil }
-
     let xcrunSwiftPath = system("/usr/bin/xcrun", "-f", "swift")
     let overriddenPrefix = URL(fileURLWithPath: xcrunSwiftPath)
         .deletingLastPathComponent().deletingLastPathComponent()
@@ -94,6 +81,7 @@ let rpathLinkerSettings: [LinkerSetting]? = {
         .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", rpath.path])
     ]
     #else
+    // TODO: Do we need an rpath here too?
     return nil
     #endif
 }()
@@ -107,43 +95,42 @@ var package = Package(
             targets: ["OrionProcessor"]
         ),
         .executable(
-            name: "orion",
-            targets: ["OrionProcessorCLI"]
+            name: "OrionCLI",
+            targets: ["OrionCLI"]
         ),
-        .executable(
-            name: "generate-test-fixtures",
-            targets: ["GenerateTestFixtures"]
+        .plugin(
+            name: "OrionPlugin",
+            targets: ["OrionPlugin"]
         ),
     ],
     dependencies: [
-//        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
-        .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", swiftSyntaxVersion),
-        .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
+        swiftSyntax,
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "OrionProcessor",
             dependencies: [
-                .product(name: swiftSyntaxDep, package: "SwiftSyntax")
+                .product(name: "SwiftSyntaxParser", package: "swift-syntax")
             ]
         ),
         .executableTarget(
-            name: "OrionProcessorCLI",
+            name: "OrionCLI",
             dependencies: [
                 "OrionProcessor",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ],
             linkerSettings: rpathLinkerSettings
         ),
-        .executableTarget(
-            name: "GenerateTestFixtures",
-            dependencies: ["OrionProcessor"],
-            linkerSettings: rpathLinkerSettings
-        ),
         .testTarget(
             name: "OrionProcessorTests",
             dependencies: ["OrionProcessor"],
             linkerSettings: rpathLinkerSettings
+        ),
+        .plugin(
+            name: "OrionPlugin",
+            capability: .buildTool(),
+            dependencies: ["OrionCLI"]
         ),
     ]
 )
@@ -202,7 +189,8 @@ if builder != .theos {
         ),
         .testTarget(
             name: "OrionTests",
-            dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"]
+            dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"],
+            plugins: ["OrionPlugin"]
         ),
     ]
 }
