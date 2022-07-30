@@ -32,7 +32,7 @@ ifeq ($(SUBPKG),)
 ifneq ($(IS_OSS_SWIFT),)
 SUBPKG := 0
 else
-ifeq ($(shell $(THEOS_BIN_PATH)/vercmp.pl $(APPLE_SWIFT_VERSION) ge 5.3),1)
+ifeq ($(call __vercmp,$(APPLE_SWIFT_VERSION),ge,5.3),1)
 SUBPKG := 1
 else
 SUBPKG := 0
@@ -48,7 +48,7 @@ before-package::
 		-e 's/\$${SUBPKG_NAME}/$(SUBPKG_$(SUBPKG)_NAME)/g' \
 		-e 's/\$${SUBPKG_FW}/$(SUBPKG_$(SUBPKG)_FW)/g' \
 		-e 's/\$${PKG_VERSION}/$(_THEOS_INTERNAL_PACKAGE_VERSION)/g' \
-		$(_THEOS_ESCAPED_STAGING_DIR)/DEBIAN/control$(ECHO_END)
+		$(THEOS_STAGING_DIR)/DEBIAN/control$(ECHO_END)
 
 internal-stage::
 	$(ECHO_NOTHING)mkdir -p $(THEOS_PACKAGE_DIR)$(ECHO_END)
