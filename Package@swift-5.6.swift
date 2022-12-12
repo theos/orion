@@ -16,7 +16,7 @@ let swiftSyntax: Package.Dependency = {
     Please check https://github.com/theos/Orion for progress updates.
     """)
     #elseif swift(>=5.7)
-    return .package(url: "https://github.com/apple/swift-syntax", branch: "0.50700.1")
+    return .package(url: "https://github.com/apple/swift-syntax", branch: "0.50700.0")
     #elseif swift(>=5.6)
     return .package(url: "https://github.com/apple/swift-syntax.git", exact: "0.50600.1")
     #else
