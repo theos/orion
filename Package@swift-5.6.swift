@@ -10,11 +10,13 @@ enum Builder {
 }
 
 let swiftSyntax: Package.Dependency = {
-    #if swift(>=5.8)
+    #if swift(>=5.9)
     #error("""
     Orion does not support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
+    #elseif swift(>=5.8)
+    return .package(url: "https://github.com/apple/swift-syntax", exact: "508.0.0")
     #elseif swift(>=5.7)
     return .package(url: "https://github.com/apple/swift-syntax", exact: "0.50700.0")
     #elseif swift(>=5.6)
@@ -88,7 +90,7 @@ let rpathLinkerSettings: [LinkerSetting]? = {
 
 var package = Package(
     name: "Orion",
-    platforms: [.macOS("10.12")],
+    platforms: [.macOS("10.15")],
     products: [
         .library(
             name: "OrionProcessor",

@@ -157,6 +157,7 @@ class OrionVisitor: SyntaxVisitor {
         self.diagnosticEngine = diagnosticEngine
         self.converter = sourceLocationConverter
         self.options = options
+        super.init(viewMode: .all)
     }
 
     private(set) var data = OrionData()
@@ -252,10 +253,10 @@ class OrionVisitor: SyntaxVisitor {
                 // we have to do this here: we can't simply prefix the func with "override" because
                 // it may have attributes, and we'll end up putting override before the attributes,
                 // whereas modifiers need to come after the attributes
-                SyntaxFactory.makeDeclModifier(
+                DeclModifierSyntax(
                     name: SyntaxFactory.makeIdentifier("override"),
-                    detailLeftParen: nil, detail: nil, detailRightParen: nil
-                ).withTrailingTrivia(.spaces(1))
+                    trailingTrivia: .spaces(1)
+                )
             )
             .withBody(SyntaxFactory.makeBlankCodeBlock())
             .withFuncKeyword(function.funcKeyword.withoutLeadingTrivia())
