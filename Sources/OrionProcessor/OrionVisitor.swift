@@ -28,6 +28,19 @@ private extension SyntaxFactory {
 }
 #endif
 
+#if swift(>=5.8)
+extension SyntaxFactory {
+    static func makeDeclModifier(
+        name: TokenSyntax,
+        detailLeftParen: Any?,
+        detail: Any?,
+        detailRightParen: Any?
+    ) -> DeclModifierSyntax {
+        makeDeclModifier(name: name, detail: nil)
+    }
+}
+#endif
+
 private extension Diagnostic.Message {
     static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
         .init(.error, "A \(declKind) cannot be private, fileprivate, or final")
@@ -157,6 +170,9 @@ class OrionVisitor: SyntaxVisitor {
         self.diagnosticEngine = diagnosticEngine
         self.converter = sourceLocationConverter
         self.options = options
+        #if swift(>=5.8)
+        super.init(viewMode: .fixedUp)
+        #endif
     }
 
     private(set) var data = OrionData()
