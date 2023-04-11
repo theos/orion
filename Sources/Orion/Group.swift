@@ -149,7 +149,6 @@ class GroupRegistry {
         let groupID = T.id
         // no point in using a read lock first since any non-failure case
         // will always require promoting to a write lock
-        // swiftlint:disable:next unneeded_parentheses_in_closure_argument
         let activation = groupsLock.withWriteLock { () -> (() -> Void)? in
             switch groups[groupID] {
             case nil:
