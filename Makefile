@@ -4,7 +4,9 @@ include $(THEOS)/makefiles/common.mk
 
 XCODEPROJ_NAME = Orion
 
+ifneq ($(THEOS_PACKAGE_SCHEME),rootless)
 Orion_XCODEFLAGS = LD_DYLIB_INSTALL_NAME=/Library/Frameworks/Orion.framework/Orion
+endif
 Orion_XCODEFLAGS += DWARF_DSYM_FOLDER_PATH=$(THEOS_OBJ_DIR)/dSYMs
 
 include $(THEOS_MAKE_PATH)/xcodeproj.mk
