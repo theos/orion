@@ -1,7 +1,7 @@
 ---
 archs:           [ armv7, armv7s, arm64, arm64e, i386, x86_64 ]
 platform:        ios
-install-name:    /Library/Frameworks/CydiaSubstrate.framework/CydiaSubstrate
+install-name:    '@rpath/CydiaSubstrate.framework/CydiaSubstrate'
 current-version: 0.0.0
 compatibility-version: 0.0.0
 exports:
