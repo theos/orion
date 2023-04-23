@@ -7,7 +7,9 @@ on:
 
 jobs:
   release:
-    runs-on: macos-12
+    # We need to use an old runner for Xcode 11.7
+    # TODO: Use a matrix instead
+    runs-on: macos-11
     steps:
     - uses: actions/checkout@v2
       with:
@@ -30,8 +32,9 @@ jobs:
     - name: Build Release
       run: |
         cd orion
-        DEVELOPER_DIR=/Applications/Xcode_14.2.app/Contents/Developer make clean package FINALPACKAGE=1
-        DEVELOPER_DIR=/Applications/Xcode_14.2.app/Contents/Developer make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+        # Orion doesnt build with 12.5 atm due to a compiler bug (SR-14535)
+        DEVELOPER_DIR=/Applications/Xcode_12.4.app/Contents/Developer make clean package FINALPACKAGE=1
+        DEVELOPER_DIR=/Applications/Xcode_12.4.app/Contents/Developer make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
         DEVELOPER_DIR=/Applications/Xcode_11.7.app/Contents/Developer make clean package FINALPACKAGE=1
         cd packages
         zip -yr9 Orion_${{ steps.setup.outputs.version }}.zip *
