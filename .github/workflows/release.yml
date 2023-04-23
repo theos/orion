@@ -30,9 +30,8 @@ jobs:
     - name: Build Release
       run: |
         cd orion
-        # Orion doesnt build with 12.5 atm due to a compiler bug (SR-14535)
-        DEVELOPER_DIR=/Applications/Xcode_12.4.app/Contents/Developer make clean package FINALPACKAGE=1
-        DEVELOPER_DIR=/Applications/Xcode_12.4.app/Contents/Developer make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+        DEVELOPER_DIR=/Applications/Xcode_14.2.app/Contents/Developer make clean package FINALPACKAGE=1
+        DEVELOPER_DIR=/Applications/Xcode_14.2.app/Contents/Developer make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
         DEVELOPER_DIR=/Applications/Xcode_11.7.app/Contents/Developer make clean package FINALPACKAGE=1
         cd packages
         zip -yr9 Orion_${{ steps.setup.outputs.version }}.zip *
