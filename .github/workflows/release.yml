@@ -24,7 +24,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: theos/theos
-        ref: a6fab2233074ba7f70d03512cbdb88e6e0a2fc54
+        ref: 153c50c49dbbac0b47b87f9480d8d2c5d6d2ace1
         path: theos
         submodules: recursive
     - name: Build Release
@@ -32,6 +32,7 @@ jobs:
         cd orion
         # Orion doesnt build with 12.5 atm due to a compiler bug (SR-14535)
         DEVELOPER_DIR=/Applications/Xcode_12.4.app/Contents/Developer make clean package FINALPACKAGE=1
+        DEVELOPER_DIR=/Applications/Xcode_12.4.app/Contents/Developer make clean package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
         DEVELOPER_DIR=/Applications/Xcode_11.7.app/Contents/Developer make clean package FINALPACKAGE=1
         cd packages
         zip -yr9 Orion_${{ steps.setup.outputs.version }}.zip *
