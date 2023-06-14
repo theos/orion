@@ -1,96 +1,29 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.8
 
 import PackageDescription
 import Foundation
 
-enum Builder {
-    case theos
-    case xcode
-    case spm
-}
-
-let swiftSyntaxVersion: Package.Dependency.Requirement = {
-    #if swift(>=5.6)
-    #error("""
-    Internal error: Swift Package Manager should be reading from
-    Package@swift-5.6.swift, not Package.swift.
+let swiftSyntax: Package.Dependency = {
+    let url = "https://github.com/apple/swift-syntax"
+    #if compiler(>=5.9)
+    #warning("""
+    Orion does not officially support this version of Swift yet. \
+    Please check https://github.com/theos/Orion for progress updates.
     """)
-    #elseif swift(>=5.5)
-    return .exact("0.50500.0")
-    #elseif swift(>=5.4)
-    return .exact("0.50400.0")
-    #elseif swift(>=5.3)
-    return .exact("0.50300.0")
-    #elseif swift(>=5.2)
-    return .exact("0.50200.0")
-    #else
-    #error("Orion does not support versions of Swift lower than 5.2.")
     #endif
-}()
-
-let builder: Builder
-let env = ProcessInfo.processInfo.environment
-if env["SPM_THEOS_BUILD"] == "1" {
-    builder = .theos
-} else if env["XPC_SERVICE_NAME"]?.contains("com.apple.dt.Xcode.") == true {
-    builder = .xcode
-} else {
-    builder = .spm
-}
-
-func system(_ path: String, _ args: String...) -> String {
-    let pipe = Pipe()
-    let process = Process()
-    process.launchPath = path
-    process.arguments = args
-    process.standardOutput = pipe
-    process.standardError = nil
-    process.launch()
-    process.waitUntilExit()
-    return String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8)!
-        .trimmingCharacters(in: .whitespacesAndNewlines)
-}
-
-// based on
-// https://github.com/muter-mutation-testing/muter/blob/dc53a9cd1792b2ffd3c9a1a0795aae99e8c7334d/Package.swift#L40
-let rpathLinkerSettings: [LinkerSetting]? = {
-    #if os(macOS)
-    guard builder == .xcode else { return nil }
-
-    let xcrunSwiftPath = system("/usr/bin/xcrun", "-f", "swift")
-    let overriddenPrefix = URL(fileURLWithPath: xcrunSwiftPath)
-        .deletingLastPathComponent().deletingLastPathComponent()
-
-    let defaultPlatformPath = system("/usr/bin/xcodebuild", "-version", "-sdk", "macosx", "PlatformPath")
-    let defaultPrefix = URL(fileURLWithPath: defaultPlatformPath)
-        .deletingLastPathComponent().deletingLastPathComponent()
-        .appendingPathComponent("Toolchains/XcodeDefault.xctoolchain/usr")
-
-    let computedPrefix: URL
-    if overriddenPrefix == defaultPrefix {
-        // there's no explicit toolchain override. A more specific override may exist
-        // inside the PATH
-        let xcodebuildPath = system("/usr/bin/type", "-p", "xcodebuild")
-        let platformPath = system(xcodebuildPath, "-version", "-sdk", "macosx", "PlatformPath")
-        computedPrefix = URL(fileURLWithPath: platformPath)
-            .deletingLastPathComponent().deletingLastPathComponent()
-            .appendingPathComponent("Toolchains/XcodeDefault.xctoolchain/usr")
-    } else {
-        computedPrefix = overriddenPrefix
-    }
-
-    let rpath = computedPrefix.appendingPathComponent("lib/swift/macosx")
-    return [
-        .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", rpath.path])
-    ]
+    #if compiler(>=5.8)
+    return .package(url: url, from: "508.0.0")
     #else
-    return nil
+    #error("""
+    Your Swift compiler version is too old for this copy of Orion.
+    Please try Orion v1.0.0.
+    """)
     #endif
 }()
 
 var package = Package(
     name: "Orion",
-    platforms: [.macOS("10.12")],
+    platforms: [.macOS("10.15")],
     products: [
         .library(
             name: "OrionProcessor",
@@ -100,43 +33,44 @@ var package = Package(
             name: "OrionCLI",
             targets: ["OrionCLI"]
         ),
-        .executable(
-            name: "generate-test-fixtures",
-            targets: ["GenerateTestFixtures"]
+        .plugin(
+            name: "OrionPlugin",
+            targets: ["OrionPlugin"]
         ),
     ],
     dependencies: [
-        .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", swiftSyntaxVersion),
-        .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
+        swiftSyntax,
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "OrionProcessor",
-            dependencies: ["SwiftSyntax"]
+            dependencies: [
+                .product(name: "SwiftSyntaxParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+            ]
         ),
-        .target(
+        .executableTarget(
             name: "OrionCLI",
             dependencies: [
                 "OrionProcessor",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
-            ],
-            linkerSettings: rpathLinkerSettings
-        ),
-        .target(
-            name: "GenerateTestFixtures",
-            dependencies: ["OrionProcessor"],
-            linkerSettings: rpathLinkerSettings
+            ]
         ),
         .testTarget(
             name: "OrionProcessorTests",
-            dependencies: ["OrionProcessor"],
-            linkerSettings: rpathLinkerSettings
+            dependencies: ["OrionProcessor"]
+        ),
+        .plugin(
+            name: "OrionPlugin",
+            capability: .buildTool(),
+            dependencies: ["OrionCLI"]
         ),
     ]
 )
 
 #if canImport(ObjectiveC)
-if builder != .theos {
+if ProcessInfo.processInfo.environment["SPM_THEOS_BUILD"] != "1" {
     package.products += [
         .library(
             name: "Orion",
@@ -179,7 +113,7 @@ if builder != .theos {
             name: "OrionBackend_Fishhook",
             dependencies: ["Fishhook", "Orion"]
         ),
-        .target(
+        .executableTarget(
             name: "OrionPlayground",
             dependencies: ["Orion", "OrionTestSupport"]
         ),
@@ -189,7 +123,8 @@ if builder != .theos {
         ),
         .testTarget(
             name: "OrionTests",
-            dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"]
+            dependencies: ["Orion", "OrionBackend_Fishhook", "OrionTestSupport"],
+            plugins: ["OrionPlugin"]
         ),
     ]
 }

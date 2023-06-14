@@ -1,45 +1,10 @@
 import Foundation
 import SwiftSyntax
+import SwiftSyntaxBuilder
 
 // it do be like that for compiler stuff
 // swiftlint:disable:next superfluous_disable_command
 // swiftlint:disable type_body_length file_length
-
-#if swift(>=5.4)
-private extension SyntaxFactory {
-    static func makeFunctionType(
-        leftParen: TokenSyntax,
-        arguments: TupleTypeElementListSyntax,
-        rightParen: TokenSyntax,
-        throwsOrRethrowsKeyword: TokenSyntax?,
-        arrow: TokenSyntax,
-        returnType: TypeSyntax
-    ) -> FunctionTypeSyntax {
-        makeFunctionType(
-            leftParen: leftParen,
-            arguments: arguments,
-            rightParen: rightParen,
-            asyncKeyword: nil,
-            throwsOrRethrowsKeyword: throwsOrRethrowsKeyword,
-            arrow: arrow,
-            returnType: returnType
-        )
-    }
-}
-#endif
-
-#if swift(>=5.8)
-extension SyntaxFactory {
-    static func makeDeclModifier(
-        name: TokenSyntax,
-        detailLeftParen: Any?,
-        detail: Any?,
-        detailRightParen: Any?
-    ) -> DeclModifierSyntax {
-        makeDeclModifier(name: name, detail: nil)
-    }
-}
-#endif
 
 private extension Diagnostic.Message {
     static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
@@ -170,9 +135,7 @@ class OrionVisitor: SyntaxVisitor {
         self.diagnosticEngine = diagnosticEngine
         self.converter = sourceLocationConverter
         self.options = options
-        #if swift(>=5.8)
         super.init(viewMode: .fixedUp)
-        #endif
     }
 
     private(set) var data = OrionData()
@@ -250,57 +213,47 @@ class OrionVisitor: SyntaxVisitor {
         return prevTrailing + leading
     }
 
-    private func makeFunction(for function: FunctionDeclSyntax) -> Syntax? {
+    private func makeFunction(for function: FunctionDecl) -> Syntax? {
         let paramList = function.signature.input.parameterList
-        let elements = paramList.enumerated().compactMap { idx, element -> FunctionParameterSyntax? in
+        let elements = paramList.enumerated().compactMap { idx, element -> FunctionParameter? in
             var element = element
             guard let name = element.firstName else { return nil }
             if name.trailingTrivia.isEmpty {
-                element = element.withFirstName(element.firstName?.withTrailingTrivia(.spaces(1)))
+                element = element.withFirstName(element.firstName?.withTrailingTrivia(.space))
             }
-            return element.withSecondName(SyntaxFactory.makeIdentifier("arg\(idx + 1)"))
+            return element.withSecondName(.identifier("arg\(idx + 1)"))
         }
         guard elements.count == paramList.count else { return nil }
-        let input = function.signature.input.withParameterList(SyntaxFactory.makeFunctionParameterList(elements))
+        let input = function.signature.input.withParameterList(.init(elements))
         let signature = function.signature.withInput(input).withOutput(function.signature.output?.withoutTrailingTrivia())
         let function2 = function.withoutTrivia().withSignature(signature)
             .addModifier(
                 // we have to do this here: we can't simply prefix the func with "override" because
                 // it may have attributes, and we'll end up putting override before the attributes,
                 // whereas modifiers need to come after the attributes
-                SyntaxFactory.makeDeclModifier(
-                    name: SyntaxFactory.makeIdentifier("override"),
-                    detailLeftParen: nil, detail: nil, detailRightParen: nil
-                ).withTrailingTrivia(.spaces(1))
+                DeclModifier(
+                    name: .identifier("override")
+                ).withTrailingTrivia(.space)
             )
-            .withBody(SyntaxFactory.makeBlankCodeBlock())
+            .withBody(nil)
             .withFuncKeyword(function.funcKeyword.withoutLeadingTrivia())
         return Syntax(function2)
     }
 
-    private func makeIdentifier(for function: FunctionDeclSyntax) -> Syntax? {
-        let declNameArguments: DeclNameArgumentsSyntax?
-
-        let params = function.signature.input.parameterList
-        if params.isEmpty {
-            declNameArguments = nil
-        } else {
-            let params = function.signature.input.parameterList
-            let argumentsArray = params.compactMap { param -> DeclNameArgumentSyntax? in
-                guard let firstName = param.firstName, let colon = param.colon else { return nil }
-                return SyntaxFactory.makeDeclNameArgument(
-                    name: firstName.withoutTrivia(), colon: colon.withoutTrivia()
-                )
+    private func makeIdentifier(for function: FunctionDecl) -> Syntax? {
+        let arguments = DeclNameArgumentList {
+            for param in function.signature.input.parameterList {
+                if let name = param.firstName {
+                    DeclNameArgument(name: name.withoutTrivia(), colon: .colon)
+                }
             }
-            guard argumentsArray.count == params.count else { return nil }
-            declNameArguments = SyntaxFactory.makeDeclNameArguments(
-                leftParen: SyntaxFactory.makeLeftParenToken(),
-                arguments: SyntaxFactory.makeDeclNameArgumentList(argumentsArray),
-                rightParen: SyntaxFactory.makeRightParenToken()
-            )
         }
-
-        return Syntax(SyntaxFactory.makeIdentifierExpr(identifier: function.identifier, declNameArguments: declNameArguments))
+        return Syntax(
+            arguments.isEmpty
+            ? "\(function.identifier)"
+            : "\(function.identifier)(\(arguments))"
+            as IdentifierExpr
+        )
     }
 
     private enum FunctionKind {
@@ -310,7 +263,7 @@ class OrionVisitor: SyntaxVisitor {
 
     private func makeClosure(for function: FunctionDeclSyntax, kind: FunctionKind) -> Syntax? {
         let params = function.signature.input.parameterList
-        let rawParamTypes = params.compactMap { $0.type }
+        let rawParamTypes = params.compactMap(\.type)
         guard rawParamTypes.count == params.count else { return nil }
 
         let prefixTypes: [TypeSyntax]
@@ -321,49 +274,24 @@ class OrionVisitor: SyntaxVisitor {
             returnsUnmanaged = false
         case .method(let firstType, let _returnsUnmanaged):
             prefixTypes = [
-                SyntaxFactory.makeTypeIdentifier(firstType),
-                SyntaxFactory.makeTypeIdentifier("Selector")
+                "\(raw: firstType)",
+                "Selector"
             ]
             returnsUnmanaged = _returnsUnmanaged
         }
         let types = prefixTypes + rawParamTypes
 
-        let last = types.last
-        let argumentsArray = types.map { type in
-            SyntaxFactory.makeTupleTypeElement(
-                type: type,
-                trailingComma: type == last ? nil : SyntaxFactory.makeCommaToken().withTrailingTrivia(.spaces(1))
-            )
+        let arguments = TupleTypeElementList {
+            for type in types {
+                TupleTypeElement(type: type)
+            }
         }
-        let arguments = SyntaxFactory.makeTupleTypeElementList(argumentsArray)
         let rawReturnType =
             function.signature.output?.returnType.withoutTrivia() ??
-            SyntaxFactory.makeTypeIdentifier("Void")
-        let returnType: TypeSyntax
-        if returnsUnmanaged {
-            returnType = Syntax(SyntaxFactory.makeSimpleTypeIdentifier(
-                name: SyntaxFactory.makeIdentifier("Unmanaged"),
-                genericArgumentClause: SyntaxFactory.makeGenericArgumentClause(
-                    leftAngleBracket: SyntaxFactory.makeLeftAngleToken(),
-                    arguments: SyntaxFactory.makeGenericArgumentList([
-                        SyntaxFactory.makeGenericArgument(argumentType: rawReturnType, trailingComma: nil)
-                    ]),
-                    rightAngleBracket: SyntaxFactory.makeRightAngleToken()
-                )
-            )).as(TypeSyntax.self)!
-        } else {
-            returnType = rawReturnType
-        }
+            "Void"
+        let returnType = returnsUnmanaged ? "Unmanaged<\(rawReturnType)>" : rawReturnType
 
-        let type = SyntaxFactory.makeFunctionType(
-            leftParen: SyntaxFactory.makeLeftParenToken(),
-            arguments: arguments,
-            rightParen: SyntaxFactory.makeRightParenToken().withTrailingTrivia(.spaces(1)),
-            throwsOrRethrowsKeyword: nil,
-            arrow: SyntaxFactory.makeArrowToken().withTrailingTrivia(.spaces(1)),
-            returnType: returnType
-        )
-        return Syntax(type)
+        return Syntax("(\(arguments)) -> \(returnType)" as TypeSyntax)
     }
 
     private func orionFunction(for function: FunctionDeclSyntax) -> OrionData.Function? {
@@ -437,7 +365,7 @@ class OrionVisitor: SyntaxVisitor {
                     ) { builder in
                         builder.fixItReplace(
                             staticModifier.sourceRange(converter: self.converter, afterLeadingTrivia: true, afterTrailingTrivia: true),
-                            with: "\(SyntaxFactory.makeClassKeyword())"
+                            with: "\(TokenSyntax.class)"
                         )
                     }
                     didFail = true

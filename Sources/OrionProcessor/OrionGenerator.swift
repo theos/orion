@@ -1,5 +1,6 @@
 import Foundation
 import SwiftSyntax
+import SwiftSyntaxBuilder
 
 // swiftlint:disable:next superfluous_disable_command
 // swiftlint:disable type_body_length file_length
@@ -33,10 +34,13 @@ private extension Sequence {
 }
 
 private extension SourceLocation {
-    func decl() -> String? {
+    func decl() -> PoundSourceLocation? {
         guard let file = file, let line = line else { return nil }
-        // TODO: Maybe escape `file`
-        return "#sourceLocation(file: \"\(file)\", line: \(line))"
+        // string literal init messes up on #sourceLocation
+        return PoundSourceLocation(args: .init(
+            fileName: .stringLiteral(Expr(literal: file).description),
+            lineNumber: .integerLiteral(Expr(literal: line).description)
+        ))
     }
 }
 

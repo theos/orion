@@ -1,6 +1,5 @@
 import Foundation
 import SwiftSyntax
-#if swift(>=5.6)
 import SwiftSyntaxParser
 
 public typealias Diagnostic = SwiftSyntaxParser.Diagnostic
@@ -111,7 +110,6 @@ extension SyntaxParser {
     }
 
 }
-#endif
 
 // so that the user doesn't have to import SwiftSyntax if they want diagnostics
 public enum OrionDiagnosticConsumer {
