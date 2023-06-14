@@ -30,12 +30,14 @@ final class OrionDirectiveBase: Hashable, Equatable {
     let name: String
     let arguments: [String]
     let location: SourceLocation
+    let syntax: Syntax
     fileprivate private(set) var isUsed = false
 
-    fileprivate init(name: String, arguments: [String], location: SourceLocation) {
+    fileprivate init(name: String, arguments: [String], location: SourceLocation, syntax: Syntax) {
         self.name = name
         self.arguments = arguments
         self.location = location
+        self.syntax = syntax
     }
 
     func setUsed() {
@@ -48,31 +50,6 @@ final class OrionDirectiveBase: Hashable, Equatable {
 
     static func == (lhs: OrionDirectiveBase, rhs: OrionDirectiveBase) -> Bool {
         lhs.location.offset == rhs.location.offset
-    }
-}
-
-struct OrionDirectiveDiagnostic: Error, LocalizedError {
-    enum Severity {
-        case warning
-        case error
-    }
-
-    let message: String
-    let severity: Severity
-    var errorDescription: String? { message }
-
-    init(_ message: String, severity: Severity = .warning) {
-        self.message = message
-        self.severity = severity
-    }
-
-    var diagnosticMessage: Diagnostic.Message {
-        let severity: Diagnostic.Severity
-        switch self.severity {
-        case .error: severity = .error
-        case .warning: severity = .warning
-        }
-        return .init(severity, message)
     }
 }
 
@@ -115,7 +92,7 @@ final class OrionDirectiveParser {
         return customList.lazy.compactMap { $0(name) }.first
     }
 
-    func directive(from text: String, at location: SourceLocation, schema: Set<String> = []) throws -> OrionDirective? {
+    func directive(from text: String, at location: SourceLocation, on syntax: Syntax, schema: Set<String> = []) throws -> OrionDirective? {
         guard text.hasPrefix(Self.prefix) else { return nil }
         let dropped = text.dropFirst(Self.prefix.count)
         // directives can be of the form `orion:foo` or `orion[mySchema]:foo`.
@@ -141,9 +118,9 @@ final class OrionDirectiveParser {
         guard let name = parts.first.map(String.init) else { return nil }
         let arguments = parts.dropFirst().map(String.init)
         guard let matched = type(matching: name) else {
-            throw OrionDirectiveDiagnostic("Unknown Orion directive: \(name)")
+            throw OrionDiagnostic.unknownDirective(name)
         }
-        let base = OrionDirectiveBase(name: name, arguments: arguments, location: location)
+        let base = OrionDirectiveBase(name: name, arguments: arguments, location: location, syntax: syntax)
         let result = allBases.insert(base)
         do {
             return try matched.init(base: result.memberAfterInsert)
@@ -183,11 +160,11 @@ enum OrionDirectives {
         init(base: OrionDirectiveBase) throws {
             self.base = base
             guard base.arguments.count == 1 else {
-                throw OrionDirectiveDiagnostic("returns_retained directive expected one argument, got \(base.arguments.count)")
+                throw OrionDiagnostic.badReturnsRetainedArity(base.arguments.count)
             }
             let rawMode = base.arguments[0]
             guard let mode = Mode(rawValue: rawMode) else {
-                throw OrionDirectiveDiagnostic("Invalid returns_retained directive mode '\(rawMode)'")
+                throw OrionDiagnostic.badReturnsRetainedMode(rawMode)
             }
             self.mode = mode
         }
@@ -200,7 +177,7 @@ enum OrionDirectives {
         init(base: OrionDirectiveBase) throws {
             self.base = base
             guard base.arguments.isEmpty else {
-                throw OrionDirectiveDiagnostic("new directive expected zero arguments, got \(base.arguments.count)")
+                throw OrionDiagnostic.newArity(base.arguments.count)
             }
         }
     }
@@ -212,7 +189,7 @@ enum OrionDirectives {
         init(base: OrionDirectiveBase) throws {
             self.base = base
             guard base.arguments.isEmpty else {
-                throw OrionDirectiveDiagnostic("disable directive expected zero arguments, got \(base.arguments.count)")
+                throw OrionDiagnostic.disableArity(base.arguments.count)
             }
         }
     }
@@ -224,7 +201,7 @@ enum OrionDirectives {
         init(base: OrionDirectiveBase) throws {
             self.base = base
             guard base.arguments.isEmpty else {
-                throw OrionDirectiveDiagnostic("supr_tramp directive expected zero arguments, got \(base.arguments.count)")
+                throw OrionDiagnostic.suprTrampArity(base.arguments.count)
             }
         }
     }
@@ -236,7 +213,7 @@ enum OrionDirectives {
         init(base: OrionDirectiveBase) throws {
             self.base = base
             guard base.arguments.isEmpty else {
-                throw OrionDirectiveDiagnostic("ignore_import directive expected zero arguments, got \(base.arguments.count)")
+                throw OrionDiagnostic.ignoreImportArity(base.arguments.count)
             }
         }
     }

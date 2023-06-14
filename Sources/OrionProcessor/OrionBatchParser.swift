@@ -1,26 +1,5 @@
 import Foundation
 
-private extension RandomAccessCollection {
-    func concurrentMap<T>(_ block: (Element) -> T) -> [T] {
-        let n = self.count
-        guard n != 0 else { return [] }
-        let start = startIndex
-        return [T](unsafeUninitializedCapacity: n) { buf, count in
-            // we use a buffer here so that in each parallel "iteration"
-            // we can write to the idx'th address locklessly. If we'd
-            // used an array the trivial way we would've had to lock and
-            // call append each time.
-            let base = buf.baseAddress!
-            DispatchQueue.concurrentPerform(iterations: n) { idx in
-                (base + idx).initialize(
-                    to: block(self[index(start, offsetBy: idx)])
-                )
-            }
-            count = n
-        }
-    }
-}
-
 // parses multiple files/directories with parallelization.
 // deterministic input order => deterministic output.
 public final class OrionBatchParser {
@@ -64,7 +43,7 @@ public final class OrionBatchParser {
         }
     }
 
-    public func parse() throws -> OrionData {
+    public func parse() async throws -> OrionData {
         // Pre-compute the list of files so that we can concurrentMap, which
         // requires GCD to know how many parallel "iterations" it has to perform.
         // This takes a negligible amount of time and it's just filenames so it's
@@ -72,8 +51,20 @@ public final class OrionBatchParser {
         // determinism.
         let files = try computeFiles().sorted { $0.path < $1.path }
         let engine = diagnosticEngine
-        let allData = files.concurrentMap { file -> Result<OrionData, Error> in
-            Result { try OrionParser(file: file, diagnosticEngine: engine, options: options).parse() }
+        // we don't use a throwing task group since that terminates as soon as
+        // an error occurs; we want to collect diagnostics across files.
+        let allData = await withTaskGroup(of: Result<OrionData, Error>.self) { group in
+            for file in files {
+                group.addTask {
+                    do {
+                        let parser = try await OrionParser(file: file, diagnosticEngine: engine, options: self.options)
+                        return try await .success(parser.parse())
+                    } catch {
+                        return .failure(error)
+                    }
+                }
+            }
+            return await group.reduce(into: []) { $0.append($1) }
         }
         return OrionData(merging: try allData.map { try $0.get() })
     }

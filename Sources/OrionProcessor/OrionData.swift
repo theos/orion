@@ -93,21 +93,18 @@ public struct OrionData {
         // to handle multiple @available's we'd have to understand
         // them semantically to determine their intersection
         var availability: AvailabilitySpecListSyntax?
-        var converter: SourceLocationConverter
     }
 
     struct FunctionHook {
         var name: String
         var function: Function
         var availability: AvailabilitySpecListSyntax?
-        var converter: SourceLocationConverter
     }
 
     struct Tweak {
         // Syntax so that we have the source location
         var name: Syntax
         var hasBackend: Bool
-        var converter: SourceLocationConverter
     }
 
     // we don't provide `[]` as a default value here because that

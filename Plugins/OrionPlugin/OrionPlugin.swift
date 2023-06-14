@@ -10,7 +10,12 @@ import PackagePlugin
         return .buildCommand(
             displayName: "Run Orion Preprocessor",
             executable: orion,
-            arguments: ["--output", output, "--"] + inputs,
+            arguments: [
+                "--output", output,
+                "--enable-xcode-diagnostics",
+                "--disable-pretty-diagnostics",
+                "--"
+            ] + inputs,
             environment: [:],
             inputFiles: inputs,
             outputFiles: [output]

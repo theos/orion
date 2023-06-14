@@ -6,53 +6,6 @@ import SwiftSyntaxBuilder
 // swiftlint:disable:next superfluous_disable_command
 // swiftlint:disable type_body_length file_length
 
-private extension Diagnostic.Message {
-    static func invalidDeclAccess(declKind: String) -> Diagnostic.Message {
-        .init(.error, "A \(declKind) cannot be private, fileprivate, or final")
-    }
-    static func staticClassMethodDecl() -> Diagnostic.Message {
-        .init(
-            .error,
-            """
-            A method hook/addition cannot be static. If you are hooking/adding a class \
-            method, use `class` instead of `static`. If this is a helper function, declare \
-            it as private or fileprivate.
-            """
-        )
-    }
-    static func finalClassMethodDecl() -> Diagnostic.Message {
-        .init(
-            .error,
-            """
-            A method hook/addition cannot be declared with the modifier final. If you intended \
-            to mark this method as an addition, add the directive `// orion:new` above the \
-            declaration instead.
-            """
-        )
-    }
-    static func multipleDecls() -> Diagnostic.Message {
-        .init(.error, "A type can only be a single type of hook or tweak")
-    }
-    static func functionHookWithoutFunction() -> Diagnostic.Message {
-        .init(.error, "Function hooks must contain a function named 'function'")
-    }
-    static func invalidFunctionHookModifiers() -> Diagnostic.Message {
-        .init(
-            .error,
-            """
-            A function hook's `function` cannot be declared with the modifiers private, \
-            fileprivate, final, class, or static
-            """
-        )
-    }
-    static func classDeinit() -> Diagnostic.Message {
-        .init(.error, "A deinitializer cannot be a class method")
-    }
-    static func commentParseIssue() -> Diagnostic.Message {
-        .init(.warning, "Could not parse comment for directives")
-    }
-}
-
 class OrionVisitor: SyntaxVisitor {
     private enum DeclarationKind: CustomStringConvertible {
         case classHook(target: Syntax)
@@ -124,16 +77,13 @@ class OrionVisitor: SyntaxVisitor {
         "hookWillActivate", "hookDidActivate"
     ]
 
+    let context: OrionSourceContext
     let options: OrionParser.Options
-    let converter: SourceLocationConverter
-    let diagnosticEngine: DiagnosticEngine
     init(
-        diagnosticEngine: DiagnosticEngine,
-        sourceLocationConverter: SourceLocationConverter,
+        context: OrionSourceContext,
         options: OrionParser.Options
     ) {
-        self.diagnosticEngine = diagnosticEngine
-        self.converter = sourceLocationConverter
+        self.context = context
         self.options = options
         super.init(viewMode: .fixedUp)
     }
@@ -143,26 +93,27 @@ class OrionVisitor: SyntaxVisitor {
 
     private func makeDirectives(
         for trivia: Trivia,
+        syntax: Syntax,
         position: AbsolutePosition,
         warnOnFailure: Bool = false
     ) -> [OrionDirective] {
         var currPos = position
-        return trivia.compactMap { piece in
+        return trivia.compactMap { piece -> OrionDirective? in
             defer { currPos += piece.sourceLength }
-            let location = converter.location(for: currPos)
+            let location = context.converter.location(for: currPos)
             let directive: String
             switch piece {
             case .lineComment(let text):
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard trimmed.hasPrefix("//") else {
-                    diagnosticEngine.diagnose(.commentParseIssue(), location: location)
+                    context.diagnose(.init(node: syntax, position: currPos, message: .commentParseIssue()))
                     return nil
                 }
                 directive = trimmed.dropFirst(2).trimmingCharacters(in: .whitespacesAndNewlines)
             case .blockComment(let text):
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard trimmed.hasPrefix("/*") && trimmed.hasSuffix("*/") else {
-                    diagnosticEngine.diagnose(.commentParseIssue(), location: location)
+                    context.diagnose(.init(node: syntax, position: currPos, message: .commentParseIssue()))
                     return nil
                 }
                 directive = trimmed.dropFirst(2).dropLast(2).trimmingCharacters(in: .whitespacesAndNewlines)
@@ -170,15 +121,17 @@ class OrionVisitor: SyntaxVisitor {
                 return nil
             }
             do {
-                return try OrionDirectiveParser.shared.directive(from: directive, at: location, schema: options.schema)
-            } catch let err as OrionDirectiveDiagnostic {
+                return try OrionDirectiveParser.shared.directive(
+                    from: directive, at: location, on: syntax, schema: options.schema
+                )
+            } catch let err as OrionDiagnostic {
                 if warnOnFailure {
-                    diagnosticEngine.diagnose(err.diagnosticMessage, location: location)
+                    context.diagnose(.init(node: syntax, position: currPos, message: err))
                 }
                 return nil
             } catch {
                 if warnOnFailure {
-                    diagnosticEngine.diagnose(Diagnostic.Message(.error, "\(error)"), location: location)
+                    context.diagnose(.init(node: syntax, position: currPos, message: .directiveParsing("\(error)")))
                 }
                 return nil
             }
@@ -188,21 +141,18 @@ class OrionVisitor: SyntaxVisitor {
     // any comments between the last token *before* syntax, and the first token *of* syntax
     // are considered here
     private func makeDirectives(for syntax: Syntax, warnOnFailure: Bool = false) -> [OrionDirective] {
-        let leading: [OrionDirective]
-        if let trivia = syntax.leadingTrivia {
-            leading = makeDirectives(
-                for: trivia,
-                position: syntax.position,
-                warnOnFailure: warnOnFailure
-            )
-        } else {
-            leading = []
-        }
+        let leading = makeDirectives(
+            for: syntax.leadingTrivia,
+            syntax: syntax,
+            position: syntax.position,
+            warnOnFailure: warnOnFailure
+        )
 
         let prevTrailing: [OrionDirective]
-        if let prev = syntax.previousToken, let trivia = prev.trailingTrivia {
+        if let prev = syntax.previousToken(viewMode: .sourceAccurate) {
             prevTrailing = makeDirectives(
-                for: trivia,
+                for: prev.trailingTrivia,
+                syntax: Syntax(prev),
                 position: prev.endPositionBeforeTrailingTrivia,
                 warnOnFailure: warnOnFailure
             )
@@ -213,46 +163,39 @@ class OrionVisitor: SyntaxVisitor {
         return prevTrailing + leading
     }
 
-    private func makeFunction(for function: FunctionDecl) -> Syntax? {
+    private func makeFunction(for function: FunctionDeclSyntax) -> Syntax? {
         let paramList = function.signature.input.parameterList
-        let elements = paramList.enumerated().compactMap { idx, element -> FunctionParameter? in
+        let elements = paramList.enumerated().compactMap { idx, element -> FunctionParameterSyntax? in
             var element = element
-            guard let name = element.firstName else { return nil }
-            if name.trailingTrivia.isEmpty {
-                element = element.withFirstName(element.firstName?.withTrailingTrivia(.space))
+            if element.firstName.trailingTrivia.isEmpty {
+                element.firstName.trailingTrivia = .space
             }
-            return element.withSecondName(.identifier("arg\(idx + 1)"))
+            element.secondName = .identifier("arg\(idx + 1)")
+            return element
         }
         guard elements.count == paramList.count else { return nil }
-        let input = function.signature.input.withParameterList(.init(elements))
-        let signature = function.signature.withInput(input).withOutput(function.signature.output?.withoutTrailingTrivia())
-        let function2 = function.withoutTrivia().withSignature(signature)
-            .addModifier(
-                // we have to do this here: we can't simply prefix the func with "override" because
-                // it may have attributes, and we'll end up putting override before the attributes,
-                // whereas modifiers need to come after the attributes
-                DeclModifier(
-                    name: .identifier("override")
-                ).withTrailingTrivia(.space)
-            )
-            .withBody(nil)
-            .withFuncKeyword(function.funcKeyword.withoutLeadingTrivia())
-        return Syntax(function2)
+        var function = function
+        function = function.addModifier(DeclModifierSyntax(
+            name: .identifier("override"),
+            trailingTrivia: .space
+        ))
+        function.funcKeyword.leadingTrivia = []
+        function.signature.input.parameterList = .init(elements)
+        function.signature.output?.trailingTrivia = []
+        function.body = nil
+        return Syntax(function)
     }
 
-    private func makeIdentifier(for function: FunctionDecl) -> Syntax? {
-        let arguments = DeclNameArgumentList {
+    private func makeIdentifier(for function: FunctionDeclSyntax) -> Syntax? {
+        let arguments = DeclNameArgumentListSyntax {
             for param in function.signature.input.parameterList {
-                if let name = param.firstName {
-                    DeclNameArgument(name: name.withoutTrivia(), colon: .colon)
-                }
+                DeclNameArgumentSyntax(name: param.firstName.trimmed)
             }
         }
         return Syntax(
             arguments.isEmpty
-            ? "\(function.identifier)"
-            : "\(function.identifier)(\(arguments))"
-            as IdentifierExpr
+            ? "\(function.identifier)" as ExprSyntax
+            : "\(function.identifier)(\(arguments))" as ExprSyntax
         )
     }
 
@@ -263,7 +206,7 @@ class OrionVisitor: SyntaxVisitor {
 
     private func makeClosure(for function: FunctionDeclSyntax, kind: FunctionKind) -> Syntax? {
         let params = function.signature.input.parameterList
-        let rawParamTypes = params.compactMap(\.type)
+        let rawParamTypes = params.map(\.type)
         guard rawParamTypes.count == params.count else { return nil }
 
         let prefixTypes: [TypeSyntax]
@@ -281,13 +224,13 @@ class OrionVisitor: SyntaxVisitor {
         }
         let types = prefixTypes + rawParamTypes
 
-        let arguments = TupleTypeElementList {
+        let arguments = TupleTypeElementListSyntax {
             for type in types {
-                TupleTypeElement(type: type)
+                TupleTypeElementSyntax(type: type)
             }
         }
         let rawReturnType =
-            function.signature.output?.returnType.withoutTrivia() ??
+            function.signature.output?.returnType.trimmed ??
             "Void"
         let returnType = returnsUnmanaged ? "Unmanaged<\(rawReturnType)>" : rawReturnType
 
@@ -305,7 +248,7 @@ class OrionVisitor: SyntaxVisitor {
             identifier: id,
             closure: closure,
             directives: makeDirectives(for: Syntax(function)),
-            location: function.startLocation(converter: converter, afterLeadingTrivia: true)
+            location: function.startLocation(converter: context.converter, afterLeadingTrivia: true)
         )
     }
 
@@ -320,7 +263,7 @@ class OrionVisitor: SyntaxVisitor {
     private func functionObjCAttribute(_ function: FunctionDeclSyntax) -> OrionData.ClassHook.Method.ObjCAttribute? {
         guard let att = function.attributes?.lazy
                 .compactMap({ $0.as(AttributeSyntax.self) })
-                .first(where: { $0.attributeName.text == "objc" })
+                .first(where: { $0.attributeName.trimmedDescription == "objc" })
             else { return nil }
         if let arg = att.argument?.as(ObjCSelectorSyntax.self) {
             return .named(arg)
@@ -336,13 +279,13 @@ class OrionVisitor: SyntaxVisitor {
     private func availability(for node: ClassDeclSyntax) -> AvailabilitySpecListSyntax? {
         (node.attributes?.lazy
             .compactMap { $0.as(AttributeSyntax.self) }
-            .first { $0.attributeName.text == "available" }?
+            .first { $0.attributeName.trimmedDescription == "available" }?
             .argument).flatMap { $0.as(AvailabilitySpecListSyntax.self) }
     }
 
     private func handle(classHook node: ClassDeclSyntax, target: Syntax) {
-        let methods = node.members.members
-            .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
+        let methods = node.memberBlock.members
+            .compactMap { FunctionDeclSyntax($0.decl) }
             .filter { (decl: FunctionDeclSyntax) -> Bool in
                 guard let modifiers = decl.modifiers else { return true }
                 // This allows users to use one of these declarations to add a helper function,
@@ -359,39 +302,35 @@ class OrionVisitor: SyntaxVisitor {
                 // Strictly disallowing static reduces confusion, making it clear that one should
                 // use `class` instead of `static`.
                 if let staticModifier = staticModifier(in: decl) {
-                    diagnosticEngine.diagnose(
-                        .staticClassMethodDecl(),
-                        location: decl.startLocation(converter: converter)
-                    ) { builder in
-                        builder.fixItReplace(
-                            staticModifier.sourceRange(converter: self.converter, afterLeadingTrivia: true, afterTrailingTrivia: true),
-                            with: "\(TokenSyntax.class)"
-                        )
-                    }
+                    context.diagnose(.init(node: Syntax(decl), message: .staticClassMethodDecl(), fixIts: [
+                        .init(message: .replaceWithClass, changes: [.replace(
+                            oldNode: Syntax(staticModifier.trimmed),
+                            newNode: Syntax(TokenSyntax.keyword(.class))
+                        )])
+                    ]))
                     didFail = true
                     return false
                 }
                 if decl.modifiers?.contains(where: { ModifierKind($0) == .final }) == true {
-                    diagnosticEngine.diagnose(
-                        .finalClassMethodDecl(),
-                        location: decl.startLocation(converter: converter)
-                    )
+                    context.diagnose(.init(node: Syntax(decl), message: .finalClassMethodDecl()))
                     didFail = true
                     return false
                 }
                 return true
             }
-            .compactMap { function -> OrionData.ClassHook.Method? in
+            .compactMap { (function: FunctionDeclSyntax) -> OrionData.ClassHook.Method? in
                 let classModifier = self.classModifier(in: function)
                 let isClass = classModifier != nil
                 let isDeinit = functionIsDeinitializer(function)
                 if isDeinit, let classModifier = classModifier {
-                    diagnosticEngine.diagnose(
-                        .classDeinit(),
-                        location: function.startLocation(converter: converter)
-                    ) { builder in
-                        builder.fixItRemove(classModifier.sourceRange(converter: self.converter))
-                    }
+                    context.diagnose(.init(
+                        node: Syntax(classModifier),
+                        message: .classDeinit(),
+                        fixIts: [.init(message: .removeClass, changes: [.replace(
+                            oldNode: Syntax(classModifier),
+                            newNode: Syntax(MissingSyntax())
+                        )])]
+                    ))
                     didFail = true
                     return nil
                 }
@@ -428,20 +367,16 @@ class OrionVisitor: SyntaxVisitor {
             name: node.identifier.text,
             target: target,
             methods: methods,
-            availability: availability(for: node),
-            converter: converter
+            availability: availability(for: node)
         ))
     }
 
     private func handle(functionHook node: ClassDeclSyntax) {
-        guard let function = node.members.members
+        guard let function = node.memberBlock.members
             .compactMap({ $0.decl.as(FunctionDeclSyntax.self) })
             .first(where: { $0.identifier.text == "function" })
             else {
-                diagnosticEngine.diagnose(
-                    .functionHookWithoutFunction(),
-                    location: node.startLocation(converter: converter)
-                )
+                context.diagnose(.init(node: Syntax(node), message: .functionHookWithoutFunction()))
                 didFail = true
                 return
             }
@@ -449,10 +384,7 @@ class OrionVisitor: SyntaxVisitor {
         if let invalidModifiers = function.modifiers?.filter({
             ModifierKind($0)?.isInvalidForFunctionHook == true
         }), !invalidModifiers.isEmpty {
-            diagnosticEngine.diagnose(
-                .invalidFunctionHookModifiers(),
-                location: invalidModifiers[0].startLocation(converter: converter)
-            )
+            context.diagnose(.init(node: Syntax(invalidModifiers[0]), message: .invalidFunctionHookModifiers()))
             didFail = true
             return
         }
@@ -461,13 +393,12 @@ class OrionVisitor: SyntaxVisitor {
         data.functionHooks.append(OrionData.FunctionHook(
             name: node.identifier.text,
             function: orionFn,
-            availability: availability(for: node),
-            converter: converter
+            availability: availability(for: node)
         ))
     }
 
     private func handle(tweak identifier: TokenSyntax, hasBackend: Bool) {
-        data.tweaks.append(OrionData.Tweak(name: Syntax(identifier), hasBackend: hasBackend, converter: converter))
+        data.tweaks.append(OrionData.Tweak(name: Syntax(identifier), hasBackend: hasBackend))
     }
 
     private func declarationKind(for node: TypeInheritanceClauseSyntax?, modifiers: ModifierListSyntax?) -> DeclarationKind? {
@@ -483,20 +414,22 @@ class OrionVisitor: SyntaxVisitor {
             let kind = declarationKinds[0]
             let uninheritable = modifiers?.filter { ModifierKind($0).map(kind.isModifierInvalid) == true } ?? []
             if !uninheritable.isEmpty {
-                diagnosticEngine.diagnose(
-                    .invalidDeclAccess(declKind: "\(kind)"),
-                    location: uninheritable[0].startLocation(converter: converter)
-                ) { builder in
-                    uninheritable.forEach {
-                        builder.fixItRemove($0.sourceRange(converter: self.converter))
+                context.diagnose(.init(
+                    node: Syntax(uninheritable[0]),
+                    message: .invalidDeclAccess(declKind: "\(kind)"),
+                    fixIts: uninheritable.map {
+                        .init(message: .removeModifier, changes: [.replace(
+                            oldNode: Syntax($0),
+                            newNode: Syntax(MissingSyntax())
+                        )])
                     }
-                }
+                ))
                 didFail = true
                 return nil
             }
             return kind
         default:
-            diagnosticEngine.diagnose(.multipleDecls(), location: node.startLocation(converter: converter))
+            context.diagnose(.init(node: Syntax(node), message: .multipleDecls()))
             didFail = true
             return nil
         }
@@ -557,7 +490,7 @@ class OrionVisitor: SyntaxVisitor {
             ignoreImports.forEach { $0.setUsed() }
             return
         }
-        data.imports.append(node.withoutTrivia())
+        data.imports.append(node.trimmed)
     }
 
     override func visitPost(_ node: TokenSyntax) {

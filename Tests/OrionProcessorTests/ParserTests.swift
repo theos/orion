@@ -2,7 +2,7 @@ import XCTest
 @testable import OrionProcessor
 
 final class ParserTests: XCTestCase {
-    func testNoArguments() throws {
+    func testNoArguments() async throws {
         let contents = #"""
         class LabelHook: ClassHook<UILabel> {
             func `init`() {
@@ -10,9 +10,9 @@ final class ParserTests: XCTestCase {
             }
         }
         """#
-        let parser = OrionParser(contents: contents)
+        let parser = OrionParser(contents: contents, fileName: "unknown")
 
-        let data = try parser.parse()
+        let data = try await parser.parse()
         XCTAssertEqual(data.functionHooks.count, 0)
         XCTAssertEqual(data.tweaks.count, 0)
         XCTAssertEqual(data.classHooks.count, 1)
@@ -22,8 +22,4 @@ final class ParserTests: XCTestCase {
 
         XCTAssertEqual("\(methods[0].function.identifier)", "`init`")
     }
-
-    static var allTests = [
-        ("testNoArguments", testNoArguments),
-    ]
 }

@@ -9,7 +9,7 @@ extension OrionGenerator.Backend: ExpressibleByArgument {
     public var defaultValueDescription: String { name }
 }
 
-struct OrionCommand: ParsableCommand {
+@main struct OrionCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "OrionCLI",
         abstract: "The Orion preprocessor."
@@ -77,6 +77,32 @@ struct OrionCommand: ParsableCommand {
     )
     var sourceLocations: Bool = true
 
+    @Flag(
+        inversion: .prefixedEnableDisable,
+        help: ArgumentHelp(
+            "Pretty-print diagnostics",
+            discussion: """
+            Prints Orion related diagnostics to standard error in a human-readable \
+            format, along with source code context information.
+
+            Multiple diagnostics printing options can be used simultaneously.
+            """
+        )
+    ) var prettyDiagnostics: Bool = true
+
+    @Flag(
+        inversion: .prefixedEnableDisable,
+        help: ArgumentHelp(
+            "Xcode-compatible diagnostics",
+            discussion: """
+            Prints Orion related diagnostics to standard error in a format \
+            that can be parsed by Xcode's error matchers.
+
+            Multiple diagnostics printing options can be used simultaneously.
+            """
+        )
+    ) var xcodeDiagnostics: Bool = false
+
     @Argument(
         help: ArgumentHelp(
             "Directories/source files to process.",
@@ -92,9 +118,14 @@ struct OrionCommand: ParsableCommand {
     )
     var inputs: [String]
 
-    private func _run() throws {
+    private func _run() async throws {
         let engine = OrionDiagnosticEngine()
-        engine.addConsumer(.printing)
+        if prettyDiagnostics {
+            engine.addConsumer(.pretty)
+        }
+        if xcodeDiagnostics {
+            engine.addConsumer(.xcode)
+        }
 
         let parserOptions = OrionParser.Options(schema: Set(schema))
 
@@ -107,17 +138,18 @@ struct OrionCommand: ParsableCommand {
             }
             let parser = OrionParser(
                 contents: input,
+                fileName: "<stdin>",
                 diagnosticEngine: engine,
                 options: parserOptions
             )
-            data = try parser.parse()
+            data = try await parser.parse()
         } else {
             let parser = OrionBatchParser(
                 inputs: inputs.map(URL.init(fileURLWithPath:)),
                 diagnosticEngine: engine,
                 options: parserOptions
             )
-            data = try parser.parse()
+            data = try await parser.parse()
         }
 
         let generatorOptions = OrionGenerator.Options(
@@ -135,9 +167,9 @@ struct OrionCommand: ParsableCommand {
         }
     }
 
-    func run() throws {
+    func run() async throws {
         do {
-            try _run()
+            try await _run()
         } catch _ as OrionFailure {
             // exit gracefully; OrionFailure means we've already emitted
             // an error message
@@ -145,5 +177,3 @@ struct OrionCommand: ParsableCommand {
         }
     }
 }
-
-OrionCommand.main()

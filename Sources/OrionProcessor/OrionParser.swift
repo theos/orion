@@ -1,8 +1,7 @@
 import Foundation
-import SwiftSyntax
+import SwiftParser
 
-public final class OrionParser {
-
+public struct OrionParser {
     public struct Options {
         public let schema: Set<String>
 
@@ -11,47 +10,28 @@ public final class OrionParser {
         }
     }
 
-    private enum Source {
-        case file(URL)
-        case contents(String)
+    private let source: String
+    private let fileName: String
+    private let engine: OrionDiagnosticEngine
+    private let options: Options
 
-        func parseSyntax(diagnosticEngine: DiagnosticEngine? = nil) throws -> SourceFileSyntax {
-            switch self {
-            case .file(let url):
-                return try SyntaxParser.parse(url, diagnosticEngine: diagnosticEngine)
-            case .contents(let contents):
-                return try SyntaxParser.parse(source: contents, diagnosticEngine: diagnosticEngine)
-            }
-        }
-
-        var filename: String {
-            switch self {
-            case .file(let url): return url.relativePath
-            case .contents: return "<unknown>"
-            }
-        }
+    public init(file: URL, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) async throws {
+        let (data, _) = try await URLSession.shared.data(from: file)
+        let contents = String(decoding: data, as: UTF8.self)
+        self.init(contents: contents, fileName: file.relativePath, diagnosticEngine: diagnosticEngine, options: options)
     }
 
-    public let engine: DiagnosticEngine
-    public let options: Options
-    private let source: Source
-
-    public init(file: URL, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) {
-        source = .file(file)
-        self.engine = diagnosticEngine.createEngine()
+    public init(contents: String, fileName: String, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) {
+        self.source = contents
+        self.fileName = fileName
+        self.engine = diagnosticEngine
         self.options = options
     }
 
-    public init(contents: String, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) {
-        source = .contents(contents)
-        self.engine = diagnosticEngine.createEngine()
-        self.options = options
-    }
-
-    public func parse() throws -> OrionData {
-        let syntax = try source.parseSyntax(diagnosticEngine: engine)
-        let converter = SourceLocationConverter(file: source.filename, tree: syntax)
-        let visitor = OrionVisitor(diagnosticEngine: engine, sourceLocationConverter: converter, options: options)
+    public func parse() async throws -> OrionData {
+        let syntax = Parser.parse(source: source)
+        let context = engine.createContext(for: syntax, fileName: fileName)
+        let visitor = OrionVisitor(context: context, options: options)
         visitor.walk(syntax)
         guard !visitor.didFail else {
             throw OrionFailure()

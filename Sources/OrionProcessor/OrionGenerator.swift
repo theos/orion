@@ -6,7 +6,7 @@ import SwiftSyntaxBuilder
 // swiftlint:disable type_body_length file_length
 
 private extension Sequence {
-    // y u no variadic generics, swift :/
+    // imagine if variadic generics didn't crash
 
     func unzip<T1, T2>() -> ([T1], [T2]) where Element == (T1, T2) {
         reduce(into: ([] as [T1], [] as [T2])) { arrays, element in
@@ -34,19 +34,12 @@ private extension Sequence {
 }
 
 private extension SourceLocation {
-    func decl() -> PoundSourceLocation? {
-        guard let file = file, let line = line else { return nil }
+    func decl() -> PoundSourceLocationSyntax? {
         // string literal init messes up on #sourceLocation
-        return PoundSourceLocation(args: .init(
-            fileName: .stringLiteral(Expr(literal: file).description),
-            lineNumber: .integerLiteral(Expr(literal: line).description)
+        PoundSourceLocationSyntax(args: .init(
+            fileName: file.makeLiteralSyntax(),
+            lineNumber: .integerLiteral("\(line)")
         ))
-    }
-}
-
-private extension Diagnostic.Message {
-    static func multipleTweaks() -> Diagnostic.Message {
-        .init(.error, "Cannot have more than one Tweak type in a module")
     }
 }
 
@@ -99,13 +92,13 @@ public final class OrionGenerator {
         public static let `internal`: Self = .init(nameWithoutModule: "Internal")
     }
 
-    private let engine: DiagnosticEngine
+    private let engine: OrionDiagnosticEngine
     public let data: OrionData
     public let options: Options
 
     public init(data: OrionData, diagnosticEngine: OrionDiagnosticEngine = .init(), options: Options = .init()) {
         self.data = data
-        self.engine = diagnosticEngine.createEngine()
+        self.engine = diagnosticEngine
         self.options = options
     }
 
@@ -335,11 +328,13 @@ public final class OrionGenerator {
             tweakName = "\(tweak.name)"
             hasCustomBackend = tweak.hasBackend
         default:
-            engine.diagnose(.multipleTweaks()) { builder in
-                self.data.tweaks
-                    .map { $0.name.sourceRange(converter: $0.converter) }
-                    .forEach { builder.highlight($0) }
-            }
+            engine.diagnose(.init(
+                node: data.tweaks[0].name,
+                message: .multipleTweaks,
+                notes: data.tweaks[1...].map {
+                    .init(node: $0.name, message: .duplicateTweak)
+                }
+            ))
             throw OrionFailure()
         }
 

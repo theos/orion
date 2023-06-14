@@ -5,14 +5,14 @@ import Foundation
 
 let swiftSyntax: Package.Dependency = {
     let url = "https://github.com/apple/swift-syntax"
-    #if compiler(>=5.9)
+    #if compiler(>=5.10)
     #warning("""
     Orion does not officially support this version of Swift yet. \
     Please check https://github.com/theos/Orion for progress updates.
     """)
     #endif
-    #if compiler(>=5.8)
-    return .package(url: url, from: "508.0.0")
+    #if compiler(>=5.9)
+    return .package(url: url, branch: "release/5.9")
     #else
     #error("""
     Your Swift compiler version is too old for this copy of Orion.
@@ -23,7 +23,7 @@ let swiftSyntax: Package.Dependency = {
 
 var package = Package(
     name: "Orion",
-    platforms: [.macOS("10.15")],
+    platforms: [.macOS("10.15"), .iOS("12.2")],
     products: [
         .library(
             name: "OrionProcessor",
@@ -46,8 +46,9 @@ var package = Package(
         .target(
             name: "OrionProcessor",
             dependencies: [
-                .product(name: "SwiftSyntaxParser", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
                 .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
             ]
         ),
         .executableTarget(

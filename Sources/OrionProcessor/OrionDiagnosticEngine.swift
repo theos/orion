@@ -1,190 +1,148 @@
 import Foundation
 import SwiftSyntax
-import SwiftSyntaxParser
+import SwiftDiagnostics
 
-public typealias Diagnostic = SwiftSyntaxParser.Diagnostic
-
-// DiagnosticEngine was removed in 5.6+. We re-introduce the
-// required API surface for compatibility
-//
-// https://github.com/apple/swift-syntax/commit/198582f1009890eee38050c6d73bc0ed1cabd87b
-
-public protocol DiagnosticConsumer {
-    var needsLineColumn: Bool { get }
-    func handle(_ diagnostic: Diagnostic)
-    func finalize()
-}
-extension DiagnosticConsumer {
-    public var needsLineColumn: Bool { true }
-}
-
-public final class DiagnosticEngine {
-    private var consumers: [DiagnosticConsumer] = []
-    private(set) var diagnostics: [Diagnostic] = []
-
-    init() {}
-
-    func addConsumer(_ consumer: DiagnosticConsumer) {
-        consumers.append(consumer)
-        // Start the consumer with all previous diagnostics.
-        for diagnostic in diagnostics {
-            consumer.handle(diagnostic)
-        }
-    }
+/// A diagnostic engine that emits to a single file.
+///
+/// Thread safe.
+public struct OrionSourceContext {
+    let engine: OrionDiagnosticEngine
+    let converter: SourceLocationConverter
 
     func diagnose(_ diagnostic: Diagnostic) {
-        diagnostics.append(diagnostic)
-        for consumer in consumers {
-            consumer.handle(diagnostic)
-        }
-    }
-
-    func diagnose(
-        _ message: Diagnostic.Message,
-        location: SourceLocation? = nil,
-        actions: ((inout Diagnostic.Builder) -> Void)? = nil
-    ) {
-        diagnose(Diagnostic(message: message, location: location, actions: actions))
+        engine.diagnose(diagnostic)
     }
 }
 
-public class PrintingDiagnosticConsumer: DiagnosticConsumer {
-    public init() {}
+public protocol OrionDiagnosticConsumer {
+    mutating func register(source: SourceFileSyntax, name: String)
+    mutating func diagnose(_ diagnostic: Diagnostic)
+    func finalize()
+}
 
-    func write<T: CustomStringConvertible>(_ msg: T) {
-        FileHandle.standardError.write("\(msg)".data(using: .utf8)!)
-    }
-
-    /// Prints the contents of a diagnostic to stderr.
-    public func handle(_ diagnostic: Diagnostic) {
-        write(diagnostic)
-        for note in diagnostic.notes {
-            write(note.asDiagnostic())
-        }
-    }
-
-    /// Prints each of the fields in a diagnositic to stderr.
-    public func write(_ diagnostic: Diagnostic) {
-        if let loc = diagnostic.location {
-            write("\(loc.file!):\(loc.line!):\(loc.column!): ")
-        } else {
-            write("<unknown>:0:0: ")
-        }
-        switch diagnostic.message.severity {
-        case .note: write("note: ")
-        case .warning: write("warning: ")
-        case .error: write("error: ")
-        }
-        write(diagnostic.message.text)
-        write("\n")
-
-        // TODO: Write original file contents out and highlight them.
-    }
-
+extension OrionDiagnosticConsumer {
+    public mutating func register(source: SourceFileSyntax, name: String) {}
     public func finalize() {}
 }
 
-typealias SyntaxParser = SwiftSyntaxParser.SyntaxParser
-
-extension SyntaxParser {
-
-    public static func parse(
-        _ url: URL,
-        diagnosticEngine: DiagnosticEngine? = nil
-    ) throws -> SourceFileSyntax {
-        try parse(url, diagnosticHandler: diagnosticEngine?.diagnose)
-    }
-
-    public static func parse(
-        source: String,
-        parseTransition: IncrementalParseTransition? = nil,
-        filenameForDiagnostics: String = "",
-        diagnosticEngine: DiagnosticEngine? = nil
-    ) throws -> SourceFileSyntax {
-        try parse(
-            source: source,
-            parseTransition: parseTransition,
-            filenameForDiagnostics: filenameForDiagnostics,
-            diagnosticHandler: diagnosticEngine?.diagnose
-        )
-    }
-
-}
-
-// so that the user doesn't have to import SwiftSyntax if they want diagnostics
-public enum OrionDiagnosticConsumer {
-    case printing
-    case custom(DiagnosticConsumer)
-
-    var consumer: DiagnosticConsumer {
-        switch self {
-        case .printing: return PrintingDiagnosticConsumer()
-        case .custom(let consumer): return consumer
-        }
-    }
-}
-
-// thread-safe abstraction around DiagnosticEngine
 public class OrionDiagnosticEngine {
-    private class MUXConsumer: DiagnosticConsumer {
-        // this type pipes messages from many `DiagnosticEngine`s
-        // to one OrionDiagnosticEngine. We maintain a strong ref
-        // to the Orion engine to ensure that it isn't deinit'd
-        // until all of its child `DiagnosticEngine`s are.
-        let engine: OrionDiagnosticEngine
-        init(engine: OrionDiagnosticEngine) {
-            self.engine = engine
-        }
-        var needsLineColumn: Bool { engine.needsLineColumn }
-        func handle(_ diagnostic: Diagnostic) { engine.handle(diagnostic) }
-        func finalize() {}
-    }
+    private let queue = DispatchQueue(label: "consumer-queue")
 
-    private let consumerQueue = DispatchQueue(label: "consumer-queue")
-    private var consumers: [DiagnosticConsumer] = []
+    public var consumers: [any OrionDiagnosticConsumer] = []
+
     public init() {}
 
-    // it might be possible to make this not require synchronization by using
-    // atomics, but there's no easy way to do that in Swift yet short of importing
-    // the Swift Atomics package, which would add yet another dependency
-    private var _needsLineColumn = false
-    private var needsLineColumn: Bool {
-        consumerQueue.sync { _needsLineColumn }
+    public func addConsumer(_ consumer: some OrionDiagnosticConsumer) {
+        queue.sync { consumers.append(consumer) }
     }
 
-    public func addConsumer(_ consumer: OrionDiagnosticConsumer) {
-        let newConsumer = consumer.consumer
-        consumerQueue.sync {
-            consumers.append(newConsumer)
-            if newConsumer.needsLineColumn {
-                // it doesn't really matter what the old value was
-                _needsLineColumn = true
+    public func diagnose(_ diagnostic: Diagnostic) {
+        queue.sync {
+            for index in consumers.indices {
+                consumers[index].diagnose(diagnostic)
             }
         }
     }
 
-    private func handle(_ diagnostic: Diagnostic) {
-        consumerQueue.sync {
-            consumers.forEach { $0.handle(diagnostic) }
+    func createContext(for source: SourceFileSyntax, fileName: String) -> OrionSourceContext {
+        queue.sync {
+            for index in consumers.indices {
+                consumers[index].register(source: source, name: fileName)
+            }
         }
+        let converter = SourceLocationConverter(file: fileName, tree: source)
+        return OrionSourceContext(engine: self, converter: converter)
     }
 
-    func createEngine() -> DiagnosticEngine {
-        let engine = DiagnosticEngine()
-        engine.addConsumer(MUXConsumer(engine: self))
-        return engine
+    func finalize() {
+        for dir in OrionDirectiveParser.shared.unusedDirectiveBases() {
+            dir.setUsed() // so that future calls don't complain about the same directives
+            diagnose(Diagnostic(
+                node: dir.syntax,
+                position: .init(utf8Offset: dir.location.offset),
+                message: .unusedDirective
+            ))
+        }
+        queue.sync {
+            for consumer in consumers {
+                consumer.finalize()
+            }
+            consumers.removeAll()
+        }
     }
 
     deinit {
-        let diagnostics = OrionDirectiveParser.shared.unusedDirectiveBases().map { dir -> Diagnostic in
-            dir.setUsed() // so that future calls don't complain about the same directives
-            return Diagnostic(message: .init(.warning, "Unused directive"), location: dir.location, actions: nil)
+        finalize()
+    }
+}
+
+public struct XcodeDiagnosticConsumer: OrionDiagnosticConsumer {
+    private var converters: [SourceFileSyntax: SourceLocationConverter] = [:]
+
+    public init() {}
+
+    public mutating func register(source: SourceFileSyntax, name: String) {
+        converters[source] = .init(file: name, tree: Syntax(source))
+    }
+
+    public func diagnose(_ diagnostic: Diagnostic) {
+        let root = diagnostic.node.root.as(SourceFileSyntax.self)
+        let converter = root.flatMap { converters[$0] }
+        let prefix = if let loc = converter?.location(for: diagnostic.position) {
+            "\(loc.file):\(loc.line):\(loc.column)"
+        } else {
+            "<unknown>:0:0"
         }
-        consumerQueue.sync {
-            diagnostics.forEach { d in
-                consumers.forEach { $0.handle(d) }
-            }
-            consumers.forEach { $0.finalize() }
+        print("\(prefix): \(diagnostic.diagMessage.severity): \(diagnostic.message)", to: &.standardError)
+    }
+}
+
+extension OrionDiagnosticConsumer where Self == XcodeDiagnosticConsumer {
+    public static var xcode: Self { .init() }
+}
+
+public struct PrettyDiagnosticConsumer: OrionDiagnosticConsumer {
+    private var diagnostics: [SourceFileSyntax: (String, [Diagnostic])] = [:]
+
+    public init() {}
+
+    public mutating func register(source: SourceFileSyntax, name: String) {
+        diagnostics[source] = (name, [])
+    }
+
+    public mutating func diagnose(_ diagnostic: Diagnostic) {
+        if let root = diagnostic.node.root.as(SourceFileSyntax.self) {
+            diagnostics[root]?.1.append(diagnostic)
         }
+    }
+
+    public func finalize() {
+        var group = GroupedDiagnostics()
+        for (file, (name, diags)) in diagnostics where !diags.isEmpty {
+            group.addSourceFile(tree: file, displayName: name, diagnostics: diags)
+        }
+        print(DiagnosticsFormatter.annotateSources(in: group), terminator: "", to: &.standardError)
+    }
+}
+
+extension OrionDiagnosticConsumer where Self == PrettyDiagnosticConsumer {
+    public static var pretty: Self { .init() }
+}
+
+struct FileHandleOutputStream: TextOutputStream {
+    let handle: FileHandle
+    func write(_ string: String) {
+        handle.write(Data(string.utf8))
+    }
+}
+
+extension TextOutputStream where Self == FileHandleOutputStream {
+    static var standardOutput: Self {
+        get { .init(handle: .standardOutput) }
+        set {}
+    }
+    static var standardError: Self {
+        get { .init(handle: .standardError) }
+        set {}
     }
 }
