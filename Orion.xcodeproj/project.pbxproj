@@ -374,7 +374,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "[[ \"${COPY_CLI}\" == \"YES\" ]] || exit 0\n[[ \"${CONFIGURATION}\" == \"Debug\" ]] && conf=\"debug\" || conf=\"release\"\norion=\"$(swift build --package-path \"${SRCROOT}\" -c \"${conf}\" --show-bin-path)/orion\"\n\ncp \"${orion}\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "[[ \"${COPY_CLI}\" == \"YES\" ]] || exit 0\n[[ \"${CONFIGURATION}\" == \"Debug\" ]] && conf=\"debug\" || conf=\"release\"\norion=\"$(swift build --package-path \"${SRCROOT}\" -c \"${conf}\" --show-bin-path)/OrionCLI\"\n\ncp \"${orion}\" \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/orion\"\n";
 		};
 		567AF4F32536817C0056182E /* Run SwiftLint If Present */ = {
 			isa = PBXShellScriptBuildPhase;
