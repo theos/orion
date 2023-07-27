@@ -18,8 +18,8 @@ Note that this guide will use the format <pre>&lt;current directory&gt; $ <span 
 
 ## Setup
 
-1. Add the Chariz repo (https://repo.chariz.com/) to your jailbroken device's package manager, and install the **Orion Runtime** package (pick iOS 12-13 or iOS 14 depending on your version).
-2. Inside your Theos installation directory (`$THEOS`), switch to the `orion` branch by running `git fetch && git checkout orion && git submodule update --init`.
+1. Add the Chariz repo (https://repo.chariz.com/) to your jailbroken device's package manager.
+2. Install the **Orion Runtime** package (pick iOS 12-13 or iOS 14-16 depending on your version).
 
 ## Initializing an Orion Tweak
 
