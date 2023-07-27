@@ -2,7 +2,7 @@
 
 ## Preface
 
-If you are using Orion for tweak development, it is recommended that you use it with Theos. This guide assumes that you have Theos installed; if you haven't done that yet, please follow the [installation instructions](https://github.com/theos/theos/wiki/Installation) for Theos and then return to this guide.
+If you are using Orion for tweak development, it is recommended that you use it with Theos. This guide assumes that you have Theos installed; if you haven't done that yet, please follow the [installation instructions](https://theos.dev/docs/installation) for Theos and then return to this guide.
 
 If you wish to use Orion without Theos, please refer to the "[Using Orion Without Theos](using-orion-without-theos.html)" guide.
 
@@ -10,12 +10,16 @@ This guide will show you how to make a simple Orion tweak which… spices up tex
 
 To follow along, you will require the following things:
 
-- [Theos](https://github.com/theos/theos/wiki/Installation)
-- A machine running macOS, Windows 10 with WSL, or Linux. If using WSL or Linux, it is recommended that you use the [official Swift toolchain](https://github.com/kabiroberai/swift-toolchain-linux).
-- A jailbroken iOS device with Orion installed.
+- [Theos](https://theos.dev/docs/installation) on a machine running macOS, Windows 10 with WSL, or Linux. If you're in a Linux environment, you must install a [host Swift toolchain](https://www.swift.org/download/) in addition to a Swift-compatible iOS toolchain.
+- A jailbroken iOS device.
 - The target app (in this tutorial, VLC for iOS) installed on your iOS device.
 
 Note that this guide will use the format <pre>&lt;current directory&gt; $ <span class="inp">&lt;command&gt;</span></pre> for all shell commands. User input will be in <code><span class="inp">red</span></code>. Some text may be truncated using <code><span class="trunc">[...]</span></code>.
+
+## Setup
+
+1. Add the Chariz repo (https://repo.chariz.com/) to your jailbroken device's package manager.
+2. Install the **Orion Runtime** package (pick iOS 12-13 or iOS 14-16 depending on your version).
 
 ## Initializing an Orion Tweak
 

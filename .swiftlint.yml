@@ -9,6 +9,7 @@ disabled_rules:
   - large_tuple
   - identifier_name
   - type_name
+  - blanket_disable_command
 opt_in_rules:
   - closure_end_indentation
   - closure_spacing
@@ -61,7 +62,7 @@ custom_rules:
     message: "Use orionError instead of fatalError"
 force_try: warning
 force_cast: warning
-function_body_length: 80
+function_body_length: 100
 line_length: 135
 file_length: 450
 cyclomatic_complexity: 12

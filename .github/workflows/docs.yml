@@ -1,13 +1,14 @@
 name: Update Docs
 
 on:
+  workflow_dispatch:
   push:
     tags:
     - '*'
 
 jobs:
   docs:
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
     - uses: actions/checkout@v2
       with:
@@ -20,9 +21,10 @@ jobs:
     - name: Update docs
       run: |
         cd master-branch
-        version="${GITHUB_REF#refs/tags/}"
+        git fetch --prune --unshallow --tags
+        version="$(git describe --abbrev=0 --tags)"
 
-        for v in `sort -rV <(printf '%s\n%s' "${version}" "$(ls ../docs-branch/versions)")`; do
+        for v in `sort -ruV <(printf '%s\n%s' "${version}" "$(ls ../docs-branch/versions)")`; do
           base="$(basename "${v}")"
           echo "- [${base}](/versions/${base})" >> "Guides/Versions.md"
         done
@@ -32,6 +34,7 @@ jobs:
 
         cd ../docs-branch
         mkdir -p versions
+        [[ -e "versions/${version}" ]] && rm -rf "versions/${version}"
         mv ../docs-perm "versions/${version}"
         mv versions .git ../docs
         cd ../docs

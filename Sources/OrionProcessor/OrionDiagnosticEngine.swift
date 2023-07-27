@@ -1,27 +1,125 @@
 import Foundation
 import SwiftSyntax
+#if swift(>=5.6)
+import SwiftSyntaxParser
 
-// so that the user doesn't have to import SwiftSyntax if they want diagnostics
-public enum OrionDiagnosticConsumer {
-    public enum JSONOutputFormat {
-        case url(URL)
-        case stdout
+public typealias Diagnostic = SwiftSyntaxParser.Diagnostic
 
-        var consumer: DiagnosticConsumer {
-            switch self {
-            case .url(let url): return JSONDiagnosticConsumer(outputURL: url)
-            case .stdout: return JSONDiagnosticConsumer()
-            }
+// DiagnosticEngine was removed in 5.6+. We re-introduce the
+// required API surface for compatibility
+//
+// https://github.com/apple/swift-syntax/commit/198582f1009890eee38050c6d73bc0ed1cabd87b
+
+public protocol DiagnosticConsumer {
+    var needsLineColumn: Bool { get }
+    func handle(_ diagnostic: Diagnostic)
+    func finalize()
+}
+extension DiagnosticConsumer {
+    public var needsLineColumn: Bool { true }
+}
+
+public final class DiagnosticEngine {
+    private var consumers: [DiagnosticConsumer] = []
+    private(set) var diagnostics: [Diagnostic] = []
+
+    init() {}
+
+    func addConsumer(_ consumer: DiagnosticConsumer) {
+        consumers.append(consumer)
+        // Start the consumer with all previous diagnostics.
+        for diagnostic in diagnostics {
+            consumer.handle(diagnostic)
         }
     }
 
-    case json(outputFormat: JSONOutputFormat)
+    func diagnose(_ diagnostic: Diagnostic) {
+        diagnostics.append(diagnostic)
+        for consumer in consumers {
+            consumer.handle(diagnostic)
+        }
+    }
+
+    func diagnose(
+        _ message: Diagnostic.Message,
+        location: SourceLocation? = nil,
+        actions: ((inout Diagnostic.Builder) -> Void)? = nil
+    ) {
+        diagnose(Diagnostic(message: message, location: location, actions: actions))
+    }
+}
+
+public class PrintingDiagnosticConsumer: DiagnosticConsumer {
+    public init() {}
+
+    func write<T: CustomStringConvertible>(_ msg: T) {
+        FileHandle.standardError.write("\(msg)".data(using: .utf8)!)
+    }
+
+    /// Prints the contents of a diagnostic to stderr.
+    public func handle(_ diagnostic: Diagnostic) {
+        write(diagnostic)
+        for note in diagnostic.notes {
+            write(note.asDiagnostic())
+        }
+    }
+
+    /// Prints each of the fields in a diagnositic to stderr.
+    public func write(_ diagnostic: Diagnostic) {
+        if let loc = diagnostic.location {
+            write("\(loc.file!):\(loc.line!):\(loc.column!): ")
+        } else {
+            write("<unknown>:0:0: ")
+        }
+        switch diagnostic.message.severity {
+        case .note: write("note: ")
+        case .warning: write("warning: ")
+        case .error: write("error: ")
+        }
+        write(diagnostic.message.text)
+        write("\n")
+
+        // TODO: Write original file contents out and highlight them.
+    }
+
+    public func finalize() {}
+}
+
+typealias SyntaxParser = SwiftSyntaxParser.SyntaxParser
+
+extension SyntaxParser {
+
+    public static func parse(
+        _ url: URL,
+        diagnosticEngine: DiagnosticEngine? = nil
+    ) throws -> SourceFileSyntax {
+        try parse(url, diagnosticHandler: diagnosticEngine?.diagnose)
+    }
+
+    public static func parse(
+        source: String,
+        parseTransition: IncrementalParseTransition? = nil,
+        filenameForDiagnostics: String = "",
+        diagnosticEngine: DiagnosticEngine? = nil
+    ) throws -> SourceFileSyntax {
+        try parse(
+            source: source,
+            parseTransition: parseTransition,
+            filenameForDiagnostics: filenameForDiagnostics,
+            diagnosticHandler: diagnosticEngine?.diagnose
+        )
+    }
+
+}
+#endif
+
+// so that the user doesn't have to import SwiftSyntax if they want diagnostics
+public enum OrionDiagnosticConsumer {
     case printing
     case custom(DiagnosticConsumer)
 
     var consumer: DiagnosticConsumer {
         switch self {
-        case .json(let outputFormat): return outputFormat.consumer
         case .printing: return PrintingDiagnosticConsumer()
         case .custom(let consumer): return consumer
         }

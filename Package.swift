@@ -12,11 +12,11 @@ enum Builder {
 let swiftSyntaxVersion: Package.Dependency.Requirement = {
     #if swift(>=5.6)
     #error("""
-    Orion does not support this version of Swift yet. \
-    Please check https://github.com/theos/Orion for progress updates.
+    Internal error: Swift Package Manager should be reading from
+    Package@swift-5.6.swift, not Package.swift.
     """)
     #elseif swift(>=5.5)
-    return .branch("release/5.5-05142021")
+    return .exact("0.50500.0")
     #elseif swift(>=5.4)
     return .exact("0.50400.0")
     #elseif swift(>=5.3)
@@ -97,8 +97,8 @@ var package = Package(
             targets: ["OrionProcessor"]
         ),
         .executable(
-            name: "orion",
-            targets: ["OrionProcessorCLI"]
+            name: "OrionCLI",
+            targets: ["OrionCLI"]
         ),
         .executable(
             name: "generate-test-fixtures",
@@ -106,7 +106,6 @@ var package = Package(
         ),
     ],
     dependencies: [
-//        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMajor(from: "0.29.0")),
         .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", swiftSyntaxVersion),
         .package(name: "swift-argument-parser", url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.4.0")),
     ],
@@ -116,7 +115,7 @@ var package = Package(
             dependencies: ["SwiftSyntax"]
         ),
         .target(
-            name: "OrionProcessorCLI",
+            name: "OrionCLI",
             dependencies: [
                 "OrionProcessor",
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
