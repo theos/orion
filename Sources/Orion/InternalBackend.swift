@@ -38,14 +38,8 @@ extension Backends.Internal {
 
         let imp = IMP(replacement)
         let orig: IMP
-        // first try to add the method (in case the current imp is inherited)
-        if class_addMethod(cls, sel, imp, types) {
-            // if added, return the super imp
-            orig = method_getImplementation(origMethod)
-        } else {
-            // otherwise, the current class has its own imp of the method. Replace it.
-            orig = method_setImplementation(origMethod, imp)
-        }
+        // class_replaceMethod adds the method if it's implemented by the superclass so no need to replicate this behavior
+        orig = class_replaceMethod(cls, sel, imp, types);
 
         return .init(orig)
     }
