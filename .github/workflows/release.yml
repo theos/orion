@@ -23,7 +23,7 @@ jobs:
         brew install ldid make fakeroot
         echo "THEOS=${GITHUB_WORKSPACE}/theos" >> "${GITHUB_ENV}"
         echo "PATH=/usr/local/opt/make/libexec/gnubin:${PATH}" >> "${GITHUB_ENV}"
-        echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+        echo "version=${GITHUB_REF#refs/tags/}" >> "${GITHUB_OUTPUT}"
     - name: Install Theos
       uses: actions/checkout@v4
       with:
