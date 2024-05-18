@@ -11,7 +11,7 @@ jobs:
     # TODO: Use a matrix instead
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
         path: orion
@@ -23,7 +23,7 @@ jobs:
         echo "PATH=/usr/local/opt/make/libexec/gnubin:${PATH}" >> "${GITHUB_ENV}"
         echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
     - name: Install Theos
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: theos/theos
         ref: 153c50c49dbbac0b47b87f9480d8d2c5d6d2ace1

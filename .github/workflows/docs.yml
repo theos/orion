@@ -10,11 +10,11 @@ jobs:
   docs:
     runs-on: macos-12
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
         path: master-branch
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         ref: docs
         path: docs-branch
