@@ -2,7 +2,7 @@ import Foundation
 #if SWIFT_PACKAGE
 @_implementationOnly import OrionC
 #else
-@_implementationOnly import Orion_Private
+@_implementationOnly import Orion.Private
 #endif
 
 /// The action to perform after a `ClassHookProtocol.deinitializer()` is run.

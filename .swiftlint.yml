@@ -10,8 +10,6 @@ disabled_rules:
   - identifier_name
   - type_name
   - blanket_disable_command
-analyzer_rules:
-  - unused_import
 opt_in_rules:
   - closure_end_indentation
   - closure_spacing
@@ -29,6 +27,7 @@ opt_in_rules:
   - yoda_condition
   - nslocalizedstring_key
   - unused_setter_value
+  - unused_import
   - optional_enum_case_matching
   - prefer_self_type_over_type_of_self
   - contains_over_range_nil_comparison
