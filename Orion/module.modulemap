@@ -4,3 +4,14 @@ framework module Orion {
   export *
   module * { export * }
 }
+// ORION_PRIVATE_MODULE_BEGIN
+
+// ideally we would declare this as Orion_Private in a
+// private modulemap but Swift seems to ignore private
+// modulemaps.
+explicit module Orion.Private {
+  header "orion_objcrt.h"
+  header "orion_lifecycle.h"
+}
+
+// ORION_PRIVATE_MODULE_END

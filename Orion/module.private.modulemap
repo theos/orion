@@ -1,4 +1,0 @@
-framework module Orion_Private {
-  header "orion_objcrt.h"
-  header "orion_lifecycle.h"
-}

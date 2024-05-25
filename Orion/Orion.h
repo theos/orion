@@ -3,5 +3,5 @@
 FOUNDATION_EXPORT double OrionVersionNumber;
 FOUNDATION_EXPORT const unsigned char OrionVersionString[];
 
-#import <Orion/Orion-Target.h>
-#import <Orion/orion_public.h>
+#import "Orion-Target.h"
+#import "orion_public.h"

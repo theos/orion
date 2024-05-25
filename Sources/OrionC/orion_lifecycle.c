@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "orion_lifecycle.h"
-#include "orion_public.h"
 
 #if SWIFT_PACKAGE
 
