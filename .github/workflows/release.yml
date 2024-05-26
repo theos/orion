@@ -7,11 +7,13 @@ on:
 
 jobs:
   release:
+    # needed to be able to create a Release
+    permissions:
+      contents: write
     # We need to use an old runner for Xcode 11.7
-    # TODO: Use a matrix instead
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
         path: orion
@@ -21,12 +23,11 @@ jobs:
         brew install ldid make fakeroot
         echo "THEOS=${GITHUB_WORKSPACE}/theos" >> "${GITHUB_ENV}"
         echo "PATH=/usr/local/opt/make/libexec/gnubin:${PATH}" >> "${GITHUB_ENV}"
-        echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+        echo "version=${GITHUB_REF#refs/tags/}" >> "${GITHUB_OUTPUT}"
     - name: Install Theos
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: theos/theos
-        ref: 153c50c49dbbac0b47b87f9480d8d2c5d6d2ace1
         path: theos
         submodules: recursive
     - name: Build Release
@@ -38,24 +39,13 @@ jobs:
         DEVELOPER_DIR=/Applications/Xcode_11.7.app/Contents/Developer make clean package FINALPACKAGE=1
         cd packages
         zip -yr9 Orion_${{ steps.setup.outputs.version }}.zip *
-        cd ..
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ steps.setup.outputs.version }}
-        body: ''
-        draft: true
-        prerelease: false
-    - name: Upload Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/orion/packages/Orion_${{ steps.setup.outputs.version }}.zip
-        asset_name: Orion_${{ steps.setup.outputs.version }}.zip
-        asset_content_type: application/zip
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release create ${{ github.ref_name }} \
+        --verify-tag \
+        --draft \
+        --repo ${{ github.repository }} \
+        --title '${{ steps.setup.outputs.version }}' \
+        orion/packages/Orion_${{ steps.setup.outputs.version }}.zip
