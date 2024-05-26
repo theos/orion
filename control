@@ -1,7 +1,7 @@
 Package: dev.theos.orion${SUBPKG_ID}
 Name: Orion (${SUBPKG_NAME})
 Depends: ${SUBPKG_FW}, mobilesubstrate (>= 0.9.5000)
-Version: 1.0.1
+Version: 1.0.2
 Provides: dev.theos.orion (= ${PKG_VERSION})
 Architecture: iphoneos-arm
 Description: Runtime for tweaks built using Orion and Swift
