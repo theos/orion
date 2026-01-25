@@ -52,7 +52,8 @@ var package = Package(
     ],
     dependencies: [
         swiftSyntax,
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
+        // "1.7.0" requires Swift 5.9 - https://github.com/theos/orion/issues/43
+        .package(url: "https://github.com/apple/swift-argument-parser", "1.0.0"..<"1.7.0"),
     ],
     targets: [
         .target(
