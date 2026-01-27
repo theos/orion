@@ -596,6 +596,7 @@
 					"@loader_path/Frameworks",
 					/Library/Frameworks,
 					/var/jb/Library/Frameworks,
+					"@loader_path/.jbroot/Library/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -649,6 +650,7 @@
 					"@loader_path/Frameworks",
 					/Library/Frameworks,
 					/var/jb/Library/Frameworks,
+					"@loader_path/.jbroot/Library/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
